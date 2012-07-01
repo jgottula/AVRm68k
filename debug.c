@@ -64,3 +64,8 @@ void blinkLEDForever(uint16_t halfPeriod)
 		_delay_ms(halfPeriod);
 	}
 }
+
+void dbgHeader(void)
+{
+	uartWritePSTR("[AVRm68k] ");
+}
