@@ -25,7 +25,7 @@ noreturn void main(void)
 	dbgHeader();
 	uartWritePSTR("Started.\n");
 	
-	i386Init();
+	m68kInit();
 	
 	while (true)
 	{
@@ -40,7 +40,7 @@ noreturn void main(void)
 			}
 		}
 		
-		i386Next();
+		m68kNext();
 	}
 	
 	blinkLEDForever(500);
