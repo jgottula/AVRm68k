@@ -1,0 +1,5 @@
+*.out
+*.hex
+*.bin
+*.lst
+*.dump

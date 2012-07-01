@@ -1,0 +1,20 @@
+DRAM reading:
+	Need to be able to pull OE high on the '595s to put them in high-Z
+Flow control:
+	Small rx buffer may be okay (signal when full)
+	Will probably need TX done and RX interrupts on
+	Modify uartRead and uartWrite so they honor RTS/CTS
+	Set the PC-side programs to use flow control
+	Use PuTTY in a VM for best results (forward FTDI USB port)
+RAM:
+	Find docs for 30-pin SIMM
+	Buy the PCM found on DigiKey or another DRAM/SRAM
+DRAM refresh:
+	Create new timer interrupt (or use existing one)
+SD:
+	Re-import and finish
+Program size:
+	Use decompressor stub + compressed code??
+Instructions:
+	Implement memory: e.g. inc r/m8 should work on memory bytes
+	Implement exceptions
