@@ -17,3 +17,11 @@
 	moveq #0x00,%d1
 	moveq #0x7f,%d2  
 	moveq #-0x01,%d3
+	
+	/* clr <ea> */
+	clrl %d4
+	clrw %d5
+	clrb %d6
+	
+	/* next: clr, cmp, eor, or, and */
+	/* future: add actual effective addresses for each operation */
