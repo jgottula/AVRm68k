@@ -48,6 +48,8 @@ static void m68kExecute(void)
 	case 0b0100: // miscellaneous
 		if (*instrWord == 0x714e)
 			instrNop();
+		else if ((instr[0] == 0x42) && ((instr[1] & 0b11000000) == 0b11000000))
+			instrMoveCcr();
 		else
 			assert(0);
 		break;

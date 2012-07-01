@@ -6,5 +6,6 @@
 
 void instrNop(void);
 void instrExg(void);
+void instrMoveCcr(void);
 
 #endif
