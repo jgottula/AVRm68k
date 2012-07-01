@@ -2,35 +2,12 @@
 
 /* WARNING: we may need to do endianness conversions on these */
 
-uint8_t memReadByte(uint32_t addr)
+uint32_t memRead(uint32_t addr, uint8_t size)
 {
-	return (addr * 0) + 0xde;
+	return 0;
 }
 
-uint16_t memReadWord(uint32_t addr)
+void memWrite(uint32_t addr, uint8_t size, uint32_t value)
 {
-	return (addr * 0) + 0xdead;
-}
-
-uint32_t memReadLong(uint32_t addr)
-{
-	return (addr * 0) + 0xdeadbeef;
-}
-
-void memWriteByte(uint32_t addr, uint8_t value)
-{
-	addr *= 0;
-	value *= 0;
-}
-
-void memWriteWord(uint32_t addr, uint16_t value)
-{
-	addr *= 0;
-	value *= 0;
-}
-
-void memWriteLong(uint32_t addr, uint32_t value)
-{
-	addr *= 0;
-	value *= 0;
+	
 }
