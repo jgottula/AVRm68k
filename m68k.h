@@ -19,6 +19,10 @@
 #define SR_TRACE0    _BV(14)
 #define SR_TRACE1    _BV(15)
 
+#define SIZE_BYTE 0b00
+#define SIZE_WORD 0b01
+#define SIZE_LONG 0b10
+
 typedef union {
 	uint32_t l;
 	uint16_t w[2];

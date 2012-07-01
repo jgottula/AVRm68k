@@ -7,7 +7,7 @@
 extern uint8_t *instr;
 extern uint16_t *instrWord;
 
-static void instrWriteReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
+static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
 	bool signExtend)
 {
 	Reg *dest;
@@ -26,13 +26,13 @@ static void instrWriteReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
 	
 	switch (size)
 	{
-	case 8:
+	case SIZE_BYTE:
 		dest->b[0] = (uint8_t)data;
 		break;
-	case 16:
+	case SIZE_WORD:
 		dest->w[0] = (uint16_t)data;
 		break;
-	case 32:
+	case SIZE_LONG:
 		dest->l = (uint32_t)data;
 		break;
 	default:
@@ -43,13 +43,13 @@ static void instrWriteReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
 	{
 		switch (size)
 		{
-		case 8:
+		case SIZE_BYTE:
 			if ((int8_t)data < 0)
 				dest->l |= 0xffffff00;
 			else
 				dest->l &= 0xffffff00;
 			break;
-		case 16:
+		case SIZE_WORD:
 			if ((int16_t)data < 0)
 				dest->l |= 0xffff0000;
 			else
@@ -59,14 +59,16 @@ static void instrWriteReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
 	}
 }
 
-static uint32_t instrComputeEA(uint8_t mode)
+static uint32_t computeEA(uint8_t mode, uint8_t reg)
 {
+	/* the first two modes should NEVER call this function */
+	
 	switch (mode)
 	{
 	case 0b000: // data reg direct
-		return -1;
+		assert(0);
 	case 0b001: // addr reg direct
-		return -1;
+		assert(0);
 	case 0b010: // addr reg indirect
 		assert(0);
 	case 0b011: // addr reg indirect (post-increment)
@@ -139,7 +141,7 @@ void instrMoveFromCcr(void)
 	dbgHeader();
 	uartWritePSTR("move ccr,<ea>\n");
 	
-	cpu.ureg.pc.l += 2;
+	cpu.ureg.pc.l += 2; // NOTE: may be larger for EA extensions
 	
 	/* get just the user portion of the SR */
 	uint16_t ccr = cpu.ureg.sr.l & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
@@ -149,11 +151,11 @@ void instrMoveFromCcr(void)
 	uint8_t reg = instr[1] & 0b111;
 	
 	if (mode <= 0b001) // reg direct
-		instrWriteReg(mode, reg, ccr, 16, false);
+		writeReg(mode, reg, ccr, SIZE_WORD, false);
 	else // eff addr
 	{
-		uint32_t dest = instrComputeEA(mode);
-		memWriteWord(dest, ccr);
+		uint32_t dest = computeEA(mode, reg);
+		memWrite(dest, SIZE_WORD, ccr);
 	}
 	
 	/* does not affect CCR */
@@ -176,9 +178,34 @@ void instrMoveq(void)
 	if (data < 0)
 		cpu.ureg.d[reg].l |= 0xffffff00;
 	
+	/* update condition codes */
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if (data == 0)
 		cpu.ureg.sr.l |= SR_ZERO;
 	else if (data < 0)
 		cpu.ureg.sr.l |= SR_NEGATIVE;
+}
+
+void instrClr(void)
+{
+	/* debug */
+	dbgHeader();
+	uartWritePSTR("clr\n");
+	
+	cpu.ureg.pc.l += 2; // NOTE: may be larger for EA extensions
+	
+	uint8_t size = instr[1] >> 6;
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	if (mode <= 0b001) // reg direct
+		writeReg(mode, reg, 0, size, false);
+	else
+	{
+		uint32_t dest = computeEA(mode, reg);
+		memWrite(dest, size, 0);
+	}
+	
+	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
+	cpu.ureg.sr.l |= SR_ZERO;
 }

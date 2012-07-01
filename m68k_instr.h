@@ -8,5 +8,6 @@ void instrNop(void);
 void instrExg(void);
 void instrMoveFromCcr(void);
 void instrMoveq(void);
+void instrClr(void);
 
 #endif
