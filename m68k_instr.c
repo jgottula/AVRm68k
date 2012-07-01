@@ -52,17 +52,17 @@ static void instrWriteEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size)
 		instrWriteRegByte(&cpu.ureg.a[reg], data, size);
 		break;
 	case 0b010: // addr reg indirect
-		break;
+		assert(0);
 	case 0b011: // addr reg indirect (post-increment)
-		break;
+		assert(0);
 	case 0b100: // addr reg indirect (pre-increment)
-		break;
+		assert(0);
 	case 0b101: // addr reg indirect (displacement)
-		break;
+		assert(0);
 	case 0b110: // multiple addr reg indirect
-		break;
+		assert(0);
 	case 0b111: // multiple pc relative
-		break;
+		assert(0);
 	default:
 		assert(0);
 	}
