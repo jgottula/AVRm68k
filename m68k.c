@@ -4,7 +4,7 @@
 #include "m68k_instr.h"
 #include "uart.h"
 
-uint8_t fetchBuffer[0x10];
+uint8_t fetchBuffer[22]; // must have even size
 const uint8_t *instr;
 const uint16_t *instrWord;
 
@@ -16,10 +16,11 @@ static void m68kFetch(void)
 	/* debug */
 	dbgHeader();
 	uartWritePSTR("Fetch:");
-	for (uint8_t i = 0; i < sizeof(fetchBuffer); ++i)
+	for (uint8_t i = 0; i < sizeof(fetchBuffer) / 2; ++i)
 	{
 		uartWriteChr(' ');
-		uartWriteHex8(fetchBuffer[i], false);
+		uartWriteHex8(fetchBuffer[i * 2], false);
+		uartWriteHex8(fetchBuffer[(i * 2) + 1], false);
 	}
 	uartWriteChr('\n');
 }
