@@ -72,7 +72,10 @@ static void m68kExecute(void)
 		assert(0);
 		break;
 	case 0b1100: // AND, MUL, ABCD, EXG
-		assert(0);
+		if (instr[0] & 0b00000001)
+			instrExg();
+		else
+			assert(0);
 		break;
 	case 0b1101: // ADD, ADDX
 		assert(0);

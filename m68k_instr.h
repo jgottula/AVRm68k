@@ -5,5 +5,6 @@
 #include <stdint.h>
 
 void instrNop(void);
+void instrExg(void);
 
 #endif
