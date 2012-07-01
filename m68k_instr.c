@@ -66,7 +66,6 @@ static uint32_t computeEA(uint8_t mode, uint8_t reg)
 	switch (mode)
 	{
 	case 0b000: // data reg direct
-		assert(0);
 	case 0b001: // addr reg direct
 		assert(0);
 	case 0b010: // addr reg indirect
