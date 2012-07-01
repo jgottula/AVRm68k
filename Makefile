@@ -5,6 +5,7 @@ CFLAGS:=-mmcu=atmega168 -std=c11 -Wall -Wextra -Wno-unused-function -Os -flto \
 M68K_ASFLAGS:=-mcpu=68030 -mno-68851 -mno-68881 -mno-68882 -mno-float
 M68K_CFLAGS:=-S -Wa,-mcpu=68030,-mno-68851,-mno-68881,-mno-68882,-mno-float
 OBJCOPYFLAGS:=-R .eeprom
+M68K_OBJCOPYFLAGS:=-R .flash
 AVRDUDEFLAGS:=-c usbasp -p m168
 SOURCES:=$(wildcard *.c)
 HEADERS:=$(wildcard *.h)
@@ -18,6 +19,8 @@ BIN:=$(PROJNAME).bin
 LST:=$(PROJNAME).lst
 DUMP:=$(PROJNAME).dump
 TEST1_OUT:=programs/test1.out
+TEST1_HEX:=programs/test1.hex
+TEST1_BIN:=programs/test1.bin
 TEST1_DUMP:=programs/test1.dump
 TEST2_ASM:=programs/test2.s
 
@@ -26,14 +29,14 @@ TEST2_ASM:=programs/test2.s
 all: avr test1 test2
 
 avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
-test1: $(TEST1_OUT) $(TEST1_DUMP)
+test1: $(TEST1_OUT) $(TEST1_HEX) $(TEST1_BIN) $(TEST1_DUMP)
 test2: $(TEST2_ASM)
 
 
 clean:
 	-rm -rf *.out *.hex *.bin *.lst *.dump
 program: $(HEX) $(TEST_HEX)
-	sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX) -U eeprom:w:$(TEST_HEX)
+	sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX) -U eeprom:w:$(TEST1_HEX)
 
 
 $(OUT): $(SOURCES) $(HEADERS) Makefile
@@ -54,6 +57,12 @@ $(LST): $(OUT)
 
 $(TEST1_OUT): $(TEST1_SOURCES) Makefile
 	m68k-elf-as $(M68K_ASFLAGS) -o $(TEST1_OUT) $(TEST1_SOURCES)
+
+$(TEST1_HEX): $(TEST1_OUT)
+	m68k-elf-objcopy -O ihex $(M68K_OBJCOPYFLAGS) $(TEST1_OUT) $@
+
+$(TEST1_BIN): $(TEST1_OUT)
+	m68k-elf-objcopy -O binary $(M68K_OBJCOPYFLAGS) $(TEST1_OUT) $@
 
 $(TEST1_DUMP): $(TEST1_OUT)
 	m68k-elf-objdump -s -d -M att $(TEST1_OUT) >$@
