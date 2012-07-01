@@ -117,7 +117,7 @@ void instrExg(void)
 	/* does not affect CCR */
 }
 
-void instrMoveCcr(void)
+void instrMoveFromCcr(void)
 {
 	/* debug */
 	dbgHeader();
@@ -135,4 +135,28 @@ void instrMoveCcr(void)
 	instrWriteEA(mode, reg, ccr, 16);
 	
 	/* does not affect CCR */
+}
+
+void instrMoveq(void)
+{
+	/* debug */
+	dbgHeader();
+	uartWritePSTR("moveq\n");
+	
+	cpu.ureg.pc.l += 2;
+	
+	uint8_t reg = (instr[0] & 0b1110) >> 1;
+	int8_t data = instr[1];
+	
+	cpu.ureg.d[reg].l = instr[1];
+	
+	/* sign-extend to long */
+	if (data < 0)
+		cpu.ureg.d[reg].l |= 0xffffff00;
+	
+	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	if (data == 0)
+		cpu.ureg.sr.l |= SR_ZERO;
+	else if (data < 0)
+		cpu.ureg.sr.l |= SR_NEGATIVE;
 }

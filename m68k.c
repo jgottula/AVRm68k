@@ -49,7 +49,7 @@ static void m68kExecute(void)
 		if (*instrWord == 0x714e)
 			instrNop();
 		else if ((instr[0] == 0x42) && ((instr[1] & 0b11000000) == 0b11000000))
-			instrMoveCcr();
+			instrMoveFromCcr();
 		else
 			assert(0);
 		break;
@@ -60,7 +60,10 @@ static void m68kExecute(void)
 		assert(0);
 		break;
 	case 0b0111: // MOVEQ
-		assert(0);
+		if ((instr[0] & 0b1) == 0)
+			instrMoveq();
+		else
+			assert(0);
 		break;
 	case 0b1000: // OR, DIV, SBCD
 		assert(0);
