@@ -1,5 +1,7 @@
 #include "m68k_mem.h"
 
+/* WARNING: we may need to do endianness conversions on these */
+
 uint8_t memReadByte(uint32_t addr)
 {
 	return (addr * 0) + 0xde;

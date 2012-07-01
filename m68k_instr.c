@@ -7,50 +7,66 @@
 extern uint8_t *instr;
 extern uint16_t *instrWord;
 
-#if 0
-static void instrWriteOperand(uint32_t *dest, uint32_t data, uint8_t size)
+static void instrWriteReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
+	bool signExtend)
 {
-	/* this works because AVR is little endian */
-	uint16_t *destWord = (uint16_t *)dest;
-	uint8_t *destByte = (uint8_t *)dest;
+	Reg *dest;
 	
-	switch (size)
+	switch (mode)
 	{
-	case 8: // byte
-		memWriteByte(*destByte, 
-		*destByte = (uint8_t)data;
-	}
-}
-#endif
-
-static void instrWriteRegByte(Reg *reg, uint32_t data, uint8_t size)
-{
-	switch (size)
-	{
-	case 8:
-		reg->b[0] = (uint8_t)data;
+	case 0b000:
+		dest = &cpu.ureg.d[reg];
 		break;
-	case 16:
-		reg->w[0] = (uint16_t)data;
-		break;
-	case 32:
-		reg->w[0] = (uint16_t)data;
+	case 0b001:
+		dest = &cpu.ureg.a[reg];
 		break;
 	default:
 		assert(0);
 	}
+	
+	switch (size)
+	{
+	case 8:
+		dest->b[0] = (uint8_t)data;
+		break;
+	case 16:
+		dest->w[0] = (uint16_t)data;
+		break;
+	case 32:
+		dest->l = (uint32_t)data;
+		break;
+	default:
+		assert(0);
+	}
+	
+	if (signExtend)
+	{
+		switch (size)
+		{
+		case 8:
+			if ((int8_t)data < 0)
+				dest->l |= 0xffffff00;
+			else
+				dest->l &= 0xffffff00;
+			break;
+		case 16:
+			if ((int16_t)data < 0)
+				dest->l |= 0xffff0000;
+			else
+				dest->l &= 0xffff0000;
+			break;
+		}
+	}
 }
 
-static void instrWriteEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size)
+static uint32_t instrComputeEA(uint8_t mode)
 {
 	switch (mode)
 	{
 	case 0b000: // data reg direct
-		instrWriteRegByte(&cpu.ureg.d[reg], data, size);
-		break;
+		return -1;
 	case 0b001: // addr reg direct
-		instrWriteRegByte(&cpu.ureg.a[reg], data, size);
-		break;
+		return -1;
 	case 0b010: // addr reg indirect
 		assert(0);
 	case 0b011: // addr reg indirect (post-increment)
@@ -125,14 +141,20 @@ void instrMoveFromCcr(void)
 	
 	cpu.ureg.pc.l += 2;
 	
-	uint8_t mode = (instr[1] >> 3) & 0b111;
-	uint8_t reg = instr[1] & 0b111;
-	
 	/* get just the user portion of the SR */
 	uint16_t ccr = cpu.ureg.sr.l & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
 		SR_NEGATIVE | SR_EXTEND);
 	
-	instrWriteEA(mode, reg, ccr, 16);
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	
+	if (mode <= 0b001) // reg direct
+		instrWriteReg(mode, reg, ccr, 16, false);
+	else // eff addr
+	{
+		uint32_t dest = instrComputeEA(mode);
+		memWriteWord(dest, ccr);
+	}
 	
 	/* does not affect CCR */
 }
