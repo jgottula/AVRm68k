@@ -11,3 +11,9 @@
 	/* move ccr,<ea> */
 	move %ccr,%d0
 	move %ccr,%d1
+	
+	/* moveq #imm,<dn> */
+	moveq #0x44,%d0
+	moveq #0x00,%d1
+	moveq #0x7f,%d2  
+	moveq #-0x01,%d3
