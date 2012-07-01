@@ -122,42 +122,42 @@ static void m68kDumpReg(void)
 	uartWritePSTR(" d4: 0x");
 	uartWriteHex32(cpu.ureg.d[4].l, false);
 	uartWritePSTR(" a0: 0x");
-	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWriteHex32(cpu.ureg.a[0].l, false);
 	uartWritePSTR(" a4: 0x");
 	uartWriteHex32(cpu.ureg.a[4].l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
 	uartWritePSTR("d1: 0x");
-	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWriteHex32(cpu.ureg.d[1].l, false);
 	uartWritePSTR(" d5: 0x");
-	uartWriteHex32(cpu.ureg.d[4].l, false);
+	uartWriteHex32(cpu.ureg.d[5].l, false);
 	uartWritePSTR(" a1: 0x");
-	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWriteHex32(cpu.ureg.a[1].l, false);
 	uartWritePSTR(" a5: 0x");
-	uartWriteHex32(cpu.ureg.a[4].l, false);
+	uartWriteHex32(cpu.ureg.a[5].l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
 	uartWritePSTR("d2: 0x");
-	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWriteHex32(cpu.ureg.d[2].l, false);
 	uartWritePSTR(" d6: 0x");
-	uartWriteHex32(cpu.ureg.d[4].l, false);
+	uartWriteHex32(cpu.ureg.d[6].l, false);
 	uartWritePSTR(" a2: 0x");
-	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWriteHex32(cpu.ureg.a[2].l, false);
 	uartWritePSTR(" a6: 0x");
-	uartWriteHex32(cpu.ureg.a[4].l, false);
+	uartWriteHex32(cpu.ureg.a[6].l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
 	uartWritePSTR("d3: 0x");
-	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWriteHex32(cpu.ureg.d[3].l, false);
 	uartWritePSTR(" d7: 0x");
-	uartWriteHex32(cpu.ureg.d[4].l, false);
+	uartWriteHex32(cpu.ureg.d[7].l, false);
 	uartWritePSTR(" a3: 0x");
-	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWriteHex32(cpu.ureg.a[3].l, false);
 	uartWritePSTR(" a7: 0x");
-	uartWriteHex32(cpu.ureg.a[4].l, false);
+	uartWriteHex32(cpu.ureg.a[7].l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
