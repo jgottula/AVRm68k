@@ -18,9 +18,7 @@ typedef volatile uint16_t *reg16_t;
 #define SPI_PIN   PINB
 
 enum PortB {
-	/* PB0 is reserved for CLKO */
-	
-	/* PB1 is free */
+	/* PB0, PB1 are free */
 	
 	/* slaves should NOT use PB2 for slave select (makes SPI to switch modes) */
 	SPI_SS_DEF = _BV(PB2),
