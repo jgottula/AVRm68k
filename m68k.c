@@ -94,8 +94,6 @@ static void m68kDumpReg(void)
 {
 	dbgHeader();
 	uartWritePSTR("----------\n");
-	dbgHeader();
-	uartWritePSTR("CPU STATE:\n");
 	
 	dbgHeader();
 	uartWritePSTR("pc: 0x");
