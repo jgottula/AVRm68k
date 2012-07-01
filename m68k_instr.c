@@ -13,7 +13,7 @@ void instrNop(void)
 	dbgHeader();
 	uartWritePSTR("nop\n");
 	
-	cpu.ureg.pc.l += 1;
+	cpu.ureg.pc.l += 2;
 	
 	/* does not affect CCR */
 }
