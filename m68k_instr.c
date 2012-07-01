@@ -8,6 +8,10 @@ extern uint8_t *instr;
 
 void instrNop(void)
 {
+	/* debug */
+	dbgHeader();
+	uartWritePSTR("nop\n");
+	
 	cpu.ureg.pc.l += 1;
 	
 	/* no flags */

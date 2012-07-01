@@ -45,7 +45,7 @@ static void m68kExecute(void)
 		assert(0);
 		break;
 	case 0b0100: // miscellaneous
-		if (*instrWord == 0x4e71)
+		if (*instrWord == 0x714e)
 			instrNop();
 		else
 			assert(0);
