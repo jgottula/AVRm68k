@@ -5,64 +5,60 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if 0
+#define SR_CARRY    _BV(0)
+#define SR_OVERFLOW _BV(1)
+#define SR_ZERO     _BV(2)
+#define SR_NEGATIVE _BV(3)
+#define SR_EXTEND   _BV(4)
+
+#define SR_INTPRIO0  _BV(7)
+#define SR_INTPRIO1  _BV(9)
+#define SR_INTPRIO2  _BV(8)
+#define SR_INTSTATE  _BV(12)
+#define SR_USERSTATE _BV(13)
+#define SR_TRACE0    _BV(14)
+#define SR_TRACE1    _BV(15)
 
 typedef union {
-	uint32_t dword;
-	uint16_t word[2];
-	uint8_t byte[4];
+	uint32_t l;
+	uint16_t w[2];
+	uint8_t b[4];
 } Reg;
 
-typedef union {
-	uint16_t word;
-	uint8_t byte[2];
-} Reg16;
-
-#define FLAG_CF _BV(0)
-#define FLAG_PF _BV(2)
-#define FLAG_AF _BV(4)
-#define FLAG_ZF _BV(6)
-#define FLAG_SF _BV(7)
-#define FLAG_OF _BV(11)
-
-#define SFLAG_TF _BV(8)
-#define SFLAG_IF _BV(9)
-#define SFLAG_NT _BV(14)
-#define SFLAG_RT _BV(16)
-#define SFLAG_VM _BV(17)
-
-#define PFX_OPSIZE   _BV(0)
-#define PFX_ADDRSIZE _BV(1)
-
 struct {
+	/* user registers */
 	struct {
-		/* status/instruction */
-		Reg eip, eflags;
+		/* control */
+		Reg pc, sr;
 		
-		/* general purpose */
-		Reg eax, ebx, ecx, edx;
-		Reg ebp, esp, esi, edi;
+		/* data */
+		Reg d[8];
 		
-		/* segment */
-		Reg16 cs, ss, ds, es, fs, gs;
-	} reg;
+		/* address */
+		Reg a[8];
+		
+		/* fp registers not implemented */
+	} ureg;
 	
+	/* supervisor registers */
 	struct {
-		Reg gdtr, ldtr, idtr, tr;
-	} mmuReg;
+		/* cache */
+		Reg caar, cacr;
+		
+		/* dest function code */
+		Reg dfc;
+		
+		/* supervisor */
+		Reg msp, sfc, sr, ssp, isp, tt1, tt0, vbr;
+	} sreg;
 	
+	/* mmu registers */
 	struct {
-		Reg cr0, cr1, cr2, cr3;
-	} ctrlReg;
-	
-	/* debug registers not implemented */
-	
-	/* test registers not implemented */
+		Reg crp, pmmusr, mmusr, srp, tc;
+	} meg;
 } cpu;
 
-void i386Next(void);
-void i386Init(void);
-
-#endif
+void m68kNext(void);
+void m68kInit(void);
 
 #endif

@@ -4,15 +4,13 @@
 #include "m68k_instr.h"
 #include "uart.h"
 
-#if 0
-
 uint8_t fetchBuffer[0x10];
-uint8_t *instr;
-uint8_t prefix;
+const uint8_t *instr;
+const uint16_t *instrWord;
 
-static void i386Fetch(void)
+static void m68kFetch(void)
 {
-	eeprom_read_block(fetchBuffer, (const void *)(intptr_t)cpu.reg.eip.dword,
+	eeprom_read_block(fetchBuffer, (const void *)(intptr_t)cpu.ureg.pc.l,
 		sizeof(fetchBuffer));
 	
 	/* debug */
@@ -26,77 +24,69 @@ static void i386Fetch(void)
 	uartWriteChr('\n');
 }
 
-static void i386Execute(void)
+static void m68kExecute(void)
 {
-	uint32_t eipBefore = cpu.reg.eip.dword;
-	
 	instr = fetchBuffer;
+	instrWord = (const uint16_t *)instr;
 	
-	/* detect prefixes and advance the instr pointer as needed */
-	prefix = 0;
-	if (instr[0] == 0x66)
+	/* separate operations by front nibble */
+	switch (instr[0] >> 4)
 	{
-		prefix |= PFX_OPSIZE;
-		++instr;
-		
-		dbgHeader();
-		uartWritePSTR("PFX_OPSIZE\n");
-	}
-	if (instr[0] == 0x67)
-	{
-		prefix |= PFX_ADDRSIZE;
-		++instr;
-		
-		dbgHeader();
-		uartWritePSTR("PFX_ADDRSIZE\n");
-	}
-	
-	/* in the future, a jump table may be faster (but larger) */
-	if ((instr[0] >= 0x88 && instr[0] <= 0x8d) ||
-		(instr[0] >= 0xa0 && instr[0] <= 0xa3) ||
-		(instr[0] >= 0xb0 && instr[0] <= 0xbf) ||
-		(instr[0] >= 0xc6 && instr[0] <= 0x67))
-		instrMOV();
-	else if ((instr[0] >= 0x30 && instr[0] <= 0x35) ||
-		(instr[0] >= 0x80 && instr[0] <= 0x83))
-		instrXOR();
-	else if (instr[0] == 0x86 || instr[0] == 0x87 ||
-		(instr[0] >= 0x91 && instr[0] <= 0x97))
-		instrXCHG();
-	else if (instr[0] == 0x06 || instr[0] == 0x0e ||
-		instr[0] == 0x16 || instr[0] == 0x1e ||
-		(instr[0] >= 0x50 && instr[0] <= 0x57) ||
-		instr[0] == 0x68 || instr[0] == 0x6a ||
-		instr[0] == 0xff)
-		instrPUSH();
-	else if (instr[0] == 0x07 || instr[0] == 0x17 ||
-		instr[0] == 0x1f || instr[0] == 0x8f ||
-		(instr[0] >= 0x58 && instr[0] <= 0x5f))
-		instrPOP();
-	else if (instr[0] == 0x90)
-		instrNOP();
-	else if (instr[0] >= 0x40 && instr[0] <= 0x47)
-		instrIncReg();
-	else if (instr[0] >= 0x48 && instr[0] <= 0x4f)
-		instrDecReg();
-	else if (instr[0] == 0x0f) // two-byte opcode
-	{
-		if (instr[1] == 0xa0 || instr[1] == 0xa8)
-			instrPUSH();
-		else if (instr[1] == 0xa1 || instr[1] == 0xa9)
-			instrPOP();
+	case 0b0000: // bit manipulation, MOVEP, immediate
+		assert(0);
+		break;
+	case 0b0001: // move byte
+		assert(0);
+		break;
+	case 0b0010: // move long
+		assert(0);
+		break;
+	case 0b0011: // move word
+		assert(0);
+		break;
+	case 0b0100: // miscellaneous
+		if (*instrWord == 0x4e71)
+			instrNop();
 		else
 			assert(0);
-	}
-	else
+		break;
+	case 0b0101: // ADDQ, SUBQ, Scc, DBcc, TRAPcc
 		assert(0);
-	
-	/* ensure that the instruction pointer was advanced */
-	/* NOTE: this will give false positives on tight loops */
-	assert(cpu.reg.eip.dword != eipBefore);
+		break;
+	case 0b0110: // Bcc, BSR, BRA
+		assert(0);
+		break;
+	case 0b0111: // MOVEQ
+		assert(0);
+		break;
+	case 0b1000: // OR, DIV, SBCD
+		assert(0);
+		break;
+	case 0b1001: // SUB, SUBX
+		assert(0);
+		break;
+	case 0b1010: // reserved
+		assert(0);
+		break;
+	case 0b1011: // CMP, EOR
+		assert(0);
+		break;
+	case 0b1100: // AND, MUL, ABCD, EXG
+		assert(0);
+		break;
+	case 0b1101: // ADD, ADDX
+		assert(0);
+		break;
+	case 0b1110: // shift, rotate, bitfield
+		assert(0);
+		break;
+	case 0b1111: // coprocessor interface, CPU32 extensions
+		assert(0);
+		break;
+	}
 }
 
-static void i386DumpReg(void)
+static void m68kDumpReg(void)
 {
 	dbgHeader();
 	uartWritePSTR("----------\n");
@@ -104,105 +94,91 @@ static void i386DumpReg(void)
 	uartWritePSTR("CPU STATE:\n");
 	
 	dbgHeader();
-	uartWritePSTR("eip: 0x");
-	uartWriteHex32(cpu.reg.eip.dword, false);
-	uartWritePSTR(" eflags: 0x");
-	uartWriteHex32(cpu.reg.eflags.dword, false);
+	uartWritePSTR("pc: 0x");
+	uartWriteHex32(cpu.ureg.pc.l, false);
+	uartWritePSTR(" sr: 0x");
+	uartWriteHex32(cpu.ureg.sr.l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
 	uartWriteChr('[');
-	uartWriteChr((cpu.reg.eflags.dword & FLAG_CF) ? 'x' : ' ');
+	uartWriteChr((cpu.ureg.sr.l & SR_CARRY) ? 'x' : ' ');
 	uartWritePSTR("] carry  [");
-	uartWriteChr((cpu.reg.eflags.dword & FLAG_PF) ? 'x' : ' ');
-	uartWritePSTR("] parity  [");
-	uartWriteChr((cpu.reg.eflags.dword & FLAG_ZF) ? 'x' : ' ');
+	uartWriteChr((cpu.ureg.sr.l & SR_OVERFLOW) ? 'x' : ' ');
+	uartWritePSTR("] overflow  [");
+	uartWriteChr((cpu.ureg.sr.l & SR_ZERO) ? 'x' : ' ');
 	uartWritePSTR("] zero  [");
-	uartWriteChr((cpu.reg.eflags.dword & FLAG_SF) ? 'x' : ' ');
-	uartWritePSTR("] sign  [");
-	uartWriteChr((cpu.reg.eflags.dword & FLAG_OF) ? 'x' : ' ');
-	uartWritePSTR("] overflow\n");
+	uartWriteChr((cpu.ureg.sr.l & SR_NEGATIVE) ? 'x' : ' ');
+	uartWritePSTR("] negative  [");
+	uartWriteChr((cpu.ureg.sr.l & SR_EXTEND) ? 'x' : ' ');
+	uartWritePSTR("] extend\n");
 	
 	dbgHeader();
-	uartWritePSTR("eax: 0x");
-	uartWriteHex32(cpu.reg.eax.dword, false);
-	uartWritePSTR(" ebx: 0x");
-	uartWriteHex32(cpu.reg.ebx.dword, false);
-	uartWritePSTR(" ecx: 0x");
-	uartWriteHex32(cpu.reg.ecx.dword, false);
-	uartWritePSTR(" edx: 0x");
-	uartWriteHex32(cpu.reg.edx.dword, false);
+	uartWritePSTR("d0: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" d4: 0x");
+	uartWriteHex32(cpu.ureg.d[4].l, false);
+	uartWritePSTR(" a0: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" a4: 0x");
+	uartWriteHex32(cpu.ureg.a[4].l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
-	uartWritePSTR("ebp: 0x");
-	uartWriteHex32(cpu.reg.ebp.dword, false);
-	uartWritePSTR(" esp: 0x");
-	uartWriteHex32(cpu.reg.esp.dword, false);
-	uartWritePSTR(" esi: 0x");
-	uartWriteHex32(cpu.reg.esi.dword, false);
-	uartWritePSTR(" edi: 0x");
-	uartWriteHex32(cpu.reg.edi.dword, false);
+	uartWritePSTR("d1: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" d5: 0x");
+	uartWriteHex32(cpu.ureg.d[4].l, false);
+	uartWritePSTR(" a1: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" a5: 0x");
+	uartWriteHex32(cpu.ureg.a[4].l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
-	uartWritePSTR("cs: 0x");
-	uartWriteHex16(cpu.reg.cs.word, false);
-	uartWritePSTR(" ss: 0x");
-	uartWriteHex16(cpu.reg.ss.word, false);
-	uartWritePSTR(" ds: 0x");
-	uartWriteHex16(cpu.reg.ds.word, false);
-	uartWritePSTR(" es: 0x");
-	uartWriteHex16(cpu.reg.es.word, false);
-	uartWritePSTR(" fs: 0x");
-	uartWriteHex16(cpu.reg.fs.word, false);
-	uartWritePSTR(" gs: 0x");
-	uartWriteHex16(cpu.reg.gs.word, false);
+	uartWritePSTR("d2: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" d6: 0x");
+	uartWriteHex32(cpu.ureg.d[4].l, false);
+	uartWritePSTR(" a2: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" a6: 0x");
+	uartWriteHex32(cpu.ureg.a[4].l, false);
+	uartWriteChr('\n');
+	
+	dbgHeader();
+	uartWritePSTR("d3: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" d7: 0x");
+	uartWriteHex32(cpu.ureg.d[4].l, false);
+	uartWritePSTR(" a3: 0x");
+	uartWriteHex32(cpu.ureg.d[0].l, false);
+	uartWritePSTR(" a7: 0x");
+	uartWriteHex32(cpu.ureg.a[4].l, false);
 	uartWriteChr('\n');
 	
 	dbgHeader();
 	uartWritePSTR("----------\n");
 }
 
-void i386Next(void)
+void m68kNext(void)
 {
 	/* debug */
-	i386DumpReg();
+	m68kDumpReg();
 	
 	/* fetch from EEPROM */
-	i386Fetch();
+	m68kFetch();
 	
 	/* execute */
-	i386Execute();
+	m68kExecute();
 }
 
-void i386Init(void)
+void m68kInit(void)
 {
-	cpu.reg.eax.dword = 0x00000000; // passed POST
-	
-	cpu.reg.edx.byte[1] = 3; // device ID
-	cpu.reg.edx.byte[0] = 8; // stepping ID (Ex/Fx, the most recent)
-	
-	cpu.ctrlReg.cr0.dword = 0x00000000;
-	
-	cpu.reg.eflags.dword = 0x00000002;
-	cpu.reg.eip.dword = 0xfffffff0;
-	cpu.reg.esp.dword = 0x00000000; // this needs to be in RAM
-	
-	/* TODO: first far jump/call will zero out the MSword of eip */
-	
-	cpu.reg.cs.word = 0x0000;
-	cpu.reg.ds.word = 0x0000;
-	cpu.reg.es.word = 0x0000;
-	cpu.reg.ss.word = 0x0000;
-	cpu.reg.fs.word = 0x0000;
-	cpu.reg.gs.word = 0x0000;
-	
-	/* TODO: set mmu registers to their initial values; see p174 of manual */
+	/* TODO: figure out which registers to initialize */
+	cpu.ureg.pc.l = 0x00000000;
 	
 	/* debug */
 	dbgHeader();
 	uartWritePSTR("CPU initialized.\n");
 }
-
-#endif
