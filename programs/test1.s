@@ -22,6 +22,11 @@
 	clrl %d4
 	clrw %d5
 	clrb %d6
+	clrl (%a7)
+	clrw (%a6)
+	clrb (%a5)
+	
+	/*  */
 	
 	/* next: clr, cmp, eor, or, and */
 	/* future: add actual effective addresses for each operation */
