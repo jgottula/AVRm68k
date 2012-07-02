@@ -18,16 +18,17 @@ typedef volatile uint16_t *reg16_t;
 #define SPI_PIN   PINB
 
 enum PortB {
-	/* PB0, PB1 are free */
+	SPI_SS_SD     = _BV(PB0),
+	SPI_SS_MCSRAM = _BV(PB1),
 	
 	/* slaves should NOT use PB2 for slave select (makes SPI to switch modes) */
-	SPI_SS_DEF = _BV(PB2),
-	SPI_SS_ALL = 0,
+	SPI_SS_DEF    = _BV(PB2),
+	SPI_SS_ALL    = SPI_SS_SD | SPI_SS_MCSRAM,
 	
-	SPI_MOSI   = _BV(PB3),
-	SPI_MISO   = _BV(PB4),
-	SPI_SCK    = _BV(PB5),
-	SPI_ALL    = SPI_MOSI | SPI_MISO | SPI_SCK
+	SPI_MOSI      = _BV(PB3),
+	SPI_MISO      = _BV(PB4),
+	SPI_SCK       = _BV(PB5),
+	SPI_ALL       = SPI_MOSI | SPI_MISO | SPI_SCK
 };
 
 #define DRAM_DDR  DDRC
