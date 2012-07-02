@@ -39,6 +39,34 @@ static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 	}
 }
 
+static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
+{
+	uint8_t actualSize;
+	
+	switch (size)
+	{
+	case SIZE_BYTE:
+		if (reg == 7) // special case for stack pointer
+			actualSize = 2;
+		else
+			actualSize = 1;
+		break;
+	case SIZE_WORD:
+		actualSize = 2;
+		break;
+	case SIZE_LONG:
+		actualSize = 4;
+		break;
+	default:
+		assert(0);
+	}
+	
+	if (incr)
+		cpu.ureg.a[reg].l += actualSize;
+	else
+		cpu.ureg.a[reg].l -= actualSize;
+}
+
 static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 	bool signExtend)
 {
@@ -76,9 +104,13 @@ static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 		memWrite(cpu.ureg.a[reg].l, size, data);
 		break;
 	case 0b011: // addr reg indirect (post-increment)
-		assert(0);
-	case 0b100: // addr reg indirect (pre-increment)
-		assert(0);
+		memWrite(cpu.ureg.a[reg].l, size, data);
+		prePostIncrDecr(true, reg, size);
+		break;
+	case 0b100: // addr reg indirect (pre-decrement)
+		prePostIncrDecr(false, reg, size);
+		memWrite(cpu.ureg.a[reg].l, size, data);
+		break;
 	case 0b101: // addr reg indirect (displacement)
 		assert(0);
 	case 0b110: // multiple addr reg indirect
