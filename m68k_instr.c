@@ -7,8 +7,7 @@
 extern uint8_t *instr;
 extern uint16_t *instrWord;
 
-static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
-	bool signExtend)
+static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 {
 	Reg *dest;
 	
@@ -38,38 +37,44 @@ static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size,
 	default:
 		assert(0);
 	}
-	
+}
+
+static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
+	bool signExtend)
+{
 	if (signExtend)
 	{
 		switch (size)
 		{
 		case SIZE_BYTE:
 			if ((int8_t)data < 0)
-				dest->l |= 0xffffff00;
+				data |= 0xffffff00;
 			else
-				dest->l &= 0xffffff00;
+				data &= 0xffffff00;
 			break;
 		case SIZE_WORD:
 			if ((int16_t)data < 0)
-				dest->l |= 0xffff0000;
+				data |= 0xffff0000;
 			else
-				dest->l &= 0xffff0000;
+				data &= 0xffff0000;
 			break;
+		default:
+			assert(0);
 		}
+		
+		/* write the entire long value now */
+		size = SIZE_LONG;
 	}
-}
-
-static uint32_t computeEA(uint8_t mode, uint8_t reg)
-{
-	/* the first two modes should NEVER call this function */
 	
 	switch (mode)
 	{
 	case 0b000: // data reg direct
 	case 0b001: // addr reg direct
-		assert(0);
+		writeReg(mode, reg, data, size);
+		break;
 	case 0b010: // addr reg indirect
-		assert(0);
+		memWrite(cpu.ureg.a[reg].l, size, data);
+		break;
 	case 0b011: // addr reg indirect (post-increment)
 		assert(0);
 	case 0b100: // addr reg indirect (pre-increment)
@@ -149,13 +154,7 @@ void instrMoveFromCcr(void)
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
-	if (mode <= 0b001) // reg direct
-		writeReg(mode, reg, ccr, SIZE_WORD, false);
-	else // eff addr
-	{
-		uint32_t dest = computeEA(mode, reg);
-		memWrite(dest, SIZE_WORD, ccr);
-	}
+	writeEA(mode, reg, ccr, SIZE_WORD, false);
 	
 	/* does not affect CCR */
 }
@@ -197,13 +196,7 @@ void instrClr(void)
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	
-	if (mode <= 0b001) // reg direct
-		writeReg(mode, reg, 0, size, false);
-	else
-	{
-		uint32_t dest = computeEA(mode, reg);
-		memWrite(dest, size, 0);
-	}
+	writeEA(mode, reg, 0, size, false);
 	
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
 	cpu.ureg.sr.l |= SR_ZERO;
