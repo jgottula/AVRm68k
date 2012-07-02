@@ -34,14 +34,14 @@ enum {
 	SPIDIV_32    = 0b110  //  626 kHz
 } SPIDivider;
 
-#if 0
-
 /* SPI parameters for each slave */
-#define SPIMODE_SRAM   SPIMODE_
-#define SPIENDIAN_SRAM SPIENDIAN_
-#define SPIDIV_SRAM    SPIDIV_
+#define SPIMODE_MCSRAM   SPIMODE_0
+#define SPIENDIAN_MCSRAM SPIENDIAN_BIG
+#define SPIDIV_MCSRAM    SPIDIV_2
 
-#endif
+#define SPIMODE_SD   SPIMODE_0
+#define SPIENDIAN_SD SPIENDIAN_BIG
+#define SPIDIV_SD    SPIDIV_2
 
 void spiBegin(uint8_t slave, uint8_t mode, uint8_t endian, uint8_t divider);
 uint8_t spiByte(uint8_t byte);
