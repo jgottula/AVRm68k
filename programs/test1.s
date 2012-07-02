@@ -19,12 +19,20 @@
 	moveq #-0x01,%d3
 	
 	/* clr <ea> */
-	clrl %d4
-	clrw %d5
-	clrb %d6
-	clrl (%a7)
-	clrw (%a6)
-	clrb (%a5)
+	/*clr.l %d4
+	clr.w %d5
+	clr.b %d6
+	clr.l (%a6)
+	clr.w (%a6)
+	clr.b (%a6)*
+	clr.l (%a6)+
+	clr.w (%a6)+
+	clr.b (%a6)+
+	clr.b (%a7)+*/ /* should increment by 2 */
+	clr.l -(%a5)
+	clr.w -(%a5)
+	clr.b -(%a5)
+	clr.b -(%a7)
 	
 	/*  */
 	
