@@ -35,9 +35,9 @@ enum {
 } SPIDivider;
 
 /* SPI parameters for each slave */
-#define SPIMODE_MCSRAM   SPIMODE_0
-#define SPIENDIAN_MCSRAM SPIENDIAN_BIG
-#define SPIDIV_MCSRAM    SPIDIV_2
+#define SPIMODE_PCM   SPIMODE_0
+#define SPIENDIAN_PCM SPIENDIAN_BIG
+#define SPIDIV_PCM    SPIDIV_2
 
 #define SPIMODE_SD   SPIMODE_0
 #define SPIENDIAN_SD SPIENDIAN_BIG
