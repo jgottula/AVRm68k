@@ -7,6 +7,7 @@
 #include "m68k.h"
 #include "intr.h"
 #include "io.h"
+#include "sd.h"
 #include "shift.h"
 #include "spi.h"
 #include "uart.h"
@@ -17,8 +18,8 @@ noreturn void main(void)
 	writeIO(&MCUSR, _BV(WDRF), 0);
 	wdt_disable();
 	
-	shiftInit();
 	intrInit();
+	sdInit();
 	spiInit();
 	uartInit();
 	
