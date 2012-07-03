@@ -171,7 +171,7 @@ void uartInit(void)
 	/* set the baud rate to 2.5 Mbaud
 	 * the formula is: (F_CPU / (8 * BAUD_RATE)) - 1 [with U2X0 on]
 	 * see table 20-11 in the ATmega328p manual for details */
-	UBRR0 = 25;
+	UBRR0 = 0;
 	
 	/* enable the double speed bit */
 	writeIO(&UCSR0A, _BV(MPCM0) | _BV(U2X0), _BV(U2X0));

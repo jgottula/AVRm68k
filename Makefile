@@ -1,12 +1,12 @@
 PROJNAME:=avrm68k
 CFLAGS:=-mmcu=atmega168 -std=c11 -Wall -Wextra -Wno-unused-function -Os -flto \
-	-ffreestanding -fwhole-program -fuse-linker-plugin -DF_CPU=16000000UL \
+	-ffreestanding -fwhole-program -fuse-linker-plugin -DF_CPU=20000000UL \
 	-DDEBUG
 M68K_ASFLAGS:=-mcpu=68030 -mno-68851 -mno-68881 -mno-68882 -mno-float
 M68K_CFLAGS:=-S -Wa,-mcpu=68030,-mno-68851,-mno-68881,-mno-68882,-mno-float
 OBJCOPYFLAGS:=-R .eeprom
 M68K_OBJCOPYFLAGS:=-R .flash
-AVRDUDEFLAGS:=-c usbasp -p m168
+AVRDUDEFLAGS:=-c usbasp -p m324a
 SOURCES:=$(wildcard *.c)
 HEADERS:=$(wildcard *.h)
 TEST1_SOURCES:=programs/test1.s
