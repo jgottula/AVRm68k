@@ -1,5 +1,5 @@
 PROJNAME:=avrm68k
-CFLAGS:=-mmcu=atmega168 -std=c11 -Wall -Wextra -Wno-unused-function -Os -flto \
+CFLAGS:=-mmcu=atmega324a -std=c11 -Wall -Wextra -Wno-unused-function -Os -flto \
 	-ffreestanding -fwhole-program -fuse-linker-plugin -DF_CPU=20000000UL \
 	-DDEBUG
 M68K_ASFLAGS:=-mcpu=68030 -mno-68851 -mno-68881 -mno-68882 -mno-float
