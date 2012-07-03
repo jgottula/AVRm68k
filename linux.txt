@@ -1,0 +1,19 @@
+Guide for cross-compiling Linux for m68k
+
+0] Make sure that cross-m68k-gcc and cross-m68k-binutils are installed
+1] Download the latest kernel tarball and extract it
+2] Edit /Makefile:
+	Find the ARCH line and set it to m68k
+	In the next line, CROSS_COMPILE, put /usr/bin/cross/m68k-elf/
+3] Use the default config: run `make multi_defconfig`
+4] Compile the kernel: `make -j2 bzImage`
+5] Compile modules: `make -j2 modules`
+6] If a build failure occurs, modify the config to leave out the problematic
+	module (set its line to 'n'), or google it. In one case, the solution was to
+	add '-Dlinux' to NOSTDINC_FLAGS in the Makefile
+7] You will now have the following files:
+	Kernel:				/vmlinux
+	Compressed kernel:	/vmlinux.bz2
+	Symbol list:		/System.map
+8] To install the modules into $TARGETDIR/lib/modules/x.y.z:
+	`make modules_install INSTALL_MOD_PATH=$TARGETDIR`
