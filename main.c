@@ -18,10 +18,10 @@ noreturn void main(void)
 	writeIO(&MCUSR, _BV(WDRF), 0);
 	wdt_disable();
 	
-	intrInit();
-	sdInit();
-	spiInit();
 	uartInit();
+	intrInit();
+	//sdInit();
+	spiInit();
 	
 	dbgHeader();
 	uartWritePSTR("Started.\n");
