@@ -7,6 +7,7 @@
 #include "m68k.h"
 #include "intr.h"
 #include "io.h"
+#include "pcm.h"
 #include "sd.h"
 #include "shift.h"
 #include "spi.h"
@@ -20,8 +21,9 @@ noreturn void main(void)
 	
 	uartInit();
 	intrInit();
-	//sdInit();
 	spiInit();
+	pcmInit();
+	//sdInit();
 	
 	dbgHeader();
 	uartWritePSTR("Started.\n");
