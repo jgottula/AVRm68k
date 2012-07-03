@@ -6,13 +6,13 @@
 static void spiSelect(uint8_t slave)
 {
 	/* set only the given slave select pin low */
-	writeIO(&SPI_PORT, SPI_SS_ALL, SPI_SS_ALL ^ slave);
+	writeIO(&PORT_SPI, SPI_SS_ALL, SPI_SS_ALL ^ slave);
 }
 
 static void spiUnselect(void)
 {
 	/* set all slave select pins high */
-	writeIO(&SPI_PORT, SPI_SS_ALL, SPI_SS_ALL);
+	writeIO(&PORT_SPI, SPI_SS_ALL, SPI_SS_ALL);
 }
 
 static void spiSetMode(uint8_t mode, uint8_t endian, uint8_t divider)
@@ -67,7 +67,7 @@ void spiEnd(void)
 void spiInit(void)
 {
 	/* set SCLK, MOSI, and all SS to output mode, and MISO to input mode */
-	writeIO(&SPI_DDR, SPI_ALL | SPI_SS_ALL, (SPI_ALL ^ SPI_MISO) | SPI_SS_ALL);
+	writeIO(&DDR_SPI, SPI_ALL | SPI_SS_ALL, (SPI_ALL ^ SPI_MISO) | SPI_SS_ALL);
 	
 	/* ensure that all slave select pins are high */
 	spiUnselect();

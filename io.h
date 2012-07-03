@@ -5,63 +5,45 @@
 #include <stdbool.h>
 #include <avr/io.h>
 
-/* reserved IO pins: PB0 (clkout), PC6 (reset) */
-
 typedef volatile uint8_t *reg_t;
 typedef volatile uint16_t *reg16_t;
+
 
 /*enum PortA {
 };*/
 
-#define SPI_DDR   DDRB
-#define SPI_PORT  PORTB
-#define SPI_PIN   PINB
+
+#define DDR_SPI   DDRB
+#define PORT_SPI  PORTB
+#define PIN_SPI   PINB
 
 enum PortB {
-	SPI_SS_SD     = _BV(PB0),
-	SPI_SS_MCSRAM = _BV(PB1),
+	SPI_SS_SD     = _BV(PB3),
+	SPI_SS_PCM    = _BV(PB4),
+	SPI_SS_ALL    = SPI_SS_SD | SPI_SS_PCM,
 	
-	/* slaves should NOT use PB2 for slave select (makes SPI to switch modes) */
-	SPI_SS_DEF    = _BV(PB2),
-	SPI_SS_ALL    = SPI_SS_SD | SPI_SS_MCSRAM,
-	
-	SPI_MOSI      = _BV(PB3),
-	SPI_MISO      = _BV(PB4),
-	SPI_SCK       = _BV(PB5),
+	SPI_MOSI      = _BV(PB5),
+	SPI_MISO      = _BV(PB6),
+	SPI_SCK       = _BV(PB7),
 	SPI_ALL       = SPI_MOSI | SPI_MISO | SPI_SCK
 };
 
-#define DRAM_DDR  DDRC
-#define DRAM_PORT PORTC
-#define DRAM_PIN  PINC
 
-enum PortC {
-	DRAM_RAS = _BV(PC0),
-	DRAM_CAS = _BV(PC1),
-	DRAM_WE  = _BV(PC2),
-	
-	
-};
+/*enum PortC {
+};*/
 
-#define UART_DDR  DDRD
-#define UART_PORT PORTD
-#define UART_PIN  PIND
 
-#define SHIFT_DDR  DDRD
-#define SHIFT_PORT PORTD
+#define DDR_UART  DDRD
+#define PORT_UART PORTD
+#define PIN_UART  PIND
 
 enum PortD {
-	/* PD0 and PD1 are reserved for RXD and TXD, respectively */
-	
+	UART_RX      = _BV(PD0),
+	UART_TX      = _BV(PD1),
 	UART_CTS     = _BV(PD2),
-	UART_RTS     = _BV(PD3),
-	
-	SHIFT_DATA   = _BV(PD4),
-	SHIFT_CLK    = _BV(PD5),
-	SHIFT_LATCH  = _BV(PD6),
-	SHIFT_CLEAR  = _BV(PD7),
-	SHIFT_ALL    = SHIFT_DATA | SHIFT_CLK | SHIFT_LATCH | SHIFT_CLEAR
+	UART_RTS     = _BV(PD3)
 };
+
 
 /* WARNING: these write functions may need to be wrapped in ATOMIC_BLOCK()
  * because of their read/modify/write nature and the possibility that an ISR
