@@ -86,7 +86,29 @@ uint8_t pcmReadByte(uint32_t addr)
 	return byte;
 }
 
-/* TODO: put write functions here */
+void pcmWriteRange(uint32_t addr, uint16_t num, const uint8_t *src)
+{
+	pcmWriteEnable();
+	
+	spiBegin(SPI_SS_PCM, SPIMODE_PCM, SPIENDIAN_PCM, SPIDIV_PCM);
+	spiByte(PCM_INSTR_PP_BAWR); // not sure which PP variant to use
+	
+	/* address */
+	spiByte((addr & 0x00ff0000) >> 16);
+	spiByte((addr & 0x0000ff00) >> 8);
+	spiByte(addr & 0x000000ff);
+	
+	do
+		spiByte(*(src++));
+	while (--num != 0);
+	
+	spiEnd();
+}
+
+void pcmWriteByte(uint32_t addr, uint8_t byte)
+{
+	pcmWriteRange(addr, 1, &byte);
+}
 
 void pcmSectorErase(uint32_t addr)
 {
@@ -98,6 +120,24 @@ void pcmSectorErase(uint32_t addr)
 	spiByte((addr & 0x00ff0000) >> 16);
 	spiByte((addr & 0x0000ff00) >> 8);
 	spiByte(addr & 0x000000ff);
+	
+	spiEnd();
+	
+	spiBegin(SPI_SS_PCM, SPIMODE_PCM, SPIENDIAN_PCM, SPIDIV_PCM);
+	spiByte(PCM_INSTR_RDSR);
+	
+	/* warning: this probably needs a timeout */
+	while ((spiByte(0x00) & PCM_SR_WIP) != 0);
+	
+	spiEnd();
+}
+
+void pcmBulkErase(void)
+{
+	pcmWriteEnable();
+	
+	spiBegin(SPI_SS_PCM, SPIMODE_PCM, SPIENDIAN_PCM, SPIDIV_PCM);
+	spiByte(PCM_INSTR_BULK_ERASE);
 	
 	spiEnd();
 	

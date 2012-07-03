@@ -36,7 +36,10 @@
 
 void pcmReadRange(uint32_t addr, uint16_t num, uint8_t *dest);
 uint8_t pcmReadByte(uint32_t addr);
+void pcmWriteRange(uint32_t addr, uint16_t num, const uint8_t *src);
+void pcmWriteByte(uint32_t addr, uint8_t byte);
 void pcmSectorErase(uint32_t addr);
+void pcmBulkErase(void);
 void pcmInit(void);
 
 #endif
