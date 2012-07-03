@@ -34,6 +34,8 @@
 #define PCM_SR_BP3  _BV(6)
 #define PCM_SR_SRWD _BV(7)
 
+void pcmReadRange(uint32_t addr, uint16_t num, uint8_t *dest);
+uint8_t pcmReadByte(uint32_t addr);
 void pcmInit(void);
 
 #endif
