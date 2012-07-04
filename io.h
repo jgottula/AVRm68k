@@ -13,14 +13,20 @@ typedef volatile uint16_t *reg16_t;
 };*/
 
 
-#define DDR_SPI   DDRB
-#define PORT_SPI  PORTB
-#define PIN_SPI   PINB
+#define DDR_SD  DDRB
+#define PORT_SD PORTB
+#define PIN_SD  PINB
+
+#define DDR_SPI  DDRB
+#define PORT_SPI PORTB
+#define PIN_SPI  PINB
 
 enum PortB {
+	SD_DETECT     = _BV(PB2),
+	
 	SPI_SS_SD     = _BV(PB3),
-	SPI_SS_PCM    = _BV(PB4),
-	SPI_SS_ALL    = SPI_SS_SD | SPI_SS_PCM,
+	SPI_SS_NULL   = _BV(PB4),
+	SPI_SS_ALL    = SPI_SS_NULL | SPI_SS_SD,
 	
 	SPI_MOSI      = _BV(PB5),
 	SPI_MISO      = _BV(PB6),
