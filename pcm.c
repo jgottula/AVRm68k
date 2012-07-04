@@ -3,6 +3,8 @@
 #include "io.h"
 #include "spi.h"
 
+#if 0
+
 static uint32_t pcmReadID(void)
 {
 	uint32_t id = 0;
@@ -158,3 +160,5 @@ void pcmInit(void)
 	/* set the status register */
 	pcmWriteSR(0x00);
 }
+
+#endif

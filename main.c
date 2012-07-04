@@ -22,7 +22,7 @@ noreturn void main(void)
 	uartInit();
 	intrInit();
 	spiInit();
-	pcmInit();
+	//pcmInit();
 	//sdInit();
 	
 	dbgHeader();
