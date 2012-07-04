@@ -7,6 +7,9 @@
 /* TODO: refresh! */
 /* TODO: fast page mode! */
 
+/* WARNING: these functions ABSOLUTELY MUST be inside ATOMIC_BLOCKs if the
+ * refresh cycle is to be run from an interrupt */
+
 static void dramLoadAddrL(uint32_t addr)
 {
 	writeIO(&PORT_ADDRL, ADDRL_ALL, (uint8_t)addr);
@@ -53,7 +56,32 @@ uint8_t dramRead(uint32_t addr)
 void dramWrite(uint32_t addr, uint8_t byte)
 {
 	uartWritePSTR("dramWrite: guessing DRAM timings!\n");
-	/* remember to unset WE when done */
+	
+	/* set the data bus to output */
+	writeIO(&DDR_DATA, DATA_ALL, DATA_ALL);
+	
+	/* assert the write enable line */
+	writeIO(&PORT_DRAM, DRAM_WE, 0);
+	
+	/* put the data on the data bus */
+	writeIO(&PORT_DATA, DATA_ALL, byte);
+	
+	/* put the high part of the address as the row number */
+	dramLoadAddrH(addr);
+	
+	/* assert RAS and wait for it to load */
+	writeIO(&PORT_DRAM, DRAM_RAS, 0);
+	_delay_us(1);
+	
+	/* put the low part of the address as the column number */
+	dramLoadAddrL(addr);
+	
+	/* assert CAS and wait for it to load */
+	writeIO(&PORT_DRAM, DRAM_CAS, 0);
+	_delay_us(1);
+	
+	/* reset all control lines */
+	writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
 }
 
 void dramRefresh(void)
