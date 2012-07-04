@@ -4,10 +4,10 @@
 #include <util/atomic.h>
 #include <util/delay.h>
 #include "debug.h"
-#include "m68k.h"
+#include "dram.h"
 #include "intr.h"
 #include "io.h"
-#include "pcm.h"
+#include "m68k.h"
 #include "sd.h"
 #include "shift.h"
 #include "spi.h"
@@ -21,9 +21,14 @@ noreturn void main(void)
 	
 	uartInit();
 	intrInit();
+	
+	dramInit();
 	spiInit();
-	//pcmInit();
-	//sdInit();
+	sdInit();
+	
+	dramRead(0b10101010100101010101);
+	
+	die(); // temporary
 	
 	dbgHeader();
 	uartWritePSTR("Started.\n");
