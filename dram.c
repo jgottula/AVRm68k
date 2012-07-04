@@ -22,6 +22,8 @@ static void dramLoadAddrH(uint32_t addr)
 
 uint8_t dramRead(uint32_t addr)
 {
+	uint8_t byte;
+	
 	uartWritePSTR("dramRead: guessing DRAM timings!\n");
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
@@ -45,7 +47,7 @@ uint8_t dramRead(uint32_t addr)
 		_delay_us(1);
 		
 		/* read from the data bus */
-		uint8_t byte = readIO(&PORT_DATA, DATA_ALL);
+		byte = readIO(&PORT_DATA, DATA_ALL);
 		
 		/* reset RAS and CAS */
 		writeIO(&PORT_DRAM, DRAM_RAS | DRAM_CAS, DRAM_RAS | DRAM_CAS);
