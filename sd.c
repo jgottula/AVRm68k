@@ -140,6 +140,10 @@ static bool sdCmd0(uint8_t cmd, bool crc, uint16_t timeout, SDRx *resp)
 
 bool sdCardDetect()
 {
+	/* temporarily set the SS pin low */
+	writeIO(&DDR_SPI, SPI_SS_SD, 0);
+	writeIO(&PORT_SPI, SPI_SS_SD, 0);
+	
 	/* set the SD detect pin to input mode without pullup */
 	writeIO(&DDR_SD, SD_DETECT, 0);
 	writeIO(&PORT_SD, SD_DETECT, 0);
@@ -148,6 +152,12 @@ bool sdCardDetect()
 	 * pulldown resistor on the board: the presence of a card will cause the
 	 * CS pin to go high; otherwise, it will be low */
 	bool cardDetected = readIO(&PIN_SD, SD_DETECT);
+	
+	assert(0);
+	
+	/* put the SS pin back as it was */
+	writeIO(&DDR_SPI, SPI_SS_SD, SPI_SS_SD);
+	writeIO(&PORT_SPI, SPI_SS_SD, SPI_SS_SD);
 	
 	return cardDetected;
 }
