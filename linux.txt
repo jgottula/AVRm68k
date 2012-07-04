@@ -1,4 +1,16 @@
+Possible Linux setups:
+- Mainline linux, compiled for m68k: requires MMU emulation
+- uCLinux: no MMU needed, but old codebase and non-standard
+- Debian m68k port: unknown pros/cons/feasibility
+
+
+BIOS/Bootloader:
+- Will be written manually
+
+
 Guide for cross-compiling Linux for m68k
+
+The Linux/m68k website has tons of good information
 
 0] Make sure that cross-m68k-gcc and cross-m68k-binutils are installed
 1] Download the latest kernel tarball and extract it
