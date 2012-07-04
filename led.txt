@@ -1,0 +1,18 @@
+LEDs
+
+Name	Color	How						Comments
+--------------------------------------------------------------------------------
+power	green	easy: attach to 5v		
+reset	red		pnp on /reset			could be merged with power
+error	red		io line					
+rx		green	npn on rx				
+tx		red		npn on tx				
+rts/cts	red		npn on rts/cts			this is iffy; should mean io is behind
+sck		red		npn on sck				
+sd		red		pnp on sd_ss			alt: R & W leds, done with io lines
+ram		green	pnp on cas				not ras since refresh will assert it
+
+General comments:
+- ALWAYS use a resistor for the base connection on PNP transistors!
+- If more than three LEDs are running directly on IO lines, use a shift reg
+	unless that takes too long
