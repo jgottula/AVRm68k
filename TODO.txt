@@ -6,6 +6,7 @@ Priorities:
 - Linux from scratch
 - Bootloader
 - HDD driver
+- RTC chip for date/time
 
 Optimizations:
 - Tighten the delays in the DRAM code based on the SIMM specs
