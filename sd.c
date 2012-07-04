@@ -138,45 +138,13 @@ static bool sdCmd0(uint8_t cmd, bool crc, uint16_t timeout, SDRx *resp)
 	return sdCmd4(cmd, 0, 0, 0, 0, crc, timeout, resp);
 }
 
-bool sdCardDetect()
-{
-	/* temporarily set the SS pin low */
-	writeIO(&DDR_SPI, SPI_SS_SD, 0);
-	writeIO(&PORT_SPI, SPI_SS_SD, 0);
-	
-	/* set the SD detect pin to input mode without pullup */
-	writeIO(&DDR_SD, SD_DETECT, 0);
-	writeIO(&PORT_SD, SD_DETECT, 0);
-	
-	/* this works because of the 50k pullup resistor in the card and the 100k
-	 * pulldown resistor on the board: the presence of a card will cause the
-	 * CS pin to go high; otherwise, it will be low */
-	bool cardDetected = readIO(&PIN_SD, SD_DETECT);
-	
-	assert(0);
-	
-	/* put the SS pin back as it was */
-	writeIO(&DDR_SPI, SPI_SS_SD, SPI_SS_SD);
-	writeIO(&PORT_SPI, SPI_SS_SD, SPI_SS_SD);
-	
-	return cardDetected;
-}
-
 void sdInit()
 {
 	SDRx resp;
 	
 	memset(&sdCtx, 0, sizeof(sdCtx));
 	
-	/* wait for the user to insert an SD card */
-	if (!sdCardDetect())
-	{
-		uartWritePSTR("Insert SD card. ");
-		while (!sdCardDetect());
-		uartWritePSTR("OK.\n");
-	}
-	
-	/* start at 10 MHz / 64 = 156 kHz */
+	/* start at 0 MHz / 64 = 312 kHz */
 	sdCtx.spiDiv = SPIDIV_64;
 	
 	/* wait for the card to power up */
