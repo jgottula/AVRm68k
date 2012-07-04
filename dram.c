@@ -1,14 +1,12 @@
 #include "dram.h"
+#include <util/atomic.h>
 #include <util/delay.h>
 #include "intr.h"
 #include "io.h"
 #include "uart.h"
 
-/* TODO: refresh! */
-/* TODO: fast page mode! */
-
-/* WARNING: these functions ABSOLUTELY MUST be inside ATOMIC_BLOCKs if the
- * refresh cycle is to be run from an interrupt */
+/* WARNING: because the refresh routine is called from an ISR and could
+ * interrupt at any time, these functions MUST use ATOMIC_BLOCKs */
 
 static void dramLoadAddrL(uint32_t addr)
 {
@@ -26,29 +24,32 @@ uint8_t dramRead(uint32_t addr)
 {
 	uartWritePSTR("dramRead: guessing DRAM timings!\n");
 	
-	/* set the data bus to input with pull-up */
-	writeIO(&DDR_DATA, DATA_ALL, 0);
-	writeIO(&PORT_DATA, DATA_ALL, DATA_ALL);
-	
-	/* put the high part of the address as the row number */
-	dramLoadAddrH(addr);
-	
-	/* assert RAS and wait for it to load */
-	writeIO(&PORT_DRAM, DRAM_RAS, 0);
-	_delay_us(1);
-	
-	/* put the low part of the address as the column number */
-	dramLoadAddrL(addr);
-	
-	/* assert CAS and wait for it to load */
-	writeIO(&PORT_DRAM, DRAM_CAS, 0);
-	_delay_us(1);
-	
-	/* read from the data bus */
-	uint8_t byte = readIO(&PORT_DATA, DATA_ALL);
-	
-	/* reset RAS and CAS */
-	writeIO(&PORT_DRAM, DRAM_RAS | DRAM_CAS, DRAM_RAS | DRAM_CAS);
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	{
+		/* set the data bus to input with pull-up */
+		writeIO(&DDR_DATA, DATA_ALL, 0);
+		writeIO(&PORT_DATA, DATA_ALL, DATA_ALL);
+		
+		/* put the high part of the address as the row number */
+		dramLoadAddrH(addr);
+		
+		/* assert RAS and wait for it to load */
+		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		_delay_us(1);
+		
+		/* put the low part of the address as the column number */
+		dramLoadAddrL(addr);
+		
+		/* assert CAS and wait for it to load */
+		writeIO(&PORT_DRAM, DRAM_CAS, 0);
+		_delay_us(1);
+		
+		/* read from the data bus */
+		uint8_t byte = readIO(&PORT_DATA, DATA_ALL);
+		
+		/* reset RAS and CAS */
+		writeIO(&PORT_DRAM, DRAM_RAS | DRAM_CAS, DRAM_RAS | DRAM_CAS);
+	}
 	
 	return byte;
 }
@@ -57,37 +58,40 @@ void dramWrite(uint32_t addr, uint8_t byte)
 {
 	uartWritePSTR("dramWrite: guessing DRAM timings!\n");
 	
-	/* set the data bus to output */
-	writeIO(&DDR_DATA, DATA_ALL, DATA_ALL);
-	
-	/* assert the write enable line */
-	writeIO(&PORT_DRAM, DRAM_WE, 0);
-	
-	/* put the data on the data bus */
-	writeIO(&PORT_DATA, DATA_ALL, byte);
-	
-	/* put the high part of the address as the row number */
-	dramLoadAddrH(addr);
-	
-	/* assert RAS and wait for it to load */
-	writeIO(&PORT_DRAM, DRAM_RAS, 0);
-	_delay_us(1);
-	
-	/* put the low part of the address as the column number */
-	dramLoadAddrL(addr);
-	
-	/* assert CAS and wait for it to load */
-	writeIO(&PORT_DRAM, DRAM_CAS, 0);
-	_delay_us(1);
-	
-	/* reset all control lines */
-	writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	{
+		/* set the data bus to output */
+		writeIO(&DDR_DATA, DATA_ALL, DATA_ALL);
+		
+		/* assert the write enable line */
+		writeIO(&PORT_DRAM, DRAM_WE, 0);
+		
+		/* put the data on the data bus */
+		writeIO(&PORT_DATA, DATA_ALL, byte);
+		
+		/* put the high part of the address as the row number */
+		dramLoadAddrH(addr);
+		
+		/* assert RAS and wait for it to load */
+		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		_delay_us(1);
+		
+		/* put the low part of the address as the column number */
+		dramLoadAddrL(addr);
+		
+		/* assert CAS and wait for it to load */
+		writeIO(&PORT_DRAM, DRAM_CAS, 0);
+		_delay_us(1);
+		
+		/* reset all control lines */
+		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+	}
 }
 
 void dramRefresh(void)
 {
+	/* WARNING: this function will always be called from an ISR */
 	/* this function takes ~2 ms to execute */
-	uartWritePSTR("dramRefresh: guessing DRAM timings!\n");
 	
 	for (uint8_t i = 0b00; i <= 0b11; ++i)
 	{
