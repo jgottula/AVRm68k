@@ -26,10 +26,6 @@ noreturn void main(void)
 	spiInit();
 	sdInit();
 	
-	dramRead(0b10101010100101010101);
-	
-	die(); // temporary
-	
 	dbgHeader();
 	uartWritePSTR("Started.\n");
 	
