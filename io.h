@@ -80,11 +80,9 @@ enum PortC {
 enum PortD {
 	UART_RX   = _BV(PD0),
 	UART_TX   = _BV(PD1),
-	UART_CTS  = _BV(PD2),
-	UART_RTS  = _BV(PD3),
-	UART_ALL  = UART_RX | UART_TX | UART_CTS | UART_RTS,
+	UART_ALL  = UART_RX | UART_TX,
 	
-	/* PD4 and PD5 are open */
+	/* PD2 thru PD5 are open */
 	
 	ADDRH_8   = _BV(PD6),
 	ADDRH_9   = _BV(PD7),
