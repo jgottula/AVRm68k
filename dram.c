@@ -86,10 +86,8 @@ void dramWrite(uint32_t addr, uint8_t byte)
 
 void dramRefresh(void)
 {
+	/* this function takes ~2 ms to execute */
 	uartWritePSTR("dramRefresh: guessing DRAM timings!\n");
-	uartWritePSTR("dramRefresh: start\n");
-	
-	uint16_t start = msec;
 	
 	for (uint8_t i = 0b00; i <= 0b11; ++i)
 	{
@@ -111,15 +109,6 @@ void dramRefresh(void)
 		}
 		while (++j != 0x00);
 	}
-	
-	uint16_t finish = msec;
-	
-	uartWritePSTR("dramRefresh: finish\n");
-	
-	uint16_t time = finish - start;
-	uartWritePSTR("dramRefresh: took ");
-	uartWriteDec16(time);
-	uartWritePSTR(" ms\n");
 }
 
 void dramInit(void)
