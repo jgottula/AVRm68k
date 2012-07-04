@@ -1,8 +1,10 @@
 #include "intr.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "dram.h"
 #include "io.h"
 
+volatile uint8_t dramCounter = 0;
 volatile uint16_t counter = 0, msec = 0, sec = 0;
 volatile bool badISR = false;
 
@@ -16,6 +18,13 @@ ISR(TIMER1_COMPA_vect)
 	{
 		++sec;
 		counter = 0;
+	}
+	
+	/* refresh the dram every 50 ms */
+	if (++dramCounter == 50)
+	{
+		dramRefresh();
+		dramCounter = 0;
 	}
 }
 
