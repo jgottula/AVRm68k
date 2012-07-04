@@ -10,6 +10,7 @@ Priorities:
 Optimizations:
 - Tighten the delays in the DRAM code based on the SIMM specs
 - Reduce the overhead between SPI begin/end sessions
+- Use fast page mode to read WORD or LONG values
 
 Program size:
 - Use decompressor stub + compressed code?
