@@ -1,25 +1,15 @@
-Flow control:
-	Small rx buffer may be okay (signal when full)
-	Will probably need TX done and RX interrupts on
-	Modify uartRead and uartWrite so they honor RTS/CTS
-	Set the PC-side programs to use flow control
-	Use PuTTY in a VM for best results (forward FTDI USB port)
+Priorities:
+- Implement RAM refresh
+- Test RAM
+- Emulator
+- SD
+- Linux from scratch
+- Bootloader
+- HDD driver
 
-PCM:
-	Add functions for reading/writing words and longs
-
-SD:
-	Finish
-
-RAM:
-	Implement PCM quad read/write mode
-
-SPI:
-	Try to decrease the amount of work between begin/end sessions
-
-FPU:
-	If required, implement 68881:
-	May be able to use avr-gcc's emulated FPU code as a shortcut
+Optimizations:
+- Tighten the delays in the DRAM code based on the SIMM specs
+- Reduce the overhead between SPI begin/end sessions
 
 Program size:
-	Use decompressor stub + compressed code??
+- Use decompressor stub + compressed code?
