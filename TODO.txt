@@ -5,6 +5,9 @@ Flow control:
 	Set the PC-side programs to use flow control
 	Use PuTTY in a VM for best results (forward FTDI USB port)
 
+PCM:
+	Add functions for reading/writing words and longs
+
 SD:
 	Finish
 
@@ -13,6 +16,10 @@ RAM:
 
 SPI:
 	Try to decrease the amount of work between begin/end sessions
+
+FPU:
+	If required, implement 68881:
+	May be able to use avr-gcc's emulated FPU code as a shortcut
 
 Program size:
 	Use decompressor stub + compressed code??
