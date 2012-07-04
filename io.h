@@ -9,38 +9,85 @@ typedef volatile uint8_t *reg_t;
 typedef volatile uint16_t *reg16_t;
 
 
-/*enum PortA {
-};*/
+#define DDR_DATA  DDRA
+#define PORT_DATA PORTA
+#define PIN_DATA  PINA
 
-#define DDR_SPI  DDRB
-#define PORT_SPI PORTB
-#define PIN_SPI  PINB
-
-enum PortB {
-	SPI_SS_SD     = _BV(PB3),
-	SPI_SS_NULL   = _BV(PB4),
-	SPI_SS_ALL    = SPI_SS_NULL | SPI_SS_SD,
-	
-	SPI_MOSI      = _BV(PB5),
-	SPI_MISO      = _BV(PB6),
-	SPI_SCK       = _BV(PB7),
-	SPI_ALL       = SPI_MOSI | SPI_MISO | SPI_SCK
+enum PortA {
+	DATA_0   = _BV(PA0),
+	DATA_1   = _BV(PA1),
+	DATA_2   = _BV(PA2),
+	DATA_3   = _BV(PA3),
+	DATA_4   = _BV(PA4),
+	DATA_5   = _BV(PA5),
+	DATA_6   = _BV(PA6),
+	DATA_7   = _BV(PA7),
+	DATA_ALL = 0xff
 };
 
 
-/*enum PortC {
-};*/
+#define DDR_DRAM  DDRB
+#define PORT_DRAM PORTB
+#define PIN_DRAM  PINB
+
+#define DDR_SPI   DDRB
+#define PORT_SPI  PORTB
+#define PIN_SPI   PINB
+
+enum PortB {
+	DRAM_CAS   = _BV(PB0),
+	DRAM_WE    = _BV(PB1),
+	DRAM_RAS   = _BV(PB2),
+	
+	/* PB3 is open */
+	
+	SPI_SS_SD  = _BV(PB4),
+	SPI_SS_ALL = SPI_SS_SD,
+	
+	SPI_MOSI   = _BV(PB5),
+	SPI_MISO   = _BV(PB6),
+	SPI_SCK    = _BV(PB7),
+	SPI_ALL    = SPI_MOSI | SPI_MISO | SPI_SCK
+};
+
+
+#define DDR_ADDRL  DDRC
+#define PORT_ADDRL PORTC
+#define PIN_ADDRL  PINC
+
+enum PortC {
+	ADDRL_0   = _BV(PC0),
+	ADDRL_1   = _BV(PC1),
+	ADDRL_2   = _BV(PC2),
+	ADDRL_3   = _BV(PC3),
+	ADDRL_4   = _BV(PC4),
+	ADDRL_5   = _BV(PC5),
+	ADDRL_6   = _BV(PC6),
+	ADDRL_7   = _BV(PC7),
+	ADDRL_ALL = 0xff
+};
 
 
 #define DDR_UART  DDRD
 #define PORT_UART PORTD
 #define PIN_UART  PIND
 
+#define DDR_ADDRH  DDRD
+#define PORT_ADDRH PORTD
+#define PIN_ADDRH  PIND
+
 enum PortD {
-	UART_RX      = _BV(PD0),
-	UART_TX      = _BV(PD1),
-	UART_CTS     = _BV(PD2),
-	UART_RTS     = _BV(PD3)
+	UART_RX   = _BV(PD0),
+	UART_TX   = _BV(PD1),
+	UART_CTS  = _BV(PD2),
+	UART_RTS  = _BV(PD3),
+	UART_ALL  = UART_RX | UART_TX | UART_CTS | UART_RTS,
+	
+	/* PD4 and PD5 are open */
+	
+	ADDRH_8   = _BV(PD6),
+	ADDRH_9   = _BV(PD7),
+	ADDRH_ALL = ADDRH_8 | ADDRH_9
 };
 
 
