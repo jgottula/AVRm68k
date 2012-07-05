@@ -1,6 +1,5 @@
 Priorities:
-- Implement RAM refresh
-- Test RAM
+- Find approximate RAM timing limits
 - Emulator
 - SD
 - Linux from scratch
@@ -9,9 +8,10 @@ Priorities:
 - RTC chip for date/time
 
 Optimizations:
-- Tighten the delays in the DRAM code based on the SIMM specs
+- Set DRAM delays based on spec (if any such spec exists)
 - Reduce the overhead between SPI begin/end sessions
 - Use fast page mode to read WORD or LONG values
+- Put nonatomic_block around _delay's in dramRead/Write
 
 Program size:
 - Use decompressor stub + compressed code?
