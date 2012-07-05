@@ -3,4 +3,5 @@
 *.bin
 *.lst
 *.dump
+*.olp
 /*.s
