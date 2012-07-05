@@ -34,6 +34,8 @@
 	clr.b -(%a5)
 	clr.b -(%a7)
 	
+	.byte 0b10100000
+	
 	/*  */
 	
 	/* next: clr, cmp, eor, or, and */
