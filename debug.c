@@ -65,6 +65,37 @@ void blinkLEDForever(uint16_t halfPeriod)
 	}
 }
 
+void dumpIO(void)
+{
+	uartWritePSTR("\nDDRA:  ");
+	uartWriteHex8(DDRA, false);
+	uartWritePSTR("\nPORTA: ");
+	uartWriteHex8(PORTA, false);
+	uartWritePSTR("\nPINA:  ");
+	uartWriteHex8(PINA, false);
+	
+	uartWritePSTR("\nDDRB:  ");
+	uartWriteHex8(DDRB, false);
+	uartWritePSTR("\nPORTB: ");
+	uartWriteHex8(PORTB, false);
+	uartWritePSTR("\nPINB:  ");
+	uartWriteHex8(PINB, false);
+	
+	uartWritePSTR("\nDDRC:  ");
+	uartWriteHex8(DDRC, false);
+	uartWritePSTR("\nPORTC: ");
+	uartWriteHex8(PORTC, false);
+	uartWritePSTR("\nPINC:  ");
+	uartWriteHex8(PINC, false);
+	
+	uartWritePSTR("\nDDRD:  ");
+	uartWriteHex8(DDRD, false);
+	uartWritePSTR("\nPORTD: ");
+	uartWriteHex8(PORTD, false);
+	uartWritePSTR("\nPIND:  ");
+	uartWriteHex8(PIND, false);
+}
+
 void dbgHeader(void)
 {
 	uartWritePSTR("[AVRm68k] ");
