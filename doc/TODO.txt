@@ -1,6 +1,8 @@
 Priorities:
 - Find approximate RAM timing limits
-- Emulator
+- Emulator: memory system
+- Emulator: addressing modes
+- Emulator: instructions
 - SD
 - Linux from scratch
 - Bootloader
