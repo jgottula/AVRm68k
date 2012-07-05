@@ -17,7 +17,7 @@
 static void runTests(void)
 {
 	dbgHeader();
-	uartWritePSTR("<<< Begin Tests >>>\n\n");
+	uartWritePSTR("<<< Begin Tests >>>\n");
 	
 	dramTest();
 	
@@ -31,9 +31,8 @@ static void runTests(void)
 	
 	memDump(0x00000, 8);
 	
-	uartWriteChr('\n');
 	dbgHeader();
-	uartWritePSTR("<<< End Tests >>>\n\n");
+	uartWritePSTR("<<< End Tests >>>\n");
 }
 
 noreturn void main(void)
