@@ -8,6 +8,7 @@
 #include "intr.h"
 #include "io.h"
 #include "m68k.h"
+#include "m68k_mem.h"
 #include "sd.h"
 #include "shift.h"
 #include "spi.h"
@@ -27,6 +28,8 @@ static void runTests(void)
 	uartWritePSTR("refresh duration: ");
 	uartWriteDec16(t1 - t0);
 	uartWritePSTR(" +/- 1 ms\n");
+	
+	memDump(0x00000, 8);
 	
 	uartWriteChr('\n');
 	dbgHeader();
