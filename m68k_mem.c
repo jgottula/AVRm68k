@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "dram.h"
 #include "m68k.h"
+#include "uart.h"
 
 uint32_t memRead(uint32_t addr, uint8_t size)
 {
@@ -47,4 +48,36 @@ void memWrite(uint32_t addr, uint8_t size, uint32_t value)
 	default:
 		assert(0);
 	}
+}
+
+void memDump(uint32_t addr, uint16_t lines)
+{
+	dbgHeader();
+	uartWritePSTR("memory dump:\n");
+	
+	for (uint16_t i = 0; i < lines; ++i)
+	{
+		uartWriteHex8(addr >> 16, false);
+		uartWriteHex16(addr, false);
+		uartWritePSTR(": ");
+		
+		for (uint8_t j = 0; j < 16; ++j)
+		{
+			uartWriteHex8(memRead(addr + j, SIZE_BYTE), false);
+			
+			if (j == 15)
+				uartWriteChr('\n');
+			else
+			{
+				if (j == 7)
+					uartWriteChr(' ');
+				uartWriteChr(' ');
+			}
+		}
+		
+		addr += 16;
+	}
+	
+	/* TODO: add textual display on the right (like hexdump -C does); replace
+	 * characters not from the usual ASCII page with periods */
 }
