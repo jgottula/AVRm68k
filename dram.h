@@ -7,6 +7,7 @@
 uint8_t dramRead(uint32_t addr);
 void dramWrite(uint32_t addr, uint8_t byte);
 void dramRefresh(void);
+void dramTest(void);
 void dramInit(void);
 
 #endif

@@ -1,6 +1,7 @@
 #include "dram.h"
 #include <util/atomic.h>
 #include <util/delay.h>
+#include "debug.h"
 #include "intr.h"
 #include "io.h"
 #include "uart.h"
@@ -18,16 +19,15 @@ uint8_t dramRead(uint32_t addr)
 {
 	uint8_t byte;
 	
-	uartWritePSTR("dramRead: guessing DRAM timings!\n");
-	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		/* set the data bus to input with pull-up */
+		/* set the data bus to input with no pull-up */
 		writeIO(&DDR_DATA, DATA_ALL, 0);
-		writeIO(&PORT_DATA, DATA_ALL, DATA_ALL);
+		writeIO(&PORT_DATA, DATA_ALL, 0);
 		
 		/* put the high part of the address as the row number */
 		dramLoadAddrBus(addr >> 10);
+		_delay_us(1);
 		
 		/* assert RAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
@@ -35,13 +35,14 @@ uint8_t dramRead(uint32_t addr)
 		
 		/* put the low part of the address as the column number */
 		dramLoadAddrBus(addr);
+		_delay_us(1);
 		
 		/* assert CAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
 		_delay_us(1);
 		
 		/* read from the data bus */
-		byte = readIO(&PORT_DATA, DATA_ALL);
+		byte = readIO(&PIN_DATA, DATA_ALL);
 		
 		/* reset RAS and CAS */
 		writeIO(&PORT_DRAM, DRAM_RAS | DRAM_CAS, DRAM_RAS | DRAM_CAS);
@@ -52,28 +53,29 @@ uint8_t dramRead(uint32_t addr)
 
 void dramWrite(uint32_t addr, uint8_t byte)
 {
-	uartWritePSTR("dramWrite: guessing DRAM timings!\n");
-	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		/* set the data bus to output */
 		writeIO(&DDR_DATA, DATA_ALL, DATA_ALL);
 		
-		/* assert the write enable line */
-		writeIO(&PORT_DRAM, DRAM_WE, 0);
-		
 		/* put the data on the data bus */
 		writeIO(&PORT_DATA, DATA_ALL, byte);
 		
 		/* put the high part of the address as the row number */
-		dramLoadAddrH(addr);
+		dramLoadAddrBus(addr >> 10);
+		_delay_us(1);
 		
 		/* assert RAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
 		_delay_us(1);
 		
+		/* assert the write enable line */
+		writeIO(&PORT_DRAM, DRAM_WE, 0);
+		_delay_us(1);
+		
 		/* put the low part of the address as the column number */
-		dramLoadAddrL(addr);
+		dramLoadAddrBus(addr);
+		_delay_us(1);
 		
 		/* assert CAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
@@ -86,8 +88,8 @@ void dramWrite(uint32_t addr, uint8_t byte)
 
 void dramRefresh(void)
 {
-	/* WARNING: this function will always be called from an ISR */
-	/* this function takes ~2 ms to execute */
+	/* this function doesn't need to save state because the non-ISR dram
+	 * functions are wrapped in ATOMIC_BLOCKs */
 	
 	for (uint8_t i = 0b00; i <= 0b11; ++i)
 	{
@@ -105,10 +107,51 @@ void dramRefresh(void)
 			writeIO(&PORT_DRAM, DRAM_RAS, 0);
 			_delay_us(1);
 			writeIO(&PORT_DRAM, DRAM_RAS, DRAM_RAS);
-			////// put another delay here??
 		}
 		while (++j != 0x00);
 	}
+}
+
+void dramTest(void)
+{
+	dbgHeader();
+	uartWritePSTR("dram test\n");
+	
+	dbgHeader();
+	uartWritePSTR("write 0x55, wait 5000 ms, read back: ");
+	
+	/* test the first 64 KiB */
+	for (uint32_t i = 0x00000; i <= 0x0ffff; ++i)
+		dramWrite(i, 0x55);
+	_delay_ms(5000);
+	for (uint32_t i = 0x00000; i < 0x0ffff; ++i)
+	{
+		if (dramRead(i) != 0x55)
+		{
+			uartWritePSTR("FAILED\n");
+			die();
+		}
+	}
+	
+	uartWritePSTR("OK\n");
+	
+	dbgHeader();
+	uartWritePSTR("write 0xaa, wait 5000 ms, read back: ");
+	
+	/* test the first 64 KiB */
+	for (uint32_t i = 0x00000; i <= 0x0ffff; ++i)
+		dramWrite(i, 0xaa);
+	_delay_ms(5000);
+	for (uint32_t i = 0x00000; i < 0x0ffff; ++i)
+	{
+		if (dramRead(i) != 0xaa)
+		{
+			uartWritePSTR("FAILED\n");
+			die();
+		}
+	}
+	
+	uartWritePSTR("OK\n");
 }
 
 void dramInit(void)
