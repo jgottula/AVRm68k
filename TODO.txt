@@ -12,6 +12,7 @@ Optimizations:
 - Reduce the overhead between SPI begin/end sessions
 - Use fast page mode to read WORD or LONG values
 - Put nonatomic_block around _delay's in dramRead/Write
+- Test AVR overclocks (6V is absolute max voltage; try 5.x volts?)
 
 Program size:
 - Use decompressor stub + compressed code?
