@@ -20,6 +20,14 @@ static void runTests(void)
 	
 	dramTest();
 	
+	uint16_t t0 = msec;
+	dramRefresh();
+	uint16_t t1 = msec;
+	dbgHeader();
+	uartWritePSTR("refresh duration: ");
+	uartWriteDec16(t1 - t0);
+	uartWritePSTR(" +/- 1 ms\n");
+	
 	uartWriteChr('\n');
 	dbgHeader();
 	uartWritePSTR("<<< End Tests >>>\n\n");
