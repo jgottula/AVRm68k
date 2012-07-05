@@ -20,8 +20,8 @@ ISR(TIMER1_COMPA_vect)
 		counter = 0;
 	}
 	
-	/* refresh the dram every 50 ms */
-	if (++dramCounter == 50)
+	/* refresh the dram at intervals */
+	if (++dramCounter == DRAM_REFRESH_FREQ)
 	{
 		dramRefresh();
 		dramCounter = 0;
