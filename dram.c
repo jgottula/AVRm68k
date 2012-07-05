@@ -114,13 +114,9 @@ void dramRefresh(void)
 
 void dramTest(void)
 {
-	dbgHeader();
 	uartWritePSTR("dram test\n");
 	
-	dbgHeader();
-	uartWritePSTR("write 0x55, wait 1000 ms, read back: ");
-	
-	/* test the first 64 KiB */
+	uartWritePSTR("64 KiB, pattern 0x55, 1000 ms: ");
 	for (uint32_t i = 0x00000; i <= 0x0ffff; ++i)
 		dramWrite(i, 0x55);
 	_delay_ms(1000);
@@ -132,13 +128,9 @@ void dramTest(void)
 			die();
 		}
 	}
-	
 	uartWritePSTR("OK\n");
 	
-	dbgHeader();
-	uartWritePSTR("write 0xaa, wait 1000 ms, read back: ");
-	
-	/* test the first 64 KiB */
+	uartWritePSTR("64 KiB, pattern 0xff, 1000 ms: ");
 	for (uint32_t i = 0x00000; i <= 0x0ffff; ++i)
 		dramWrite(i, 0xaa);
 	_delay_ms(1000);
@@ -150,7 +142,6 @@ void dramTest(void)
 			die();
 		}
 	}
-	
 	uartWritePSTR("OK\n");
 }
 

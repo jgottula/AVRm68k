@@ -6,9 +6,7 @@ void assertFail(const char *file, uint16_t line)
 {
 	if (uartEnabled())
 	{
-		uartWriteChr('\n');
-		dbgHeader();
-		uartWritePSTR("Assertion failed at ");
+		uartWritePSTR("\nAssertion failed at ");
 		uartWriteStr(file);
 		uartWriteChr(':');
 		uartWriteDec16(line);
@@ -95,9 +93,4 @@ void dumpIO(void)
 	uartWriteHex8(PORTD, false);
 	uartWritePSTR("\nPIND:  ");
 	uartWriteHex8(PIND, false);
-}
-
-void dbgHeader(void)
-{
-	uartWritePSTR("[AVRm68k] ");
 }

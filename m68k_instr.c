@@ -127,7 +127,6 @@ bool instrEmu(void)
 	switch (instr[0] & 0b1111)
 	{
 	case 0b0000:
-		dbgHeader();
 		uartWritePSTR("emu: dump reg\n");
 		m68kDumpReg();
 		break;
@@ -143,7 +142,6 @@ bool instrEmu(void)
 void instrNop(void)
 {
 	/* debug */
-	dbgHeader();
 	uartWritePSTR("nop\n");
 	
 	cpu.ureg.pc.l += 2;
@@ -154,7 +152,6 @@ void instrNop(void)
 void instrExg(void)
 {
 	/* debug */
-	dbgHeader();
 	uartWritePSTR("exg\n");
 	
 	cpu.ureg.pc.l += 2;
@@ -192,7 +189,6 @@ void instrExg(void)
 void instrMoveFromCcr(void)
 {
 	/* debug */
-	dbgHeader();
 	uartWritePSTR("move ccr,<ea>\n");
 	
 	cpu.ureg.pc.l += 2; // NOTE: may be larger for EA extensions
@@ -212,7 +208,6 @@ void instrMoveFromCcr(void)
 void instrMoveq(void)
 {
 	/* debug */
-	dbgHeader();
 	uartWritePSTR("moveq\n");
 	
 	cpu.ureg.pc.l += 2;
@@ -237,7 +232,6 @@ void instrMoveq(void)
 void instrClr(void)
 {
 	/* debug */
-	dbgHeader();
 	uartWritePSTR("clr\n");
 	
 	cpu.ureg.pc.l += 2; // NOTE: may be larger for EA extensions

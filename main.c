@@ -16,7 +16,6 @@
 
 static void runTests(void)
 {
-	dbgHeader();
 	uartWritePSTR("<<< Begin Tests >>>\n");
 	
 	dramTest();
@@ -24,14 +23,12 @@ static void runTests(void)
 	uint16_t t0 = msec;
 	dramRefresh();
 	uint16_t t1 = msec;
-	dbgHeader();
 	uartWritePSTR("refresh duration: ");
 	uartWriteDec16(t1 - t0);
 	uartWritePSTR(" +/- 1 ms\n");
 	
 	memDump(0x00000, 8);
 	
-	dbgHeader();
 	uartWritePSTR("<<< End Tests >>>\n");
 }
 
@@ -48,9 +45,7 @@ noreturn void main(void)
 	spiInit();
 	//sdInit();
 	
-	uartWriteChr('\n');
-	dbgHeader();
-	uartWritePSTR("Started.\n");
+	uartWritePSTR("\nStarted.\n");
 	
 	runTests();
 	
@@ -64,7 +59,6 @@ noreturn void main(void)
 			{
 				badISR = false;
 				
-				dbgHeader();
 				uartWritePSTR("Bad ISR!\n");
 			}
 		}

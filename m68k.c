@@ -14,7 +14,6 @@ static void m68kFetch(void)
 		sizeof(fetchBuffer));
 	
 	/* debug */
-	dbgHeader();
 	uartWritePSTR("Fetch:");
 	for (uint8_t i = 0; i < sizeof(fetchBuffer) / 2; ++i)
 	{
@@ -182,6 +181,5 @@ void m68kInit(void)
 	}
 	
 	/* debug */
-	dbgHeader();
 	uartWritePSTR("CPU initialized.\n");
 }

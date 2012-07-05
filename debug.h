@@ -27,7 +27,6 @@ noreturn void reset(void);
 void flashLED(uint16_t duration);
 noreturn void blinkLEDForever(uint16_t halfPeriod);
 void dumpIO();
-void dbgHeader(void);
 
 noreturn inline void die(void)
 {

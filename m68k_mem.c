@@ -52,7 +52,6 @@ void memWrite(uint32_t addr, uint8_t size, uint32_t value)
 
 void memDump(uint32_t addr, uint16_t lines)
 {
-	dbgHeader();
 	uartWritePSTR("memory dump:\n");
 	
 	for (uint16_t i = 0; i < lines; ++i)
