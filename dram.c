@@ -8,16 +8,10 @@
 /* WARNING: because the refresh routine is called from an ISR and could
  * interrupt at any time, these functions MUST use ATOMIC_BLOCKs */
 
-static void dramLoadAddrL(uint32_t addr)
+static void dramLoadAddrBus(uint16_t addr10)
 {
-	writeIO(&PORT_ADDRL, ADDRL_ALL, (uint8_t)addr);
-	writeIO(&PORT_ADDRH, ADDRH_ALL, (uint8_t)(addr >> 2));
-}
-
-static void dramLoadAddrH(uint32_t addr)
-{
-	writeIO(&PORT_ADDRL, ADDRL_ALL, (uint8_t)(addr >> 10));
-	writeIO(&PORT_ADDRH, ADDRH_ALL, (uint8_t)(addr >> 12));
+	writeIO(&PORT_ADDRL, ADDRL_ALL, (uint8_t)addr10);
+	writeIO(&PORT_ADDRH, ADDRH_ALL, (uint8_t)(addr10 >> 2));
 }
 
 uint8_t dramRead(uint32_t addr)
@@ -33,14 +27,14 @@ uint8_t dramRead(uint32_t addr)
 		writeIO(&PORT_DATA, DATA_ALL, DATA_ALL);
 		
 		/* put the high part of the address as the row number */
-		dramLoadAddrH(addr);
+		dramLoadAddrBus(addr >> 10);
 		
 		/* assert RAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
 		_delay_us(1);
 		
 		/* put the low part of the address as the column number */
-		dramLoadAddrL(addr);
+		dramLoadAddrBus(addr);
 		
 		/* assert CAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
