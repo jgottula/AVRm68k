@@ -62,6 +62,7 @@ struct {
 	} meg;
 } cpu;
 
+void m68kDumpReg(void);
 void m68kNext(void);
 void m68kInit(void);
 

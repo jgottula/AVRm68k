@@ -76,8 +76,8 @@ static void m68kExecute(void)
 	case 0b1001: // SUB, SUBX
 		assert(0);
 		break;
-	case 0b1010: // reserved
-		assert(0);
+	case 0b1010: // reserved (emulator instructions)
+		assert(instrEmu());
 		break;
 	case 0b1011: // CMP, EOR
 		assert(0);
@@ -100,7 +100,7 @@ static void m68kExecute(void)
 	}
 }
 
-static void m68kDumpReg(void)
+void m68kDumpReg(void)
 {
 	dbgHeader();
 	uartWritePSTR("----------\n");
@@ -176,7 +176,7 @@ static void m68kDumpReg(void)
 void m68kNext(void)
 {
 	/* debug */
-	m68kDumpReg();
+	//m68kDumpReg();
 	
 	/* fetch from EEPROM */
 	m68kFetch();
