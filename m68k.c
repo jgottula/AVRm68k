@@ -102,17 +102,12 @@ static void m68kExecute(void)
 
 void m68kDumpReg(void)
 {
-	dbgHeader();
-	uartWritePSTR("----------\n");
-	
-	dbgHeader();
 	uartWritePSTR("pc: 0x");
 	uartWriteHex32(cpu.ureg.pc.l, false);
 	uartWritePSTR(" sr: 0x");
 	uartWriteHex32(cpu.ureg.sr.l, false);
 	uartWriteChr('\n');
 	
-	dbgHeader();
 	uartWriteChr('[');
 	uartWriteChr((cpu.ureg.sr.l & SR_CARRY) ? 'x' : ' ');
 	uartWritePSTR("] carry  [");
@@ -125,7 +120,6 @@ void m68kDumpReg(void)
 	uartWriteChr((cpu.ureg.sr.l & SR_EXTEND) ? 'x' : ' ');
 	uartWritePSTR("] extend\n");
 	
-	dbgHeader();
 	uartWritePSTR("d0: 0x");
 	uartWriteHex32(cpu.ureg.d[0].l, false);
 	uartWritePSTR(" d4: 0x");
@@ -136,7 +130,6 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.a[4].l, false);
 	uartWriteChr('\n');
 	
-	dbgHeader();
 	uartWritePSTR("d1: 0x");
 	uartWriteHex32(cpu.ureg.d[1].l, false);
 	uartWritePSTR(" d5: 0x");
@@ -147,7 +140,6 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.a[5].l, false);
 	uartWriteChr('\n');
 	
-	dbgHeader();
 	uartWritePSTR("d2: 0x");
 	uartWriteHex32(cpu.ureg.d[2].l, false);
 	uartWritePSTR(" d6: 0x");
@@ -158,7 +150,6 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.a[6].l, false);
 	uartWriteChr('\n');
 	
-	dbgHeader();
 	uartWritePSTR("d3: 0x");
 	uartWriteHex32(cpu.ureg.d[3].l, false);
 	uartWritePSTR(" d7: 0x");
@@ -168,16 +159,10 @@ void m68kDumpReg(void)
 	uartWritePSTR(" a7: 0x");
 	uartWriteHex32(cpu.ureg.a[7].l, false);
 	uartWriteChr('\n');
-	
-	dbgHeader();
-	uartWritePSTR("----------\n");
 }
 
 void m68kNext(void)
 {
-	/* debug */
-	//m68kDumpReg();
-	
 	/* fetch from EEPROM */
 	m68kFetch();
 	
