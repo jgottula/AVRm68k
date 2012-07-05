@@ -14,8 +14,10 @@
 #undef HAVE_LED
 
 #ifdef DEBUG
+/* don't use PSTR() around __FILE__, as it will make duplicate copies, resulting
+ * in a net size _increase_ */
 #define assert(x) \
-	{ if (!(x)) { assertFail(PSTR(__FILE__), __LINE__); } }
+	{ if (!(x)) { assertFail(__FILE__, __LINE__); } }
 #else
 #define assert(x) (x)
 #endif
