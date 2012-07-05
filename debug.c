@@ -9,7 +9,7 @@ void assertFail(const char *file, uint16_t line)
 		uartWriteChr('\n');
 		dbgHeader();
 		uartWritePSTR("Assertion failed at ");
-		uartWritePStr(file);
+		uartWriteStr(file);
 		uartWriteChr(':');
 		uartWriteDec16(line);
 		uartWritePSTR(".\n");
