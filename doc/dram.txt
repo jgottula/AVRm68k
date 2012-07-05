@@ -22,3 +22,5 @@ tP   > 60  ?
 tWCY > 150 ?
 tDH  > 15  Mux to CAS delay??
 tRWC > 175 ?
+
+Refreshing at 250 ms seems to retain data; 500 fails; <= 100 seems safest
