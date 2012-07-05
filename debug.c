@@ -6,6 +6,7 @@ void assertFail(const char *file, uint16_t line)
 {
 	if (uartEnabled())
 	{
+		uartWriteChr('\n');
 		dbgHeader();
 		uartWritePSTR("Assertion failed at ");
 		uartWritePStr(file);
