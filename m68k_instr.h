@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+bool instrEmu(void);
 void instrNop(void);
 void instrExg(void);
 void instrMoveFromCcr(void);

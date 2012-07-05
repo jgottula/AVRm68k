@@ -122,6 +122,24 @@ static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 	}
 }
 
+bool instrEmu(void)
+{
+	switch (instr[0] & 0b1111)
+	{
+	case 0b0000:
+		dbgHeader();
+		uartWritePSTR("emu: dump reg\n");
+		m68kDumpReg();
+		break;
+	default:
+		return false;
+	}
+	
+	cpu.ureg.pc.l += 1;
+	
+	return true;
+}
+
 void instrNop(void)
 {
 	/* debug */
