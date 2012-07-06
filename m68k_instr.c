@@ -41,7 +41,7 @@ void instrNop(void)
 	/* does not affect CCR */
 }
 
-/* untested */
+#warning instrExg: untested!
 void instrExg(void)
 {
 	/* debug */
@@ -79,7 +79,7 @@ void instrExg(void)
 	/* does not affect CCR */
 }
 
-/* untested */
+#warning instrCcr: untested!
 void instrMoveFromCcr(void)
 {
 	/* debug */
@@ -100,7 +100,7 @@ void instrMoveFromCcr(void)
 	/* does not affect CCR */
 }
 
-/* untested */
+#warning instrMoveq: untested!
 void instrMoveq(void)
 {
 	/* debug */
@@ -121,7 +121,7 @@ void instrMoveq(void)
 		cpu.ureg.sr.l |= SR_NEGATIVE;
 }
 
-/* untested */
+#warning instrClr: untested!
 void instrClr(void)
 {
 	/* debug */
