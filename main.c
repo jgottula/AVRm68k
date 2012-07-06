@@ -36,7 +36,7 @@ noreturn void main(void)
 	
 	while (true)
 	{
-		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+		ATOMIC_BLOCK(ATOMIC_FORCEON)
 		{
 			if (badISR)
 			{
