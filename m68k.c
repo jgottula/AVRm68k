@@ -14,7 +14,7 @@ static void m68kFetch(void)
 		sizeof(fetchBuffer));
 	
 	/* debug */
-	uartWritePSTR("[Fetch]");
+	uartWritePSTR("\n[Fetch]");
 	for (uint8_t i = 0; i < sizeof(fetchBuffer) / 2; ++i)
 	{
 		uartWriteChr(' ');
