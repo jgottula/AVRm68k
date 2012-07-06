@@ -3,6 +3,7 @@ Priorities:
 - Emulator: memory system
 - Emulator: addressing modes
 - Emulator: instructions
+  - Next: clr, cmp, eor, or, and
 - Replace SIMM
   - Wire two address lines
   - Update IO defs
