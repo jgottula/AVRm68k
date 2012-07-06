@@ -5,7 +5,17 @@
 #include "uart.h"
 
 extern uint8_t *instr;
-extern uint16_t *instrWord;
+
+static uint16_t decodeBigEndian16(const uint8_t *bytes)
+{
+	return ((uint16_t)bytes[0] << 8) | bytes[1];
+}
+
+static uint32_t decodeBigEndian32(const uint8_t *bytes)
+{
+	return ((uint32_t)bytes[0] << 24) | ((uint32_t)bytes[1] << 16) |
+		((uint32_t)bytes[2] << 8) | bytes[3];
+}
 
 /* untested */
 static uint16_t signExtend8to16(uint8_t byte)
@@ -241,7 +251,7 @@ static uint32_t accessEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 
 bool instrEmu(void)
 {
-	uint16_t instrWord = (instr[0] << 8) | instr[1];
+	uint16_t instrWord = decodeBigEndian16(instr);
 	
 	switch (instrWord)
 	{
@@ -252,9 +262,8 @@ bool instrEmu(void)
 		return true;
 	case EMUINSTR_DUMPMEM:
 		uartWritePSTR("emu: dumpmem\n");
-		uint32_t addr = ((uint32_t)instr[2] << 24) |
-			((uint32_t)instr[3] << 16) | ((uint32_t)instr[4] << 8) | instr[5];
-		uint16_t lines = ((uint16_t)instr[6] << 8) | instr[7];
+		uint32_t addr = decodeBigEndian32(instr + 2);
+		uint16_t lines = decodeBigEndian16(instr + 6);
 		memDump(addr, lines);
 		cpu.ureg.pc.l += 8;
 		return true;
