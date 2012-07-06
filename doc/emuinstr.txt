@@ -1,7 +1,10 @@
 Special emulator instructions
 
-The instruction prefix 0b1010 is reserved.
+The instruction prefix 0b1010 (0xa___)) is reserved.
 
-least significant nibble definitions:
+0xa001 dumpreg: dump registers
+  no args
 
-0b0001 dumpreg: dump registers
+0xa002 dumpmem: dump memory
+  long: address
+  word: lines

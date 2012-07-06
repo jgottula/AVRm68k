@@ -241,19 +241,26 @@ static uint32_t accessEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 
 bool instrEmu(void)
 {
-	switch (instr[0])
+	uint16_t instrWord = (instr[0] << 8) | instr[1];
+	
+	switch (instrWord)
 	{
 	case EMUINSTR_DUMPREG:
 		uartWritePSTR("emu: dumpreg\n");
 		m68kDumpReg();
-		break;
+		cpu.ureg.pc.l += 2;
+		return true;
+	case EMUINSTR_DUMPMEM:
+		uartWritePSTR("emu: dumpmem\n");
+		uint32_t addr = ((uint32_t)instr[2] << 24) |
+			((uint32_t)instr[3] << 16) | ((uint32_t)instr[4] << 8) | instr[5];
+		uint16_t lines = ((uint16_t)instr[6] << 8) | instr[7];
+		memDump(addr, lines);
+		cpu.ureg.pc.l += 8;
+		return true;
 	default:
 		return false;
 	}
-	
-	cpu.ureg.pc.l += 1;
-	
-	return true;
 }
 
 void instrNop(void)
