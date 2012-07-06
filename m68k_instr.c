@@ -163,18 +163,6 @@ static uint32_t accessEA(uint32_t addr, uint8_t mode, uint8_t reg,
 	return rtn;
 }
 
-static void preEA(uint8_t mode, uint8_t reg, uint8_t size)
-{
-	if (mode == AMODE_AREGPREDEC)
-		prePostIncrDecr(false, reg, size);
-}
-
-static void postEA(uint8_t mode, uint8_t reg, uint8_t size)
-{
-	if (mode == AMODE_AREGPOSTINC)
-		prePostIncrDecr(true, reg, size);
-}
-
 static uint32_t calcEA(uint8_t mode, uint8_t reg)
 {
 	uint32_t effAddr;
