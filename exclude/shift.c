@@ -1,8 +1,6 @@
 #include "shift.h"
 #include "io.h"
 
-#if 0
-
 static void shiftLatch()
 {
 	SHIFT_PORT ^= SHIFT_LATCH;
@@ -69,5 +67,3 @@ void shiftInit(void)
 {
 	writeIO(&SHIFT_PORT, SHIFT_ALL, SHIFT_CLK | SHIFT_LATCH | SHIFT_CLEAR);
 }
-
-#endif
