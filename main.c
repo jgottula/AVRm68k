@@ -30,9 +30,9 @@ noreturn void main(void)
 	
 	uartWritePSTR("\nStarted.\n");
 	
-	testAll();
-	
 	m68kInit();
+	
+	testAll();
 	
 	while (true)
 	{
