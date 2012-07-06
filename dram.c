@@ -112,39 +112,6 @@ void dramRefresh(void)
 	}
 }
 
-void dramTest(void)
-{
-	uartWritePSTR("dram test\n");
-	
-	uartWritePSTR("64 KiB, pattern 0x55, 1000 ms: ");
-	for (uint32_t i = 0x00000; i <= 0x0ffff; ++i)
-		dramWrite(i, 0x55);
-	_delay_ms(1000);
-	for (uint32_t i = 0x00000; i < 0x0ffff; ++i)
-	{
-		if (dramRead(i) != 0x55)
-		{
-			uartWritePSTR("FAILED\n");
-			die();
-		}
-	}
-	uartWritePSTR("OK\n");
-	
-	uartWritePSTR("64 KiB, pattern 0xff, 1000 ms: ");
-	for (uint32_t i = 0x00000; i <= 0x0ffff; ++i)
-		dramWrite(i, 0xaa);
-	_delay_ms(1000);
-	for (uint32_t i = 0x00000; i < 0x0ffff; ++i)
-	{
-		if (dramRead(i) != 0xaa)
-		{
-			uartWritePSTR("FAILED\n");
-			die();
-		}
-	}
-	uartWritePSTR("OK\n");
-}
-
 void dramInit(void)
 {
 	/* set the address bus and control lines to output mode */

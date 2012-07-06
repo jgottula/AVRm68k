@@ -12,25 +12,8 @@
 #include "sd.h"
 #include "shift.h"
 #include "spi.h"
+#include "test.h"
 #include "uart.h"
-
-static void runTests(void)
-{
-	uartWritePSTR("<<< Begin Tests >>>\n");
-	
-	dramTest();
-	
-	uint16_t t0 = msec;
-	dramRefresh();
-	uint16_t t1 = msec;
-	uartWritePSTR("refresh duration: ");
-	uartWriteDec16(t1 - t0);
-	uartWritePSTR(" +/- 1 ms\n");
-	
-	memDump(0x00000, 8);
-	
-	uartWritePSTR("<<< End Tests >>>\n");
-}
 
 noreturn void main(void)
 {
@@ -47,7 +30,7 @@ noreturn void main(void)
 	
 	uartWritePSTR("\nStarted.\n");
 	
-	runTests();
+	testAll();
 	
 	m68kInit();
 	
