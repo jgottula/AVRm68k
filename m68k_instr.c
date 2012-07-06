@@ -241,10 +241,10 @@ static uint32_t accessEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 
 bool instrEmu(void)
 {
-	switch (instr[0] & 0b1111)
+	switch (instr[0])
 	{
-	case 0b0000:
-		uartWritePSTR("emu: dump reg\n");
+	case EMUINSTR_DUMPREG:
+		uartWritePSTR("emu: dumpreg\n");
 		m68kDumpReg();
 		break;
 	default:

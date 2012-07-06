@@ -4,4 +4,4 @@ The instruction prefix 0b1010 is reserved.
 
 least significant nibble definitions:
 
-0b0000 dump registers
+0b0001 dumpreg: dump registers

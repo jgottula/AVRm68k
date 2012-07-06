@@ -31,6 +31,8 @@
 #define EXT_BRIEF 0
 #define EXT_FULL  1
 
+#define EMUINSTR_DUMPREG 0b10100001
+
 typedef union {
 	uint32_t l;
 	uint16_t w[2];
