@@ -17,7 +17,6 @@ static uint32_t decodeBigEndian32(const uint8_t *bytes)
 		((uint32_t)bytes[2] << 8) | bytes[3];
 }
 
-/* untested */
 static uint16_t signExtend8to16(uint8_t byte)
 {
 	if ((int8_t)byte < 0)
@@ -26,7 +25,6 @@ static uint16_t signExtend8to16(uint8_t byte)
 		return byte;
 }
 
-/* untested */
 static uint32_t signExtend8to32(uint8_t byte)
 {
 	if ((int8_t)byte < 0)
@@ -35,17 +33,16 @@ static uint32_t signExtend8to32(uint8_t byte)
 		return byte;
 }
 
-/* untested */
 static uint32_t readReg(uint8_t mode, uint8_t reg, int8_t size)
 {
 	Reg *src;
 	
 	switch (mode)
 	{
-	case 0b000:
+	case AMODE_DREGDIRECT:
 		src = &cpu.ureg.d[reg];
 		break;
-	case 0b001:
+	case AMODE_AREGDIRECT:
 		src = &cpu.ureg.a[reg];
 		break;
 	default:
@@ -65,17 +62,16 @@ static uint32_t readReg(uint8_t mode, uint8_t reg, int8_t size)
 	}
 }
 
-/* untested */
 static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 {
 	Reg *dest;
 	
 	switch (mode)
 	{
-	case 0b000:
+	case AMODE_DREGDIRECT:
 		dest = &cpu.ureg.d[reg];
 		break;
-	case 0b001:
+	case AMODE_AREGDIRECT:
 		dest = &cpu.ureg.a[reg];
 		break;
 	default:
@@ -98,7 +94,6 @@ static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 	}
 }
 
-/* untested */
 static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
 {
 	uint8_t actualSize;
@@ -127,7 +122,6 @@ static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
 		cpu.ureg.a[reg].l -= actualSize;
 }
 
-/* untested */
 static bool getExtType()
 {
 	const uint8_t *extWord = instr + 2;
@@ -138,101 +132,18 @@ static bool getExtType()
 		return EXT_BRIEF;
 }
 
-/* untested */
-static uint32_t calcBriefDisp()
-{
-	const uint8_t *briefExt = instr + 2;
-	
-	/* this may not be right (8 bits??) */
-	uint8_t disp = signExtend8to32(briefExt[1]);
-	
-	return disp;
-}
-
-/* untested */
-static uint32_t calcBriefDispWithIndex()
-{
-	const uint8_t *briefExt = instr + 2;
-	
-	uint8_t disp = signExtend8to32(briefExt[1]);
-	uint8_t reg = ((briefExt[0] >> 4) & 0b00000111);
-	uint8_t size = ((briefExt[0] & 0b00001000) ? SIZE_LONG : SIZE_WORD);
-	uint8_t scale = ((briefExt[0] >> 1) & 0b00000011);
-	
-	return disp + (memRead(reg, SIZE_LONG) * (1 << scale));
-}
-
-/* untested */
-static uint32_t calcEA(uint8_t mode, uint8_t reg, uint8_t size)
-{
-	uint32_t effAddr;
-	
-	switch (mode)
-	{
-	case 0b000: // data reg direct
-	case 0b001: // addr reg direct
-		assert(0);
-	case 0b010: // addr reg indirect
-		effAddr = cpu.ureg.a[reg].l;
-		break;
-	case 0b011: // addr reg indirect (post-increment)
-		effAddr = cpu.ureg.a[reg].l;
-		prePostIncrDecr(true, reg, size);
-		break;
-	case 0b100: // addr reg indirect (pre-decrement)
-		prePostIncrDecr(false, reg, size);
-		effAddr = cpu.ureg.a[reg].l;
-		break;
-	case 0b101: // addr reg indirect (displacement)
-		effAddr = cpu.ureg.a[reg].l + calcBriefDisp();
-		break;
-	case 0b110: // multiple addr reg indirect
-		effAddr = memRead(cpu.ureg.a[reg].l + calcBriefDispWithIndex(),
-			SIZE_LONG);
-		break;
-	case 0b111: // multiple pc relative
-		assert(0);
-	default:
-		assert(0);
-	}
-	
-	return effAddr;
-}
-
-/* untested */
-static uint32_t accessEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
-	bool signExtendTo32, bool write)
+static uint32_t accessEA(uint32_t addr, uint8_t mode, uint8_t reg,
+	uint32_t data, uint8_t size, bool write)
 {
 	uint32_t rtn = 0;
 	
-	if (signExtendTo32)
-	{
-		switch (size)
-		{
-		case SIZE_BYTE:
-			if ((int8_t)data < 0)
-				data |= 0xffffff00;
-			else
-				data &= 0xffffff00;
-			break;
-		case SIZE_WORD:
-			if ((int16_t)data < 0)
-				data |= 0xffff0000;
-			else
-				data &= 0xffff0000;
-			break;
-		default:
-			assert(0);
-		}
-		
-		/* use the entire long value now */
-		size = SIZE_LONG;
-	}
+	if (mode == AMODE_AREGPREDEC)
+		prePostIncrDecr(false, reg, size);
 	
 	switch (mode)
 	{
-	case 0b000: // data reg direct
-	case 0b001: // addr reg direct
+	case AMODE_DREGDIRECT:
+	case AMODE_AREGDIRECT:
 		if (write)
 			writeReg(mode, reg, data, size);
 		else
@@ -240,13 +151,70 @@ static uint32_t accessEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 		break;
 	default:
 		if (write)
-			memWrite(calcEA(mode, reg, size), size, data);
+			memWrite(addr, size, data);
 		else
-			rtn = memRead(calcEA(mode, reg, size), size);
+			rtn = memRead(addr, size);
 		break;
 	}
 	
+	if (mode == AMODE_AREGPOSTINC)
+		prePostIncrDecr(true, reg, size);
+	
 	return rtn;
+}
+
+static void preEA(uint8_t mode, uint8_t reg, uint8_t size)
+{
+	if (mode == AMODE_AREGPREDEC)
+		prePostIncrDecr(false, reg, size);
+}
+
+static void postEA(uint8_t mode, uint8_t reg, uint8_t size)
+{
+	if (mode == AMODE_AREGPOSTINC)
+		prePostIncrDecr(true, reg, size);
+}
+
+static uint32_t calcEA(uint8_t mode, uint8_t reg)
+{
+	uint32_t effAddr;
+	
+	switch (mode)
+	{
+	case AMODE_DREGDIRECT:
+	case AMODE_AREGDIRECT:
+		effAddr = 0;
+		break;
+	case AMODE_AREGINDIRECT:
+	case AMODE_AREGPOSTINC:
+	case AMODE_AREGPREDEC:
+		effAddr = cpu.ureg.a[reg].l;
+		break;
+	case AMODE_AREGDISPLACE:
+		assert(0);
+	case AMODE_AREGINDEXED:
+		assert(0);
+	case AMODE_EXTRA:
+		switch (reg)
+		{
+		case AMODE_EXTRA_ABSSHORT:
+			assert(0);
+		case AMODE_EXTRA_ABSLONG:
+			assert(0);
+		case AMODE_EXTRA_PCDISPLACE:
+			assert(0);
+		case AMODE_EXTRA_PCINDEXED:
+			assert(0);
+		case AMODE_EXTRA_IMMEDIATE:
+			assert(0);
+		default:
+			assert(0);
+		}
+	default:
+		assert(0);
+	}
+	
+	return effAddr;
 }
 
 bool instrEmu(void)
@@ -335,7 +303,8 @@ void instrMoveFromCcr(void)
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
-	accessEA(mode, reg, ccr, SIZE_WORD, false, true);
+	uint32_t effAddr = calcEA(mode, reg);
+	accessEA(effAddr, mode, reg, ccr, SIZE_WORD, true);
 	
 	/* does not affect CCR */
 }
@@ -373,7 +342,8 @@ void instrClr(void)
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	
-	accessEA(mode, reg, 0, size, false, true);
+	uint32_t effAddr = calcEA(mode, reg);
+	accessEA(effAddr, mode, reg, 0, size, true);
 	
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
 	cpu.ureg.sr.l |= SR_ZERO;
