@@ -28,22 +28,22 @@ uint32_t memRead(uint32_t addr, uint8_t size)
 	assert(0);
 }
 
-void memWrite(uint32_t addr, uint8_t size, uint32_t value)
+void memWrite(uint32_t addr, uint8_t size, uint32_t data)
 {
 	switch (size)
 	{
 	case SIZE_BYTE:
-		dramWrite(addr, value);
+		dramWrite(addr, data);
 		break;
 	case SIZE_WORD:
-		dramWrite(addr, (value >> 8));
-		dramWrite(addr + 1, value);
+		dramWrite(addr, (data >> 8));
+		dramWrite(addr + 1, data);
 		break;
 	case SIZE_LONG:
-		dramWrite(addr, (value >> 24));
-		dramWrite(addr + 1, (value >> 16));
-		dramWrite(addr + 2, (value >> 8));
-		dramWrite(addr + 3, value);
+		dramWrite(addr, (data >> 24));
+		dramWrite(addr + 1, (data >> 16));
+		dramWrite(addr + 2, (data >> 8));
+		dramWrite(addr + 3, data);
 		break;
 	default:
 		assert(0);
