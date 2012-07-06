@@ -3,18 +3,33 @@ Priorities:
 - Emulator: memory system
 - Emulator: addressing modes
 - Emulator: instructions
+- Replace SIMM
+  - Wire two address lines
+  - Update IO defs
+  - Replace all 20-bit addresses with 24-bit ones (0xffffff)
+  - Tighten timings
 - SD
 - Linux from scratch
 - Bootloader
 - HDD driver
 - RTC chip for date/time
 
+Tests:
+- m68k_mem: read and write, for all sizes
+- ALL address modes
+
 Optimizations:
 - Set DRAM delays based on spec (if any such spec exists)
 - Reduce the overhead between SPI begin/end sessions
 - Use fast page mode to read WORD or LONG values
 - Put nonatomic_block around _delay's in dramRead/Write
-- Test AVR overclocks (6V is absolute max voltage; try 5.x volts?)
+- Test AVR overclocks (6V is absolute max voltage; try ~5.5V overvolt somehow?)
+- Remove debug code
 
 Program size:
 - Use decompressor stub + compressed code?
+
+Overclocking:
+- Use LM317/7806 to do up to 6V
+- Problem: outputs need to be buffered or else all TTL-level components will be
+  overvolted
