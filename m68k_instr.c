@@ -7,6 +7,7 @@
 extern uint8_t *instr;
 extern uint16_t *instrWord;
 
+/* untested */
 static uint16_t signExtend8to16(uint8_t byte)
 {
 	if ((int8_t)byte < 0)
@@ -15,6 +16,7 @@ static uint16_t signExtend8to16(uint8_t byte)
 		return byte;
 }
 
+/* untested */
 static uint32_t signExtend8to32(uint8_t byte)
 {
 	if ((int8_t)byte < 0)
@@ -23,6 +25,37 @@ static uint32_t signExtend8to32(uint8_t byte)
 		return byte;
 }
 
+/* untested */
+static uint32_t readReg(uint8_t mode, uint8_t reg, int8_t size)
+{
+	Reg *src;
+	
+	switch (mode)
+	{
+	case 0b000:
+		src = &cpu.ureg.d[reg];
+		break;
+	case 0b001:
+		src = &cpu.ureg.a[reg];
+		break;
+	default:
+		assert(0);
+	}
+	
+	switch (size)
+	{
+	case SIZE_BYTE:
+		return src->b[0];
+	case SIZE_WORD:
+		return src->w[0];
+	case SIZE_LONG:
+		return src->l;
+	default:
+		assert(0);
+	}
+}
+
+/* untested */
 static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 {
 	Reg *dest;
@@ -55,6 +88,7 @@ static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 	}
 }
 
+/* untested */
 static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
 {
 	uint8_t actualSize;
@@ -83,6 +117,7 @@ static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
 		cpu.ureg.a[reg].l -= actualSize;
 }
 
+/* untested */
 static bool getExtType()
 {
 	const uint8_t *extWord = instr + 2;
@@ -93,23 +128,74 @@ static bool getExtType()
 		return EXT_BRIEF;
 }
 
+/* untested */
 static uint32_t calcBriefDisp()
 {
 	const uint8_t *briefExt = instr + 2;
 	
-	uint8_t size = ((briefExt[0] & 0b00001000) ? SIZE_LONG : SIZE_WORD);
-	uint8_t disp = briefExt[1];
+	/* this may not be right (8 bits??) */
+	uint8_t disp = signExtend8to32(briefExt[1]);
 	
-	if (size == SIZE_WORD)
-		return signExtend8to16(disp);
-	else
-		return signExtend8to32(disp);
+	return disp;
 }
 
-static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
-	bool signExtend)
+/* untested */
+static uint32_t calcBriefDispWithIndex()
 {
-	if (signExtend)
+	const uint8_t *briefExt = instr + 2;
+	
+	uint8_t disp = signExtend8to32(briefExt[1]);
+	uint8_t reg = ((briefExt[0] >> 4) & 0b00000111);
+	uint8_t size = ((briefExt[0] & 0b00001000) ? SIZE_LONG : SIZE_WORD);
+	uint8_t scale = ((briefExt[0] >> 1) & 0b00000011);
+	
+	return disp + (memRead(reg, SIZE_LONG) * (1 << scale));
+}
+
+/* untested */
+static uint32_t calcEA(uint8_t mode, uint8_t reg, uint8_t size)
+{
+	uint32_t effAddr;
+	
+	switch (mode)
+	{
+	case 0b000: // data reg direct
+	case 0b001: // addr reg direct
+		assert(0);
+	case 0b010: // addr reg indirect
+		effAddr = cpu.ureg.a[reg].l;
+		break;
+	case 0b011: // addr reg indirect (post-increment)
+		effAddr = cpu.ureg.a[reg].l;
+		prePostIncrDecr(true, reg, size);
+		break;
+	case 0b100: // addr reg indirect (pre-decrement)
+		prePostIncrDecr(false, reg, size);
+		effAddr = cpu.ureg.a[reg].l;
+		break;
+	case 0b101: // addr reg indirect (displacement)
+		effAddr = cpu.ureg.a[reg].l + calcBriefDisp();
+		break;
+	case 0b110: // multiple addr reg indirect
+		effAddr = memRead(cpu.ureg.a[reg].l + calcBriefDispWithIndex(),
+			SIZE_LONG);
+		break;
+	case 0b111: // multiple pc relative
+		assert(0);
+	default:
+		assert(0);
+	}
+	
+	return effAddr;
+}
+
+/* untested */
+static uint32_t accessEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
+	bool signExtendTo32, bool write)
+{
+	uint32_t rtn = 0;
+	
+	if (signExtendTo32)
 	{
 		switch (size)
 		{
@@ -129,7 +215,7 @@ static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 			assert(0);
 		}
 		
-		/* write the entire long value now */
+		/* use the entire long value now */
 		size = SIZE_LONG;
 	}
 	
@@ -137,30 +223,20 @@ static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 	{
 	case 0b000: // data reg direct
 	case 0b001: // addr reg direct
-		writeReg(mode, reg, data, size);
+		if (write)
+			writeReg(mode, reg, data, size);
+		else
+			rtn = readReg(mode, reg, size);
 		break;
-	case 0b010: // addr reg indirect
-		memWrite(cpu.ureg.a[reg].l, size, data);
-		break;
-	case 0b011: // addr reg indirect (post-increment)
-		memWrite(cpu.ureg.a[reg].l, size, data);
-		prePostIncrDecr(true, reg, size);
-		break;
-	case 0b100: // addr reg indirect (pre-decrement)
-		prePostIncrDecr(false, reg, size);
-		memWrite(cpu.ureg.a[reg].l, size, data);
-		break;
-	case 0b101: // addr reg indirect (displacement)
-		memWrite(memRead(cpu.ureg.a[reg].l + calcBriefDisp(), SIZE_LONG),
-			size, data);
-		break;
-	case 0b110: // multiple addr reg indirect
-		assert(0);
-	case 0b111: // multiple pc relative
-		assert(0);
 	default:
-		assert(0);
+		if (write)
+			memWrite(calcEA(mode, reg, size), size, data);
+		else
+			rtn = memRead(calcEA(mode, reg, size), size);
+		break;
 	}
+	
+	return rtn;
 }
 
 bool instrEmu(void)
@@ -190,6 +266,7 @@ void instrNop(void)
 	/* does not affect CCR */
 }
 
+/* untested */
 void instrExg(void)
 {
 	/* debug */
@@ -227,6 +304,7 @@ void instrExg(void)
 	/* does not affect CCR */
 }
 
+/* untested */
 void instrMoveFromCcr(void)
 {
 	/* debug */
@@ -241,11 +319,12 @@ void instrMoveFromCcr(void)
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
-	writeEA(mode, reg, ccr, SIZE_WORD, false);
+	accessEA(mode, reg, ccr, SIZE_WORD, false, true);
 	
 	/* does not affect CCR */
 }
 
+/* untested */
 void instrMoveq(void)
 {
 	/* debug */
@@ -266,6 +345,7 @@ void instrMoveq(void)
 		cpu.ureg.sr.l |= SR_NEGATIVE;
 }
 
+/* untested */
 void instrClr(void)
 {
 	/* debug */
@@ -277,7 +357,7 @@ void instrClr(void)
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	
-	writeEA(mode, reg, 0, size, false);
+	accessEA(mode, reg, 0, size, false, true);
 	
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
 	cpu.ureg.sr.l |= SR_ZERO;

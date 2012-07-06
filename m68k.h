@@ -23,6 +23,11 @@
 #define SIZE_WORD 0b01
 #define SIZE_LONG 0b10
 
+#define SCALE_1 0b00
+#define SCALE_2 0b01
+#define SCALE_4 0b10
+#define SCALE_8 0b11
+
 #define EXT_BRIEF 0
 #define EXT_FULL  1
 
