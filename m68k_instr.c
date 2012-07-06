@@ -7,6 +7,22 @@
 extern uint8_t *instr;
 extern uint16_t *instrWord;
 
+static uint16_t signExtend8to16(uint8_t byte)
+{
+	if ((int8_t)byte < 0)
+		return 0xff00 | byte;
+	else
+		return byte;
+}
+
+static uint32_t signExtend8to32(uint8_t byte)
+{
+	if ((int8_t)byte < 0)
+		return 0xffffff00 | byte;
+	else
+		return byte;
+}
+
 static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 {
 	Reg *dest;
@@ -213,19 +229,15 @@ void instrMoveq(void)
 	cpu.ureg.pc.l += 2;
 	
 	uint8_t reg = (instr[0] & 0b1110) >> 1;
-	int8_t data = instr[1];
+	uint8_t data = instr[1];
 	
-	cpu.ureg.d[reg].l = instr[1];
-	
-	/* sign-extend to long */
-	if (data < 0)
-		cpu.ureg.d[reg].l |= 0xffffff00;
+	cpu.ureg.d[reg].l = signExtend8to32(instr[1]);
 	
 	/* update condition codes */
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
-	if (data == 0)
+	if ((int8_t)data == 0)
 		cpu.ureg.sr.l |= SR_ZERO;
-	else if (data < 0)
+	else if ((int8_t)data < 0)
 		cpu.ureg.sr.l |= SR_NEGATIVE;
 }
 
