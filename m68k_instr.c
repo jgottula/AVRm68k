@@ -83,6 +83,29 @@ static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
 		cpu.ureg.a[reg].l -= actualSize;
 }
 
+static bool getExtType()
+{
+	const uint8_t *extWord = instr + 2;
+	
+	if (extWord[0] & 0b00000001)
+		return EXT_FULL;
+	else
+		return EXT_BRIEF;
+}
+
+static uint32_t calcBriefDisp()
+{
+	const uint8_t *briefExt = instr + 2;
+	
+	uint8_t size = ((briefExt[0] & 0b00001000) ? SIZE_LONG : SIZE_WORD);
+	uint8_t disp = briefExt[1];
+	
+	if (size == SIZE_WORD)
+		return signExtend8to16(disp);
+	else
+		return signExtend8to32(disp);
+}
+
 static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 	bool signExtend)
 {
@@ -128,7 +151,9 @@ static void writeEA(uint8_t mode, uint8_t reg, uint32_t data, uint8_t size,
 		memWrite(cpu.ureg.a[reg].l, size, data);
 		break;
 	case 0b101: // addr reg indirect (displacement)
-		assert(0);
+		memWrite(memRead(cpu.ureg.a[reg].l + calcBriefDisp(), SIZE_LONG),
+			size, data);
+		break;
 	case 0b110: // multiple addr reg indirect
 		assert(0);
 	case 0b111: // multiple pc relative

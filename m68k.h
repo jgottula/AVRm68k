@@ -23,6 +23,9 @@
 #define SIZE_WORD 0b01
 #define SIZE_LONG 0b10
 
+#define EXT_BRIEF 0
+#define EXT_FULL  1
+
 typedef union {
 	uint32_t l;
 	uint16_t w[2];
