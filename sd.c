@@ -6,7 +6,7 @@
 #include "io.h"
 #include "spi.h"
 
-struct {
+static struct {
 	bool init;
 	bool ver2;
 	bool hc;

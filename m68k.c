@@ -4,9 +4,8 @@
 #include "m68k_instr.h"
 #include "uart.h"
 
-uint8_t fetchBuffer[22]; // must have even size
+static uint8_t fetchBuffer[22]; // must have even size
 const uint8_t *instr;
-const uint16_t *instrWord;
 
 static void m68kFetch(void)
 {
@@ -27,7 +26,6 @@ static void m68kFetch(void)
 static void m68kExecute(void)
 {
 	instr = fetchBuffer;
-	instrWord = (const uint16_t *)instr;
 	
 	uartWritePSTR("[Instr] ");
 	
@@ -47,7 +45,7 @@ static void m68kExecute(void)
 		assert(0);
 		break;
 	case 0b0100: // miscellaneous
-		if (*instrWord == 0x714e)
+		if (instr[0] == 0x4e && instr[1] == 0x71)
 			instrNop();
 		else if (instr[0] == 0x42)
 		{
