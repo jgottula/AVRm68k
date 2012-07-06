@@ -6,6 +6,6 @@
 
 uint32_t memRead(uint32_t addr, uint8_t size);
 void memWrite(uint32_t addr, uint8_t size, uint32_t value);
-void memDump(uint32_t addr, uint16_t lines);
+void memDump(uint32_t addr, uint16_t len);
 
 #endif

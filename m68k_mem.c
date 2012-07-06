@@ -50,18 +50,27 @@ void memWrite(uint32_t addr, uint8_t size, uint32_t value)
 	}
 }
 
-void memDump(uint32_t addr, uint16_t lines)
+void memDump(uint32_t addr, uint16_t len)
 {
-	for (uint16_t i = 0; i < lines; ++i)
+	uint32_t addrBegin = addr & 0xfffffff0;
+	uint32_t addrEnd = addr + len;
+	
+	if (((addr + len) & 0x0f) != 0)
+	{
+		addrEnd &= 0xfffffff0;
+		addrEnd += 0x10;
+	}
+	
+	for (uint32_t i = addrBegin; i < addrEnd; i += 16)
 	{
 		uartWritePSTR("  ");
-		uartWriteHex8(addr >> 16, false);
-		uartWriteHex16(addr, false);
-		uartWritePSTR(":  ");
+		uartWriteHex8(i >> 16, false);
+		uartWriteHex16(i, false);
+		uartWritePSTR("  ");
 		
 		for (uint8_t j = 0; j < 16; ++j)
 		{
-			uartWriteHex8(memRead(addr + j, SIZE_BYTE), false);
+			uartWriteHex8(memRead(i + j, SIZE_BYTE), false);
 			
 			if (j == 15)
 				uartWriteChr('\n');
@@ -72,8 +81,6 @@ void memDump(uint32_t addr, uint16_t lines)
 				uartWriteChr(' ');
 			}
 		}
-		
-		addr += 16;
 	}
 	
 	/* TODO: add textual display on the right (like hexdump -C does); replace
