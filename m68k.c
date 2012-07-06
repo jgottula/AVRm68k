@@ -14,7 +14,7 @@ static void m68kFetch(void)
 		sizeof(fetchBuffer));
 	
 	/* debug */
-	uartWritePSTR("Fetch:");
+	uartWritePSTR("[Fetch]");
 	for (uint8_t i = 0; i < sizeof(fetchBuffer) / 2; ++i)
 	{
 		uartWriteChr(' ');
@@ -28,6 +28,8 @@ static void m68kExecute(void)
 {
 	instr = fetchBuffer;
 	instrWord = (const uint16_t *)instr;
+	
+	uartWritePSTR("[Instr] ");
 	
 	/* separate operations by front nibble */
 	switch (instr[0] >> 4)
@@ -101,13 +103,13 @@ static void m68kExecute(void)
 
 void m68kDumpReg(void)
 {
-	uartWritePSTR("pc: 0x");
+	uartWritePSTR("  pc: 0x");
 	uartWriteHex32(cpu.ureg.pc.l, false);
 	uartWritePSTR(" sr: 0x");
 	uartWriteHex32(cpu.ureg.sr.l, false);
 	uartWriteChr('\n');
 	
-	uartWriteChr('[');
+	uartWritePSTR("  [");
 	uartWriteChr((cpu.ureg.sr.l & SR_CARRY) ? 'x' : ' ');
 	uartWritePSTR("] carry  [");
 	uartWriteChr((cpu.ureg.sr.l & SR_OVERFLOW) ? 'x' : ' ');
@@ -119,7 +121,7 @@ void m68kDumpReg(void)
 	uartWriteChr((cpu.ureg.sr.l & SR_EXTEND) ? 'x' : ' ');
 	uartWritePSTR("] extend\n");
 	
-	uartWritePSTR("d0: 0x");
+	uartWritePSTR("  d0: 0x");
 	uartWriteHex32(cpu.ureg.d[0].l, false);
 	uartWritePSTR(" d4: 0x");
 	uartWriteHex32(cpu.ureg.d[4].l, false);
@@ -129,7 +131,7 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.a[4].l, false);
 	uartWriteChr('\n');
 	
-	uartWritePSTR("d1: 0x");
+	uartWritePSTR("  d1: 0x");
 	uartWriteHex32(cpu.ureg.d[1].l, false);
 	uartWritePSTR(" d5: 0x");
 	uartWriteHex32(cpu.ureg.d[5].l, false);
@@ -139,7 +141,7 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.a[5].l, false);
 	uartWriteChr('\n');
 	
-	uartWritePSTR("d2: 0x");
+	uartWritePSTR("  d2: 0x");
 	uartWriteHex32(cpu.ureg.d[2].l, false);
 	uartWritePSTR(" d6: 0x");
 	uartWriteHex32(cpu.ureg.d[6].l, false);
@@ -149,7 +151,7 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.a[6].l, false);
 	uartWriteChr('\n');
 	
-	uartWritePSTR("d3: 0x");
+	uartWritePSTR("  d3: 0x");
 	uartWriteHex32(cpu.ureg.d[3].l, false);
 	uartWritePSTR(" d7: 0x");
 	uartWriteHex32(cpu.ureg.d[7].l, false);
