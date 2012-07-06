@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/sh
 
-sudo screen /dev/ftdifriend 9600
+sudo screen /dev/ftdifriend 1250000
