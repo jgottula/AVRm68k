@@ -10,7 +10,6 @@
 #include "m68k.h"
 #include "m68k_mem.h"
 #include "sd.h"
-#include "shift.h"
 #include "spi.h"
 #include "test.h"
 #include "uart.h"
