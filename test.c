@@ -8,9 +8,7 @@
 
 static void testDRAM(void)
 {
-	uartWritePSTR("dram test\n");
-	
-	uartWritePSTR("1 Mib, incr pattern, 1000 ms: ");
+	uartWritePSTR("dram test: 1 MiB, incr pattern, 1000 ms: ");
 	for (uint32_t i = 0x00000; i <= 0xfffff; ++i)
 		dramWrite(i, i);
 	_delay_ms(1000);
@@ -37,10 +35,10 @@ static void testRefresh(void)
 
 void testAll(void)
 {
-	uartWritePSTR("[[[ Unit Tests ]]]\n");
+	uartWritePSTR("-------- Unit Tests --------\n");
 	
 	testDRAM();
 	testRefresh();
 	
-	uartWritePSTR("[[[ Tests Completed ]]]\n");
+	uartWritePSTR("----- Tests Completed ------\n");
 }
