@@ -27,7 +27,6 @@ uint8_t dramRead(uint32_t addr)
 		
 		/* put the high part of the address as the row number */
 		dramLoadAddrBus(addr >> 10);
-		_delay_us(1);
 		
 		/* assert RAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
@@ -35,7 +34,6 @@ uint8_t dramRead(uint32_t addr)
 		
 		/* put the low part of the address as the column number */
 		dramLoadAddrBus(addr);
-		_delay_us(1);
 		
 		/* assert CAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
@@ -63,7 +61,6 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		
 		/* put the high part of the address as the row number */
 		dramLoadAddrBus(addr >> 10);
-		_delay_us(1);
 		
 		/* assert RAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
@@ -71,11 +68,9 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		
 		/* assert the write enable line */
 		writeIO(&PORT_DRAM, DRAM_WE, 0);
-		_delay_us(1);
 		
 		/* put the low part of the address as the column number */
 		dramLoadAddrBus(addr);
-		_delay_us(1);
 		
 		/* assert CAS and wait for it to load */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
