@@ -37,7 +37,7 @@ void testAll(void)
 {
 	uartWritePSTR("-------- Unit Tests --------\n");
 	
-	testDRAM();
+	/*testDRAM();*/
 	testRefresh();
 	
 	uartWritePSTR("----- Tests Completed ------\n");
