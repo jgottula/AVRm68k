@@ -19,7 +19,9 @@ static void testDRAM(void)
 		
 		if (byte != (i & 0xff))
 		{
-			uartWritePSTR("FAILED (expected: 0x");
+			uartWritePSTR("FAILED\nfailed @ 0x");
+			uartWriteHex24(i, false);
+			uartWritePSTR(" (expected: 0x");
 			uartWriteHex8(i & 0xff, false);
 			uartWritePSTR(" actual: 0x");
 			uartWriteHex8(byte, false);
