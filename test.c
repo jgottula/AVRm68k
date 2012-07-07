@@ -29,22 +29,22 @@ static void benchmarkDRAM(void)
 	uint16_t before, after;
 	
 	before = msec;
-	for (uint32_t i = 0x000000; i < 0x0fffff; ++i)
+	for (uint32_t i = 0x000000; i < 0x00ffff; ++i)
 		dramRead(i);
 	after = msec;
 	
-	uartWritePSTR("dram read speed: 1 MiB / ");
+	uartWritePSTR("dram read speed: 16 KiB / ");
 	uartWriteDec16((after - before) / 1000);
 	uartWriteChr('.');
 	uartWriteDec16((after - before) % 1000);
 	uartWritePSTR(" s\n");
 	
 	before = msec;
-	for (uint32_t i = 0x000000; i < 0x0fffff; ++i)
+	for (uint32_t i = 0x000000; i < 0x00ffff; ++i)
 		dramWrite(i, 0);
 	after = msec;
 	
-	uartWritePSTR("dram write speed: 1 MiB / ");
+	uartWritePSTR("dram write speed: 16 KiB / ");
 	uartWriteDec16((after - before) / 1000);
 	uartWriteChr('.');
 	uartWriteDec16((after - before) % 1000);
