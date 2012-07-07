@@ -21,9 +21,8 @@ noreturn void main(void)
 	wdt_disable();
 	
 	uartInit();
-	intrInit();
-	
 	dramInit();
+	intrInit();
 	spiInit();
 	//sdInit();
 	
