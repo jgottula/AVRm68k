@@ -9,7 +9,9 @@
 
 static void testDRAM(void)
 {
-	uartWritePSTR("dram test: 16 MiB, incr pattern, 1000 ms: ");
+	uint16_t errors = 0;
+	
+	uartWritePSTR("dram test: 16 MiB, incr pattern, 1000 ms:");
 	for (uint32_t i = 0x000000; i <= 0xffffff; ++i)
 		dramWrite(i, i);
 	_delay_ms(1000);
@@ -19,17 +21,20 @@ static void testDRAM(void)
 		
 		if (byte != (i & 0xff))
 		{
-			uartWritePSTR("FAILED\nfailed @ 0x");
+			uartWritePSTR("failed @ 0x");
 			uartWriteHex24(i, false);
 			uartWritePSTR(" (expected: 0x");
 			uartWriteHex8(i & 0xff, false);
 			uartWritePSTR(" actual: 0x");
 			uartWriteHex8(byte, false);
 			uartWritePSTR(")\n");
-			die();
+			
+			++errors;
 		}
 	}
-	uartWritePSTR("OK\n");
+	
+	uartWriteDec16(errors);
+	uartWritePSTR(" total errors.\n");
 }
 
 static void benchmarkDRAM(void)
