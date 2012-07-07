@@ -1,14 +1,13 @@
 Priorities:
-- Find approximate RAM timing limits
+- Replace SIMM
+  - Rewrite read & write with correct timings and other things
+  - Implement cas-before-ras refresh
+  - See about FPM
+  - Implement read-modify-write (for incrementing memory locations, etc)
 - Emulator: memory system
 - Emulator: addressing modes
 - Emulator: instructions
   - Next: clr, cmp, eor, or, and
-- Replace SIMM
-  - Wire two address lines
-  - Update IO defs
-  - Replace all 20-bit addresses with 24-bit ones (0xffffff)
-  - Tighten timings
 - SD
 - Linux from scratch
 - Bootloader
@@ -31,6 +30,18 @@ Program size:
 - Use decompressor stub + compressed code?
 
 Overclocking:
-- Use LM317/7806 to do up to 6V
-- Problem: outputs need to be buffered or else all TTL-level components will be
-  overvolted
+- Get power as 12V (or 7.4V) and use another LM317 to get >5V
+  - Or, use boost converter (more expensive/difficult)
+  - This needs to be VERY precise
+- Check that all TTL components (i.e. those not buffered with 4050) can
+  withstand the overvolt
+  - ATmega324A: abs max 6V, 5.5V reasonable
+  - OWC DRAM: abs max 7V, 5.5V reasonable
+  - MAX232: abs max 6V, 5.5V reasonable
+  - FT232R: don't want to touch this
+- Check that 3.3V outputs from SPI devices will actually register above the Vih
+  threshold of the AVR (5.5-6V WILL be a problem)
+  - Check if 4050 with Vcc 5V will actually pull 3.3V up to 5V
+    - Alt: use bipolar discretes?
+- Will need to buffer the UART tx line to 5V using 4050 (if using FTDI chip)
+- It may be possible to use the ADC to track Vcc
