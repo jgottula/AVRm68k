@@ -88,6 +88,8 @@ struct {
 	} meg;
 } cpu;
 
+extern uint8_t *instr;
+
 void m68kDumpReg(void);
 void m68kNext(void);
 void m68kInit(void);

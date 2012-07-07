@@ -6,8 +6,6 @@
 #include "m68k_mem.h"
 #include "uart.h"
 
-extern uint8_t *instr;
-
 bool instrEmu(void)
 {
 	uint16_t instrWord = decodeBigEndian16(instr);
