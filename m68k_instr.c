@@ -31,18 +31,16 @@ bool instrEmu(void)
 
 void instrNop(void)
 {
-	/* debug */
 	uartWritePSTR("nop\n");
 	
 	cpu.ureg.pc.l += 2;
 	
-	/* does not affect CCR */
+	/* does not affect condition codes */
 }
 
-#warning instrExg: untested!
+#warning exg: TEST!
 void instrExg(void)
 {
-	/* debug */
 	uartWritePSTR("exg\n");
 	
 	cpu.ureg.pc.l += 2;
@@ -74,34 +72,37 @@ void instrExg(void)
 	*reg1 = *reg2;
 	*reg2 = temp;
 	
-	/* does not affect CCR */
+	/* does not affect condition codes */
 }
 
-#warning instrCcr: untested!
+#warning ccr: TEST!
 void instrMoveFromCcr(void)
 {
-	/* debug */
 	uartWritePSTR("move ccr,<ea>\n");
 	
-	cpu.ureg.pc.l += 2; // NOTE: may be larger for EA extensions
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(mode, reg, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
 	
 	/* get just the user portion of the SR */
 	uint16_t ccr = cpu.ureg.sr.l & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
 		SR_NEGATIVE | SR_EXTEND);
 	
-	uint8_t mode = (instr[1] >> 3) & 0b111;
-	uint8_t reg = instr[1] & 0b111;
-	
-	uint32_t effAddr = calcEA(mode, reg);
 	accessEA(effAddr, mode, reg, ccr, SIZE_WORD, true);
 	
-	/* does not affect CCR */
+	/* does not affect condition codes */
 }
 
-#warning instrMoveq: untested!
+#warning moveq: TEST!
 void instrMoveq(void)
 {
-	/* debug */
 	uartWritePSTR("moveq\n");
 	
 	cpu.ureg.pc.l += 2;
@@ -119,21 +120,26 @@ void instrMoveq(void)
 		cpu.ureg.sr.l |= SR_NEGATIVE;
 }
 
-#warning instrClr: untested!
+#warning clr: REWRITE!
 void instrClr(void)
 {
-	/* debug */
 	uartWritePSTR("clr\n");
 	
-	cpu.ureg.pc.l += 2; // NOTE: may be larger for EA extensions
+	uint8_t instrLen = 2;
 	
 	uint8_t size = instr[1] >> 6;
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	
-	uint32_t effAddr = calcEA(mode, reg);
+	uint32_t effAddr;
+	instrLen += calcEA(mode, reg, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
 	accessEA(effAddr, mode, reg, 0, size, true);
 	
+	/* update condition codes */
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
 	cpu.ureg.sr.l |= SR_ZERO;
 }
