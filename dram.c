@@ -86,12 +86,12 @@ void dramRefresh(void)
 	/* this function doesn't need to save state because the non-ISR dram
 	 * functions are wrapped in ATOMIC_BLOCKs */
 	
-	for (uint8_t i = 0b00; i <= 0b11; ++i)
+	for (uint8_t i = 0b0000; i <= 0b1111; ++i)
 	{
 		uint8_t j = 0x00;
 		
 		/* load the high part of the address */
-		writeIO(&PORT_ADDRH, ADDRH_ALL, i << 6);
+		writeIO(&PORT_ADDRH, ADDRH_ALL, i << 4);
 		
 		do
 		{

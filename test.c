@@ -9,11 +9,11 @@
 
 static void testDRAM(void)
 {
-	uartWritePSTR("dram test: 1 MiB, incr pattern, 1000 ms: ");
-	for (uint32_t i = 0x00000; i <= 0xfffff; ++i)
+	uartWritePSTR("dram test: 16 MiB, incr pattern, 1000 ms: ");
+	for (uint32_t i = 0x000000; i <= 0xffffff; ++i)
 		dramWrite(i, i);
 	_delay_ms(1000);
-	for (uint32_t i = 0x00000; i < 0xfffff; ++i)
+	for (uint32_t i = 0x000000; i < 0xffffff; ++i)
 	{
 		if (dramRead(i) != (i & 0xff))
 		{
@@ -29,22 +29,22 @@ static void benchmarkDRAM(void)
 	uint16_t before, after;
 	
 	before = msec;
-	for (uint32_t i = 0x00000; i < 0x0ffff; ++i)
+	for (uint32_t i = 0x000000; i < 0x0fffff; ++i)
 		dramRead(i);
 	after = msec;
 	
-	uartWritePSTR("dram read speed: 64 KiB / ");
+	uartWritePSTR("dram read speed: 1 MiB / ");
 	uartWriteDec16((after - before) / 1000);
 	uartWriteChr('.');
 	uartWriteDec16((after - before) % 1000);
 	uartWritePSTR(" s\n");
 	
 	before = msec;
-	for (uint32_t i = 0x00000; i < 0x0ffff; ++i)
+	for (uint32_t i = 0x000000; i < 0x0fffff; ++i)
 		dramWrite(i, 0);
 	after = msec;
 	
-	uartWritePSTR("dram write speed: 64 KiB / ");
+	uartWritePSTR("dram write speed: 1 MiB / ");
 	uartWriteDec16((after - before) / 1000);
 	uartWriteChr('.');
 	uartWriteDec16((after - before) % 1000);

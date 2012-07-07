@@ -65,7 +65,8 @@ enum PortC {
 	ADDRL_5   = _BV(PC5),
 	ADDRL_6   = _BV(PC6),
 	ADDRL_7   = _BV(PC7),
-	ADDRL_ALL = 0xff
+	ADDRL_ALL = ADDRL_0 | ADDRL_1 | ADDRL_2 | ADDRL_3 |
+	            ADDRL_4 | ADDRL_5 | ADDRL_6 | ADDRL_7
 };
 
 
@@ -82,11 +83,13 @@ enum PortD {
 	UART_TX   = _BV(PD1),
 	UART_ALL  = UART_RX | UART_TX,
 	
-	/* PD2 thru PD5 are open */
+	/* PD2 and PD3 are open */
 	
-	ADDRH_8   = _BV(PD6),
-	ADDRH_9   = _BV(PD7),
-	ADDRH_ALL = ADDRH_8 | ADDRH_9
+	ADDRH_8   = _BV(PD4),
+	ADDRH_9   = _BV(PD5),
+	ADDRH_10  = _BV(PD6),
+	ADDRH_11  = _BV(PD7),
+	ADDRH_ALL = ADDRH_8 | ADDRH_9 | ADDRH_10 | ADDRH_11
 };
 
 
