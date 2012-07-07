@@ -139,15 +139,46 @@ uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut)
 	case AMODE_AREGINDIRECT:
 	case AMODE_AREGPOSTINC:
 	case AMODE_AREGPREDEC:
+	{
 		*addrOut = cpu.ureg.a[reg].l;
 		return 0;
+	}
 	case AMODE_AREGDISPLACE:
-		*addrOut = cpu.ureg.a[reg].l +
-			signExtend16to32(decodeBigEndian16(instr + 2));
+	{
+		uint16_t displacement = decodeBigEndian16(instr + 2);
+		*addrOut = cpu.ureg.a[reg].l + signExtend16to32(displacement);
+		
 		return 2;
+	}
 	case AMODE_AREGINDEXED:
-		assert(0);
+	{
+		uint16_t briefExt = decodeBigEndian16(instr + 2);
+		uint8_t displacement = (uint8_t)briefExt;
+		uint8_t reg = ((briefExt >> 12) & 0b111);
+		bool size = ((briefExt & (1 << 11)) == 1);
+		uint8_t scale = ((briefExt >> 9) & 0b11);
+		const Reg *idxReg;
+		
+		if (briefExt & (1 << 15))
+			idxReg = &cpu.ureg.a[reg];
+		else
+			idxReg = &cpu.ureg.d[reg];
+		
+		uint32_t idxValue;
+		
+		if (size)
+			idxValue = idxReg->l;
+		else
+			idxValue = signExtend16to32(idxReg->w[0]);
+		
+		idxValue <<= scale;
+		
+		*addrOut = cpu.ureg.a[reg].l + signExtend8to32(displacement) + idxValue;
+		
+		return 2;
+	}
 	case AMODE_EXTRA:
+	{
 		switch (reg)
 		{
 		case AMODE_EXTRA_ABSSHORT:
@@ -163,6 +194,7 @@ uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut)
 		default:
 			assert(0);
 		}
+	}
 	default:
 		assert(0);
 	}
