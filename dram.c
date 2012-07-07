@@ -126,4 +126,6 @@ void dramInit(void)
 		_delay_ms(DRAM_REFRESH_FREQ);
 		dramRefresh();
 	}
+	
+	uartWritePSTR("DRAM initialized.\n");
 }
