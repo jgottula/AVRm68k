@@ -85,7 +85,7 @@ struct {
 	/* mmu registers */
 	struct {
 		Reg crp, pmmusr, mmusr, srp, tc;
-	} meg;
+	} mreg;
 } cpu;
 
 extern const uint8_t *instr;
