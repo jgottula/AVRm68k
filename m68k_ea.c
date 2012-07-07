@@ -152,6 +152,8 @@ uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut)
 	}
 	case AMODE_AREGINDEXED:
 	{
+		#warning addr indirect with index, base disp mode not implemented!
+		
 		uint16_t briefExt = decodeBigEndian16(instr + 2);
 		uint8_t displacement = (uint8_t)briefExt;
 		uint8_t reg = ((briefExt >> 12) & 0b111);
@@ -186,7 +188,12 @@ uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut)
 		case AMODE_EXTRA_ABSLONG:
 			assert(0);
 		case AMODE_EXTRA_PCDISPLACE:
-			assert(0);
+		{
+			uint16_t displacement = decodeBigEndian16(instr + 2);
+			*addrOut = cpu.ureg.pc.l + signExtend16to32(displacement);
+			
+			return 2;
+		}
 		case AMODE_EXTRA_PCINDEXED:
 			assert(0);
 		case AMODE_EXTRA_IMMEDIATE:
