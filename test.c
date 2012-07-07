@@ -15,9 +15,15 @@ static void testDRAM(void)
 	_delay_ms(1000);
 	for (uint32_t i = 0x000000; i < 0xffffff; ++i)
 	{
-		if (dramRead(i) != (i & 0xff))
+		uint8_t byte = dramRead(i);
+		
+		if (byte != (i & 0xff))
 		{
-			uartWritePSTR("FAILED\n");
+			uartWritePSTR("FAILED (expected: 0x");
+			uartWriteHex8(i & 0xff, false);
+			uartWritePSTR(" actual: 0x");
+			uartWriteHex8(byte, false);
+			uartWritePSTR(")\n");
 			die();
 		}
 	}
