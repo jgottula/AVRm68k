@@ -10,31 +10,41 @@
 static void testDRAM(void)
 {
 	uint16_t errors = 0;
+	uint32_t min = 0xffffff, max = 0x000000;
 	
-	uartWritePSTR("dram test: 16 MiB, incr pattern, 1000 ms:");
-	for (uint32_t i = 0x000000; i <= 0xffffff; ++i)
+	uartWritePSTR("dram test: 16 MiB, decr addr, decr pattern, 1000 ms...");
+	for (uint32_t i = 0xffffff; (int32_t)i >= 0; --i)
 		dramWrite(i, i);
 	_delay_ms(1000);
-	for (uint32_t i = 0x000000; i < 0xffffff; ++i)
+	for (uint32_t i = 0xffffff; (int32_t)i >= 0; --i)
 	{
 		uint8_t byte = dramRead(i);
 		
 		if (byte != (i & 0xff))
 		{
-			uartWritePSTR("failed @ 0x");
+			/*uartWritePSTR("failed @ 0x");
 			uartWriteHex24(i, false);
 			uartWritePSTR(" (expected: 0x");
 			uartWriteHex8(i & 0xff, false);
 			uartWritePSTR(" actual: 0x");
 			uartWriteHex8(byte, false);
-			uartWritePSTR(")\n");
+			uartWritePSTR(")\n");*/
+			
+			if (i < min)
+				min = i;
+			if (i > max)
+				max = i;
 			
 			++errors;
 		}
 	}
 	
 	uartWriteDec16(errors);
-	uartWritePSTR(" total errors.\n");
+	uartWritePSTR(" total errors (min: 0x");
+	uartWriteHex24(min, false);
+	uartWritePSTR(", max: 0x");
+	uartWriteHex24(max, false);
+	uartWriteChr('\n');
 }
 
 static void benchmarkDRAM(void)
