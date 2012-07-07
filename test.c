@@ -41,7 +41,7 @@ static void benchmarkDRAM(void)
 		dramRead(i);
 	after = msec;
 	
-	uartWritePSTR("dram read speed: 16 KiB / ");
+	uartWritePSTR("dram read speed: 64 KiB / ");
 	uartWriteDec16((after - before) / 1000);
 	uartWriteChr('.');
 	uartWriteDec16((after - before) % 1000);
@@ -52,7 +52,7 @@ static void benchmarkDRAM(void)
 		dramWrite(i, 0);
 	after = msec;
 	
-	uartWritePSTR("dram write speed: 16 KiB / ");
+	uartWritePSTR("dram write speed: 64 KiB / ");
 	uartWriteDec16((after - before) / 1000);
 	uartWriteChr('.');
 	uartWriteDec16((after - before) % 1000);
