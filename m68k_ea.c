@@ -125,6 +125,7 @@ uint32_t accessEA(uint32_t addr, uint8_t mode, uint8_t reg, uint32_t data,
 	return rtn;
 }
 
+#warning calcEA: TEST!
 uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut)
 {
 	/* the function's return value is the number of bytes taken up by the EA
@@ -142,7 +143,7 @@ uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut)
 		return 0;
 	case AMODE_AREGDISPLACE:
 		*addrOut = cpu.ureg.a[reg].l +
-			signExtend16to32(decodeBigEndian16(instr[2]));
+			signExtend16to32(decodeBigEndian16(instr + 2));
 		return 2;
 	case AMODE_AREGINDEXED:
 		assert(0);
