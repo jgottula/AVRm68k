@@ -12,7 +12,7 @@ static void testDRAM(void)
 	uint16_t errors = 0;
 	uint32_t min = 0xffffff, max = 0x000000;
 	
-	uartWritePSTR("dram test: 16 MiB, decr addr, decr pattern, 1000 ms...");
+	uartWritePSTR("dram test: 16 MiB, decr addr, decr pattern, 1000 ms...\n");
 	for (uint32_t i = 0xffffff; (int32_t)i >= 0; --i)
 		dramWrite(i, i);
 	_delay_ms(1000);
@@ -44,7 +44,7 @@ static void testDRAM(void)
 	uartWriteHex24(min, false);
 	uartWritePSTR(", max: 0x");
 	uartWriteHex24(max, false);
-	uartWriteChr('\n');
+	uartWritePSTR(")\n");
 }
 
 static void benchmarkDRAM(void)
