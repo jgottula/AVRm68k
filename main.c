@@ -21,14 +21,15 @@ noreturn void main(void)
 	wdt_disable();
 	
 	uartInit();
+	uartWritePSTR("\nStarted.\n");
+	
 	dramInit();
 	intrInit();
 	spiInit();
 	//sdInit();
-	
-	uartWritePSTR("\nStarted.\n");
-	
 	m68kInit();
+	
+	uartWritePSTR("Init complete.\n");
 	
 	testAll();
 	
