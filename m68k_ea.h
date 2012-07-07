@@ -6,6 +6,6 @@
 
 uint32_t accessEA(uint32_t addr, uint8_t mode, uint8_t reg, uint32_t data,
 	uint8_t size, bool write);
-uint32_t calcEA(uint8_t mode, uint8_t reg);
+uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut);
 
 #endif

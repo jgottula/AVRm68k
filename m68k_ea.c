@@ -1,6 +1,8 @@
 #include "m68k_ea.h"
+#include "bitwise.h"
 #include "debug.h"
 #include "m68k.h"
+#include "m68k_instr.h"
 #include "m68k_mem.h"
 
 static uint32_t readReg(uint8_t mode, uint8_t reg, int8_t size)
@@ -123,23 +125,25 @@ uint32_t accessEA(uint32_t addr, uint8_t mode, uint8_t reg, uint32_t data,
 	return rtn;
 }
 
-uint32_t calcEA(uint8_t mode, uint8_t reg)
+uint8_t calcEA(uint8_t mode, uint8_t reg, uint32_t *addrOut)
 {
-	uint32_t effAddr;
+	/* the function's return value is the number of bytes taken up by the EA
+	 * extension words */
 	
 	switch (mode)
 	{
 	case AMODE_DREGDIRECT:
 	case AMODE_AREGDIRECT:
-		effAddr = 0;
-		break;
+		return 0;
 	case AMODE_AREGINDIRECT:
 	case AMODE_AREGPOSTINC:
 	case AMODE_AREGPREDEC:
-		effAddr = cpu.ureg.a[reg].l;
-		break;
+		*addrOut = cpu.ureg.a[reg].l;
+		return 0;
 	case AMODE_AREGDISPLACE:
-		assert(0);
+		*addrOut = cpu.ureg.a[reg].l +
+			signExtend16to32(decodeBigEndian16(instr[2]));
+		return 2;
 	case AMODE_AREGINDEXED:
 		assert(0);
 	case AMODE_EXTRA:
@@ -161,6 +165,4 @@ uint32_t calcEA(uint8_t mode, uint8_t reg)
 	default:
 		assert(0);
 	}
-	
-	return effAddr;
 }
