@@ -1,6 +1,8 @@
 #include "dram.h"
+#include <avr/cpufunc.h>
 #include <util/atomic.h>
 #include <util/delay.h>
+#include <util/delay_basic.h>
 #include "debug.h"
 #include "intr.h"
 #include "io.h"
@@ -15,6 +17,7 @@ static void dramLoadAddrBus(uint16_t addr12)
 	writeIO(&PORT_ADDRH, ADDRH_ALL, (uint8_t)(addr12 >> 4));
 }
 
+#warning dramRead: REWRITE!
 uint8_t dramRead(uint32_t addr)
 {
 	uint8_t byte;
@@ -42,13 +45,14 @@ uint8_t dramRead(uint32_t addr)
 		/* read from the data bus */
 		byte = readIO(&PIN_DATA, DATA_ALL);
 		
-		/* reset RAS and CAS */
-		writeIO(&PORT_DRAM, DRAM_RAS | DRAM_CAS, DRAM_RAS | DRAM_CAS);
+		/* reset all control lines */
+		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
 	}
 	
 	return byte;
 }
 
+#warning dramWrite: REWRITE!
 void dramWrite(uint32_t addr, uint8_t byte)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
@@ -86,25 +90,28 @@ void dramRefresh(void)
 	/* this function doesn't need to save/restore state because the non-ISR dram
 	 * functions are wrapped in ATOMIC_BLOCKs */
 	
-	for (uint8_t i = 0b0000; i <= 0b1111; ++i)
+	/* this function uses the cas-before-ras refresh method */
+	
+	writeIO(&PORT_DRAM, DRAM_CAS, 0);
+	
+	for (uint32_t i = 0x0000; i < DRAM_SIZE / (1 << 12); ++i)
 	{
-		uint8_t j = 0x00;
+		/* wait for RAS precharge (100 ns = 2 cycles @ 20 MHz) */
+		_NOP();
+		_NOP();
 		
-		/* load the high part of the address */
-		writeIO(&PORT_ADDRH, ADDRH_ALL, i << 4);
+		/* bring RAS low to refresh the next row */
+		writeIO(&PORT_DRAM, DRAM_RAS, 0);
 		
-		do
-		{
-			/* load the low part of the address */
-			writeIO(&PORT_ADDRL, ADDRL_ALL, j);
-			
-			/* assert RAS, wait, and then reset RAS */
-			writeIO(&PORT_DRAM, DRAM_RAS, 0);
-			_delay_us(1);
-			writeIO(&PORT_DRAM, DRAM_RAS, DRAM_RAS);
-		}
-		while (++j != 0x00);
+		/* wait for the RAS pulse time (60 ns = 2 cycles @ 20 MHz) */
+		_NOP();
+		
+		/* bring RAS high again */
+		writeIO(&PORT_DRAM, DRAM_RAS, DRAM_RAS);
 	}
+	
+	/* reset all control lines */
+	writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
 }
 
 void dramInit(void)
