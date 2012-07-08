@@ -9,10 +9,74 @@
 
 static void testDRAM(void)
 {
+	const uint32_t chunkSize = 0x8000;
+	const uint16_t delayTime = 1000;
+	
 	uint16_t errors = 0;
 	uint32_t min = 0xffffff, max = 0x000000;
 	
-	uartWritePSTR("dram test: 16 MiB, decr addr, decr pattern, 1000 ms...\n");
+	uartWritePSTR("dram test: 32KiB chunks, incr addr, alt aa/55, 1s wait, "
+		"10us spacing...\n");
+	for (uint32_t chunk = 0x000000; chunk < 0x1000000; chunk += chunkSize)
+	{
+		uint16_t chunkErrors = 0;
+		
+		uartWritePSTR("chunk 0x");
+		uartWriteHex24(chunk, false);
+		
+		uartWritePSTR(": waiting");
+		_delay_ms(delayTime);
+		
+		uartWritePSTR(" writing");
+		
+		for (uint32_t relAddr = 0x000000; relAddr < chunkSize; relAddr += 2)
+		{
+			uint32_t addr = chunk + relAddr;
+			
+			dramWrite(addr, 0xaa);
+			_delay_us(10);
+			dramWrite(addr + 1, 0x55);
+			_delay_us(10);
+		}
+		
+		uartWritePSTR(" waiting");
+		_delay_ms(delayTime);
+		
+		uartWritePSTR(" reading");
+		
+		for (uint32_t relAddr = 0x000000; relAddr < chunkSize; relAddr += 2)
+		{
+			uint32_t addr = chunk + relAddr;
+			
+			if (dramRead(addr) != 0xaa)
+			{
+				if (addr < min)
+					min = addr;
+				if (addr > max)
+					max = addr;
+				++chunkErrors;
+			}
+			_delay_us(10);
+			
+			if (dramRead(addr + 1) != 0x55)
+			{
+				if (addr < min)
+					min = addr;
+				if (addr > max)
+					max = addr;
+				++chunkErrors;
+			}
+			_delay_us(10);
+		}
+		
+		errors += chunkErrors;
+		
+		uartWritePSTR(" done (");
+		uartWriteDec16(chunkErrors);
+		uartWritePSTR(" errors).\n");
+	}
+	
+	#if 0
 	for (uint32_t i = 0xffffff; (int32_t)i >= 0; --i)
 		dramWrite(i, i);
 	_delay_ms(1000);
@@ -30,6 +94,9 @@ static void testDRAM(void)
 			uartWriteHex8(byte, false);
 			uartWritePSTR(")\n");*/
 			
+			uartWriteHex24(i, false);
+			uartWriteChr('\n');
+			
 			if (i < min)
 				min = i;
 			if (i > max)
@@ -38,6 +105,7 @@ static void testDRAM(void)
 			++errors;
 		}
 	}
+	#endif
 	
 	uartWriteDec16(errors);
 	uartWritePSTR(" total errors (min: 0x");
