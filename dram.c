@@ -17,30 +17,30 @@ static void dramLoadAddrBus(uint16_t addr12)
 	writeIO(&PORT_ADDRH, ADDRH_ALL, (uint8_t)(addr12 >> 4));
 }
 
-#warning dramRead: REWRITE!
 uint8_t dramRead(uint32_t addr)
 {
 	uint8_t byte;
 	
+	/* this function uses the basic read technique (not fast page mode) */
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		/* set the data bus to input with no pull-up */
+		/* set the data bus to input with pull-ups */
 		writeIO(&DDR_DATA, DATA_ALL, 0);
-		writeIO(&PORT_DATA, DATA_ALL, 0);
+		writeIO(&PORT_DATA, DATA_ALL, DATA_ALL);
 		
-		/* put the high part of the address as the row number */
+		/* put the row number on the address bus */
 		dramLoadAddrBus(addr >> 12);
 		
-		/* assert RAS and wait for it to load */
+		/* bring RAS low to load the row */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
-		_delay_us(1);
 		
-		/* put the low part of the address as the column number */
+		/* put the column number on the address bus */
 		dramLoadAddrBus(addr);
 		
-		/* assert CAS and wait for it to load */
+		/* bring CAS low to load the column (60 ns = 2 cycles @ 20 MHz) */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
-		_delay_us(1);
+		_NOP();
 		
 		/* read from the data bus */
 		byte = readIO(&PIN_DATA, DATA_ALL);
