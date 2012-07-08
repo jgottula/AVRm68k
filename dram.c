@@ -52,33 +52,31 @@ uint8_t dramRead(uint32_t addr)
 	return byte;
 }
 
-#warning dramWrite: REWRITE!
 void dramWrite(uint32_t addr, uint8_t byte)
 {
+	/* this function uses the basic write technique (not fast page mode) */
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		/* set the data bus to output */
 		writeIO(&DDR_DATA, DATA_ALL, DATA_ALL);
 		
-		/* put the data on the data bus */
-		writeIO(&PORT_DATA, DATA_ALL, byte);
-		
-		/* put the high part of the address as the row number */
+		/* put the row number on the address bus */
 		dramLoadAddrBus(addr >> 12);
 		
-		/* assert RAS and wait for it to load */
+		/* bring RAS low to load the row */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
-		_delay_us(1);
 		
-		/* assert the write enable line */
+		/* set WE low for write and put the byte on the data bus */
 		writeIO(&PORT_DRAM, DRAM_WE, 0);
+		writeIO(&PORT_DATA, DATA_ALL, byte);
 		
-		/* put the low part of the address as the column number */
+		/* put the column number on the address bus */
 		dramLoadAddrBus(addr);
 		
-		/* assert CAS and wait for it to load */
+		/* bring CAS low to load the column (60 ns = 2 cycles @ 20 MHz) */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
-		_delay_us(1);
+		_NOP();
 		
 		/* reset all control lines */
 		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
