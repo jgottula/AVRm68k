@@ -104,7 +104,10 @@ inline uint8_t readIO(reg_t reg, uint8_t mask)
 
 inline void writeIO(reg_t reg, uint8_t mask, uint8_t val)
 {
-	*reg = readIO(reg, ~mask) | (val & mask);
+	if (mask == 0xff)
+		*reg = val;
+	else
+		*reg = readIO(reg, ~mask) | (val & mask);
 }
 
 inline uint16_t readIO16(reg16_t reg, uint16_t mask)
@@ -114,7 +117,10 @@ inline uint16_t readIO16(reg16_t reg, uint16_t mask)
 
 inline void writeIO16(reg16_t reg, uint16_t mask, uint16_t val)
 {
-	*reg = readIO16(reg, ~mask) | (val & mask);
+	if (mask == 0xffff)
+		*reg = val;
+	else
+		*reg = readIO16(reg, ~mask) | (val & mask);
 }
 
 #endif
