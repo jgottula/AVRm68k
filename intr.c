@@ -4,8 +4,9 @@
 #include "dram.h"
 #include "io.h"
 
-volatile uint8_t dramCounter = 0;
-volatile uint16_t counter = 0, msec = 0, sec = 0;
+static volatile uint8_t dramCounter = 0;
+static volatile uint16_t counter = 0;
+volatile uint16_t msec = 0, sec = 0;
 volatile bool badISR = false;
 
 ISR(TIMER1_COMPA_vect)
