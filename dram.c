@@ -94,7 +94,7 @@ void dramRefresh(void)
 	
 	writeIO(&PORT_DRAM, DRAM_CAS, 0);
 	
-	for (uint32_t i = 0x0000; i < DRAM_SIZE / (1 << 12); ++i)
+	for (uint16_t i = 0x0000; i < DRAM_SIZE / (1 << 12); ++i)
 	{
 		/* wait for RAS precharge (100 ns = 2 cycles @ 20 MHz) */
 		_NOP();
