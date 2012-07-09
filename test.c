@@ -5,7 +5,38 @@
 #include "intr.h"
 #include "m68k.h"
 #include "m68k_mem.h"
+#include "sram.h"
 #include "uart.h"
+
+static void testSRAM(void)
+{
+	bool fail = false;
+	
+	uartWritePSTR("sram byte mode: ");
+	sramWriteByte(0x100, 0x55);
+	
+	if (sramReadByte(0x100) != 0x55)
+		fail = true;
+	sramWriteByte(0x100, 0xaa);
+	if (sramReadByte(0x100) != 0xaa)
+		fail = true;
+	
+	if (fail)
+		uartWritePSTR("failed\n");
+	else
+		uartWritePSTR("passed\n");
+	
+	uartWritePSTR("sram seq mode: ");
+	const uint8_t src[] = "hello world";
+	uint8_t dest[0x10];
+	sramWriteSeq(0x100, 12, src);
+	sramReadSeq(0x100, 12, dest);
+	
+	if (memcmp(src, dest, 12) != 0)
+		uartWritePSTR("failed\n");
+	else
+		uartWritePSTR("passed\n");
+}
 
 static void testDRAM(void)
 {
@@ -144,68 +175,26 @@ static void benchmarkDRAM(void)
 
 static void testRefresh(void)
 {
-	uint16_t t0 = msec;
-	dramRefresh();
-	uint16_t t1 = msec;
-	uartWritePSTR("dram refresh duration: ");
-	uartWriteDec16(t1 - t0);
-	uartWritePSTR(" +/- 1 ms\n");
-}
-
-/* untested */
-static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
-{
-	uint8_t actualSize;
-	
-	switch (size)
+	/* protect from competing ISR refreshes */
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-	case SIZE_BYTE:
-		if (reg == 7) // special case for stack pointer
-			actualSize = 2;
-		else
-			actualSize = 1;
-		break;
-	case SIZE_WORD:
-		actualSize = 2;
-		break;
-	case SIZE_LONG:
-		actualSize = 4;
-		break;
-	default:
-		assert(0);
+		uint16_t t0 = msec;
+		dramRefresh();
+		uint16_t t1 = msec;
+		uartWritePSTR("dram refresh duration: ");
+		uartWriteDec16(t1 - t0);
+		uartWritePSTR(" +/- 1 ms\n");
 	}
-	
-	if (incr)
-		cpu.ureg.a[reg].l += actualSize;
-	else
-		cpu.ureg.a[reg].l -= actualSize;
 }
 
 void testAll(void)
 {
 	uartWritePSTR("-------- Unit Tests --------\n");
 	
-	benchmarkDRAM();
-	testRefresh();
-	testDRAM();
-	
-	/*m68kDumpReg();
-	prePostIncrDecr(true, 6, SIZE_BYTE);
-	m68kDumpReg();
-	prePostIncrDecr(true, 6, SIZE_WORD);
-	m68kDumpReg();
-	prePostIncrDecr(true, 6, SIZE_LONG);
-	m68kDumpReg();
-	prePostIncrDecr(false, 6, SIZE_BYTE);
-	m68kDumpReg();
-	prePostIncrDecr(false, 6, SIZE_WORD);
-	m68kDumpReg();
-	prePostIncrDecr(false, 6, SIZE_LONG);
-	m68kDumpReg();
-	prePostIncrDecr(true, 7, SIZE_BYTE);
-	m68kDumpReg();
-	prePostIncrDecr(false, 7, SIZE_BYTE);
-	m68kDumpReg();*/
+	testSRAM();
+	//benchmarkDRAM();
+	//testRefresh();
+	//testDRAM();
 	
 	/*writeReg(0b000, 0, 0x12345678, SIZE_LONG);
 	writeReg(0b000, 1, 0x1234, SIZE_WORD);
