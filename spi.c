@@ -55,13 +55,13 @@ void spiBeginQuick(uint8_t slave)
 uint8_t spiByte(uint8_t byte)
 {
 	/* write the byte into the SPI data register */
-	writeIO(&SPDR, 0xff, byte);
+	SPDR = byte;
 	
 	/* wait for the byte to get sent over the bus */
 	loop_until_bit_is_set(SPSR, SPIF);
 	
 	/* get the slave's response */
-	return readIO(&SPDR, 0xff);
+	return SPDR;
 }
 
 void spiEnd(void)
