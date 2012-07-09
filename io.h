@@ -35,20 +35,19 @@ enum PortA {
 #define PIN_SPI   PINB
 
 enum PortB {
-	DRAM_CAS   = _BV(PB0),
-	DRAM_WE    = _BV(PB1),
-	DRAM_RAS   = _BV(PB2),
-	DRAM_ALL   = DRAM_CAS | DRAM_WE | DRAM_RAS,
+	DRAM_CAS    = _BV(PB0),
+	DRAM_WE     = _BV(PB1),
+	DRAM_RAS    = _BV(PB2),
+	DRAM_ALL    = DRAM_CAS | DRAM_WE | DRAM_RAS,
 	
-	/* PB3 is open */
+	SPI_SS_SD   = _BV(PB3),
+	SPI_SS_SRAM = _BV(PB4),
+	SPI_SS_ALL  = SPI_SS_SD | SPI_SS_SRAM,
 	
-	SPI_SS_SD  = _BV(PB4),
-	SPI_SS_ALL = SPI_SS_SD,
-	
-	SPI_MOSI   = _BV(PB5),
-	SPI_MISO   = _BV(PB6),
-	SPI_SCK    = _BV(PB7),
-	SPI_ALL    = SPI_MOSI | SPI_MISO | SPI_SCK
+	SPI_MOSI    = _BV(PB5),
+	SPI_MISO    = _BV(PB6),
+	SPI_SCK     = _BV(PB7),
+	SPI_ALL     = SPI_MOSI | SPI_MISO | SPI_SCK
 };
 
 
