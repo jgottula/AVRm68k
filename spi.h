@@ -24,20 +24,20 @@ enum {
 	SPIDIV_SPR1  = 0b010,
 	SPIDIV_SPI2X = 0b100,
 	
-	SPIDIV_4     = 0b000, //  5.0 MHz
-	SPIDIV_16    = 0b001, // 1.25 kHz
-	SPIDIV_64    = 0b010, //  312 kHz
-	SPIDIV_128   = 0b011, //  156 kHz
+	SPIDIV_4     = 0b000, //  5.000 MHz
+	SPIDIV_16    = 0b001, //  1.250 MHz
+	SPIDIV_64    = 0b010, //  0.313 MHz
+	SPIDIV_128   = 0b011, //  0.156 MHz
 	
-	SPIDIV_2     = 0b100, // 10.0 MHz
-	SPIDIV_8     = 0b101, //  5.2 MHz
-	SPIDIV_32    = 0b110  //  626 kHz
+	SPIDIV_2     = 0b100, // 10.000 MHz
+	SPIDIV_8     = 0b101, //  2.500 MHz
+	SPIDIV_32    = 0b110  //  0.625 MHz
 } SPIDivider;
 
 /* SPI parameters for each slave */
-#define SPIMODE_PCM   SPIMODE_0
-#define SPIENDIAN_PCM SPIENDIAN_BIG
-#define SPIDIV_PCM    SPIDIV_2
+#define SPIMODE_SRAM   SPIMODE_0
+#define SPIENDIAN_SRAM SPIENDIAN_BIG
+#define SPIDIV_SRAM    SPIDIV_2
 
 #define SPIMODE_SD   SPIMODE_0
 #define SPIENDIAN_SD SPIENDIAN_BIG
