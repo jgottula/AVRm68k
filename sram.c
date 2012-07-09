@@ -71,10 +71,46 @@ void sramWriteByte(uint16_t addr, uint8_t byte)
 
 void sramReadSeq(uint16_t addr, uint16_t len, uint8_t *dest)
 {
+	/* start an instruction sequence */
+	spiBegin(SPI_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
 	
+	/* set to sequential mode (if necessary) */
+	setMode(SRAM_SR_MODE_SEQ);
+	
+	/* issue the read instruction */
+	spiByte(SRAM_INSTR_READ);
+	
+	/* write the address */
+	spiByte(addr >> 8);
+	spiByte(addr);
+	
+	/* read the data */
+	do
+		*(dest++) = spiByte(0x00);
+	while (--len != 0);
+	
+	spiEnd();
 }
 
 void sramWriteSeq(uint16_t addr, uint16_t len, const uint8_t *src)
 {
+	/* start an instruction sequence */
+	spiBegin(SPI_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
 	
+	/* set to sequential mode (if necessary) */
+	setMode(SRAM_SR_MODE_SEQ);
+	
+	/* issue the write instruction */
+	spiByte(SRAM_INSTR_WRITE);
+	
+	/* write the address */
+	spiByte(addr >> 8);
+	spiByte(addr);
+	
+	/* write the data */
+	do
+		spiByte(*(src++));
+	while (--len != 0);
+	
+	spiEnd();
 }
