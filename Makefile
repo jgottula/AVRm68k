@@ -24,7 +24,7 @@ TEST1_BIN:=programs/test1.bin
 TEST1_DUMP:=programs/test1.dump
 TEST2_ASM:=programs/test2.s
 
-.PHONY: all avr test1 test2 program clean
+.PHONY: all avr test1 test2 program clean asm
 
 all: avr test1 test2
 
@@ -37,6 +37,10 @@ clean:
 	-rm -rf *.out *.hex *.bin *.lst *.dump
 program: $(HEX) $(TEST_HEX)
 	sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX) -U eeprom:w:$(TEST1_HEX)
+
+
+asm: $(SOURCES) $(HEADERS) Makefile
+	avr-gcc $(CFLAGS) $(INCLUDE) $(LINK) -S $(SOURCES)
 
 
 $(OUT): $(SOURCES) $(HEADERS) Makefile
