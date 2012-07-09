@@ -6,7 +6,7 @@ M68K_ASFLAGS:=-mcpu=68030 -mno-68851 -mno-68881 -mno-68882 -mno-float
 M68K_CFLAGS:=-S -Wa,-mcpu=68030,-mno-68851,-mno-68881,-mno-68882,-mno-float
 OBJCOPYFLAGS:=-R .eeprom
 M68K_OBJCOPYFLAGS:=-R .flash
-AVRDUDEFLAGS:=-c usbasp -p m324a -D
+AVRDUDEFLAGS:=-c usbasp -p m324a
 SOURCES:=$(wildcard *.c)
 HEADERS:=$(wildcard *.h)
 TEST1_SOURCES:=programs/test1.s
@@ -24,7 +24,7 @@ TEST1_BIN:=programs/test1.bin
 TEST1_DUMP:=programs/test1.dump
 TEST2_ASM:=programs/test2.s
 
-.PHONY: all avr test1 test2 program progtest clean asm
+.PHONY: all avr test1 test2 program clean asm
 
 all: avr test1 test2
 
@@ -36,9 +36,7 @@ test2: $(TEST2_ASM)
 clean:
 	-rm -rf *.out *.hex *.bin *.lst *.dump
 program: $(HEX) $(TEST_HEX)
-	sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
-progtest: $(TEST1_HEX) Makefile
-	sudo avrdude $(AVRDUDEFLAGS) -U eeprom:w:$(TEST1_HEX)
+	sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX) -U eeprom:w:$(TEST1_HEX)
 
 
 asm: $(SOURCES) $(HEADERS) Makefile
