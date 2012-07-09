@@ -47,6 +47,11 @@ void spiBegin(uint8_t slave, uint8_t mode, uint8_t endian, uint8_t divider)
 	spiSelect(slave);
 }
 
+void spiBeginQuick(uint8_t slave)
+{
+	spiSelect(slave);
+}
+
 uint8_t spiByte(uint8_t byte)
 {
 	/* write the byte into the SPI data register */

@@ -44,6 +44,7 @@ enum {
 #define SPIDIV_SD    SPIDIV_2
 
 void spiBegin(uint8_t slave, uint8_t mode, uint8_t endian, uint8_t divider);
+void spiBeginQuick(uint8_t slave);
 uint8_t spiByte(uint8_t byte);
 void spiEnd(void);
 void spiInit(void);
