@@ -4,7 +4,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/* 16 MiB */
 #define DRAM_SIZE 0x1000000
+
 #define DRAM_REFRESH_FREQ 64
 
 uint8_t dramRead(uint32_t addr);
