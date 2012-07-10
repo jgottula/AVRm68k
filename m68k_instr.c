@@ -383,8 +383,7 @@ void instrRts(void)
 {
 	uartWritePSTR("rts\n");
 	
-	cpu.ureg.pc.l += 2;
-	/* calculations can now take place */
+	/* program counter increment not necessary (pc overwritten; no ea calc) */
 	
 	cpu.ureg.pc.l = popLong();
 	
