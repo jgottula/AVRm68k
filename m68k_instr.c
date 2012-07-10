@@ -126,7 +126,6 @@ void instrClr(void)
 	
 	uint8_t instrLen = 2;
 	
-	uint8_t size = instr[1] >> 6;
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	
@@ -135,6 +134,8 @@ void instrClr(void)
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
+	
+	uint8_t size = instr[1] >> 6;
 	
 	accessEA(instr + 2, effAddr, mode, reg, 0, size, true);
 	
@@ -179,4 +180,34 @@ void instrPea(void)
 	
 	cpu.ureg.a[7].l -= 4;
 	memWrite(cpu.ureg.a[7].l, SIZE_LONG, effAddr);
+}
+
+void instrMovea(void)
+{
+	uartWritePSTR("movea <ea>,%an\n");
+	
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	uint8_t size = ((instr[0] >> 4) & 0b11);
+	
+	/* convert the weird size into a normal size */
+	if (size & 0b10)
+		size ^= 0b01;
+	--size;
+	
+	uint32_t newAddr = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
+	if (size == SIZE_WORD)
+		newAddr = signExtend16to32(newAddr);
+	
+	uint8_t actualReg = (instr[0] >> 1) & 0b111;
+	cpu.ureg.a[actualReg].l = newAddr;
 }

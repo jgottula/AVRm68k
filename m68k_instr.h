@@ -12,5 +12,6 @@ void instrMoveq(void);
 void instrClr(void);
 void instrLea(void);
 void instrPea(void);
+void instrMovea(void);
 
 #endif
