@@ -157,10 +157,10 @@ uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
 	}
 	case AMODE_INDEXED:
 	{
-		uint8_t extWords = 1;
-		
 		if (extWordType(ptr)) // full ext word
 		{
+			uint8_t extWords = 1;
+			
 			uint8_t fullExtH = ptr[0], fullExtL = ptr[1];
 			
 			bool idxRegType = ((fullExtH & 0b10000000) != 0);
@@ -294,7 +294,7 @@ uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
 			
 			*addrOut = cpu.ureg.a[reg].l + index + baseDisp;
 			
-			return extWords * 2;
+			return 2;
 		}
 	}
 	case AMODE_EXTRA:
@@ -302,9 +302,13 @@ uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
 		switch (reg)
 		{
 		case AMODE_EXTRA_ABSSHORT:
-			assert(0);
+		{
+			
+		}
 		case AMODE_EXTRA_ABSLONG:
-			assert(0);
+		{
+			
+		}
 		case AMODE_EXTRA_PCDISPLACE:
 		{
 			uint16_t displacement = decodeBigEndian16(ptr);
@@ -313,7 +317,32 @@ uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
 			return 2;
 		}
 		case AMODE_EXTRA_PCINDEXED:
-			assert(0);
+		{
+			uint8_t briefExtH = ptr[0], briefExtL = ptr[1];
+			
+			bool idxRegType = ((briefExtH & 0b10000000) != 0);
+			uint8_t idxRegNum = (briefExtH >> 4) & 0b111;
+			bool idxSize = ((briefExtH & (1 << 3)) != 0);
+			uint8_t idxScale = ((briefExtH >> 1) & 0b11);
+			uint8_t dispByte = briefExtL;
+			
+			uint32_t index, baseDisp;
+			
+			if (!idxRegType)
+				index = cpu.ureg.d[idxRegNum].l;
+			else
+				index = cpu.ureg.a[idxRegNum].l;
+			
+			if (!idxSize)
+				index = signExtend16to32(index);
+			
+			index <<= idxScale;
+			baseDisp = signExtend8to32(dispByte);
+			
+			*addrOut = cpu.ureg.pc.l + index + baseDisp;
+			
+			return 2;
+		}
 		case AMODE_EXTRA_IMMEDIATE:
 			assert(0);
 		default:
