@@ -20,6 +20,9 @@
 	move.b #0x66,%d2
 	move.l %d2,%a2
 	
+	move.l #0xffffffff,%d0
+	not.l %d0
+	
 	.word EMU_DUMPREG
 	.word EMU_DUMPMEM
 		.long 0x00000000

@@ -15,5 +15,6 @@ void instrPea(void);
 void instrMove(void);
 void instrMoveFromSr(void);
 void instrMoveToCcr(void);
+void instrNot(void);
 
 #endif

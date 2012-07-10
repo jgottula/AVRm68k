@@ -284,3 +284,56 @@ void instrMoveToCcr(void)
 	
 	/* does not affect condition codes */
 }
+
+void instrNot(void)
+{
+	uartWritePSTR("not <ea>\n");
+	
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(instr + 2, mode, reg, size, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	/* get the operand */
+	uint32_t operand = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
+	
+	bool negative, zero;
+	
+	switch (size)
+	{
+	case SIZE_BYTE:
+		operand ^= 0xff;
+		negative = ((int8_t)operand < 0);
+		zero = ((int8_t)operand == 0);
+		break;
+	case SIZE_WORD:
+		operand ^= 0xffff;
+		negative = ((int16_t)operand < 0);
+		zero = ((int16_t)operand == 0);
+		break;
+	case SIZE_LONG:
+		operand = ~operand;
+		negative = ((int32_t)operand < 0);
+		zero = ((int32_t)operand == 0);
+		break;
+	default:
+		assert(0);
+	}
+	
+	/* write the operand back */
+	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
+	
+	/* update condition codes */
+	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	if (zero)
+		cpu.ureg.sr.b[0] |= SR_ZERO;
+	else if (negative)
+		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+}

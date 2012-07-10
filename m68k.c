@@ -29,6 +29,8 @@ static void m68kExecute(void)
 	
 	uartWritePSTR("[Instr] ");
 	
+	/* ensure that more likely instructions are first in if/else blocks */
+	
 	/* separate operations by front nibble */
 	switch (instr[0] >> 4)
 	{
@@ -59,6 +61,8 @@ static void m68kExecute(void)
 			instrLea();
 		else if (instr[0] == 0x48 && (instr[1] & 0b11000000) == 0b01000000)
 			instrPea();
+		else if (instr[0] == 0x46)
+			instrNot();
 		else
 			assert(0);
 		break;
