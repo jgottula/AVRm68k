@@ -71,7 +71,7 @@ static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 	}
 }
 
-static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
+static uint32_t prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
 {
 	uint8_t actualSize;
 	
@@ -97,6 +97,8 @@ static void prePostIncrDecr(bool incr, uint8_t reg, uint8_t size)
 		cpu.ureg.a[reg].l += actualSize;
 	else
 		cpu.ureg.a[reg].l -= actualSize;
+	
+	return cpu.ureg.a[reg].l;
 }
 
 static uint8_t calcBrief(const uint8_t *ptr, uint8_t reg, uint32_t *addrOut,
@@ -256,7 +258,7 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 	uint32_t rtn = 0;
 	
 	if (mode == AMODE_AREGPREDEC)
-		prePostIncrDecr(false, reg, size);
+		addr = prePostIncrDecr(false, reg, size);
 	
 	switch (mode)
 	{
@@ -303,7 +305,7 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 	}
 	
 	if (mode == AMODE_AREGPOSTINC)
-		prePostIncrDecr(true, reg, size);
+		addr = prePostIncrDecr(true, reg, size);
 	
 	return rtn;
 }
