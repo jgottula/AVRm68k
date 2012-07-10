@@ -280,7 +280,7 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 			switch (size)
 			{
 			case SIZE_BYTE:
-				return *ptr;
+				return (uint8_t)decodeBigEndian16(ptr);
 			case SIZE_WORD:
 				return decodeBigEndian16(ptr);
 			case SIZE_LONG:
