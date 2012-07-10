@@ -1,14 +1,14 @@
 Priorities:
 - Replace SIMM
   - Rewrite read & write with correct timings and other things
-  - Implement cas-before-ras refresh
-  - See about FPM
+  - Implement fast page mode functions for accessing words and longs
   - Implement read-modify-write (for incrementing memory locations, etc)
 - Emulator: memory system
 - Emulator: addressing modes
 - Emulator: instructions
   - Next: clr, cmp, eor, or, and
 - SD
+  - Because of no card detect, throw fatal error upon early init problems
 - Linux from scratch
 - Bootloader
 - HDD driver
@@ -37,11 +37,11 @@ Tests:
   - Immediate
 
 Optimizations:
-- Set DRAM delays based on spec (if any such spec exists)
-- Reduce the overhead between SPI begin/end sessions
-- Use fast page mode to read WORD or LONG values
-- Put nonatomic_block around _delay's in dramRead/Write
-- Test AVR overclocks (6V is absolute max voltage; try ~5.5V overvolt somehow?)
+- Remember to BENCHMARK/PROFILE all optimizations for determining efficacy
+- Implement icache and/or dcache (internal ram and/or sram)
+- Use fast page mode to read WORD or LONG values from dram
+- Implement DMA using second microcontroller such as ATtiny13 (for cache
+  writeback to DRAM, or SD writes, or for buffered asynchronous serial, etc)
 - Remove debug code
 
 Program size:
