@@ -8,6 +8,20 @@
 
 extern const uint8_t *instr;
 
+static void pushLong(uint32_t value)
+{
+	cpu.ureg.a[7].l -= 4;
+	memWrite(cpu.ureg.a[7].l, SIZE_LONG, value);
+}
+
+static uint32_t popLong(void)
+{
+	uint32_t value = memRead(cpu.ureg.a[7].l, SIZE_LONG);
+	cpu.ureg.a[7].l += 4;
+	
+	return value;
+}
+
 bool instrEmu(void)
 {
 	uint16_t instrWord = decodeBigEndian16(instr);
@@ -179,8 +193,7 @@ void instrPea(void)
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
 	
-	cpu.ureg.a[7].l -= 4;
-	memWrite(cpu.ureg.a[7].l, SIZE_LONG, effAddr);
+	pushLong(effAddr);
 	
 	/* does not affect condition codes */
 }
