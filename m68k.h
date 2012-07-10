@@ -29,7 +29,7 @@
 #define AMODE_AREGPOSTINC  0b011
 #define AMODE_AREGPREDEC   0b100
 #define AMODE_AREGDISPLACE 0b101
-#define AMODE_AREGINDEXED  0b110
+#define AMODE_INDEXED      0b110
 #define AMODE_EXTRA        0b111
 
 #define AMODE_EXTRA_ABSSHORT   0b000
@@ -42,6 +42,10 @@
 #define SCALE_2 0b01
 #define SCALE_4 0b10
 #define SCALE_8 0b11
+
+#define BD_SIZE_NULL 0b01
+#define BD_SIZE_WORD 0b10
+#define BD_SIZE_LONG 0b11
 
 #define EXT_BRIEF 0
 #define EXT_FULL  1
@@ -87,8 +91,6 @@ struct {
 		Reg crp, pmmusr, mmusr, srp, tc;
 	} mreg;
 } cpu;
-
-extern const uint8_t *instr;
 
 void m68kDumpReg(void);
 void m68kNext(void);
