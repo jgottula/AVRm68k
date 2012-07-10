@@ -311,7 +311,8 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 }
 
 #warning calcEA: TEST!
-uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
+uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint8_t size,
+	uint32_t *addrOut)
 {
 	/* the function's return value is the number of bytes taken up by the EA
 	 * extension words */
@@ -371,7 +372,18 @@ uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
 				return calcBrief(ptr, reg, addrOut, true);
 		}
 		case AMODE_EXTRA_IMMEDIATE:
-			return 0;
+		{
+			switch (size)
+			{
+			case SIZE_BYTE:
+			case SIZE_WORD:
+				return 2;
+			case SIZE_LONG:
+				return 4;
+			default:
+				assert(0);
+			}
+		}
 		default:
 			assert(0);
 		}
