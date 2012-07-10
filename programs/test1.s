@@ -1,42 +1,26 @@
 	.section .text
 	
-	/* nop */
-	nop
+	.equ EMU_DUMPREG, 0xa001
+	.equ EMU_DUMPMEM, 0xa002
 	
-	/* exg <an|dn>,<an|dn> */
-	exg %d0,%d1
-	exg %a0,%a1
-	exg %d2,%a2
+	lea (0x40),%sp
+	pea 0xdeadbeef
 	
-	/* move ccr,<ea> */
-	move %ccr,%d0
-	move %ccr,%d1
+	moveq #-0x40,%d0
+	movea.l (0x3c),%a6
 	
-	/* moveq #imm,<dn> */
-	moveq #0x44,%d0
-	moveq #0x00,%d1
-	moveq #0x7f,%d2  
-	moveq #-0x01,%d3
+	moveq #-0x01,%d0
+	move.w %d0,%ccr
+	move.w %sr,%d1
 	
-	/* clr <ea> */
-	/*clr.l %d4
-	clr.w %d5
-	clr.b %d6
-	clr.l (%a6)
-	clr.w (%a6)
-	clr.b (%a6)*
-	clr.l (%a6)+
-	clr.w (%a6)+
-	clr.b (%a6)+
-	clr.b (%a7)+*/ /* should increment by 2 */
-	clr.l -(%a5)
-	clr.w -(%a5)
-	clr.b -(%a5)
-	clr.b -(%a7)
+	movea.l (0x00000000),%a5
+	move.l (0x00000000),%a5
 	
-	.byte 0b10100000
+	move.l #0x05050505,%d2
+	move.b #0x66,%d2
+	move.l %d2,%a2
 	
-	/*  */
-	
-	/* next: clr, cmp, eor, or, and */
-	/* future: add actual effective addresses for each operation */
+	.word EMU_DUMPREG
+	.word EMU_DUMPMEM
+		.long 0x00000000
+		.word 0x0040
