@@ -126,9 +126,9 @@ static uint8_t calcBrief(const uint8_t *ptr, uint8_t reg, uint32_t *addrOut,
 	baseDisp = signExtend8to32(dispByte);
 	
 	if (!pcRelative)
-		*addrOut = cpu.ureg.pc.l + index + baseDisp;
-	else
 		*addrOut = cpu.ureg.a[reg].l + index + baseDisp;
+	else
+		*addrOut = cpu.ureg.pc.l + index + baseDisp;
 	
 	return 2;
 }
