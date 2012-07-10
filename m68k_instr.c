@@ -185,21 +185,14 @@ void instrPea(void)
 	/* does not affect condition codes */
 }
 
-void instrMovea(void)
+void instrMove(void)
 {
-	uartWritePSTR("movea <ea>,%an\n");
+	uartWritePSTR("move <ea>,<ea>\n");
 	
 	uint8_t instrLen = 2;
 	
-	uint8_t mode = (instr[1] & 0b00111000) >> 3;
-	uint8_t reg = instr[1] & 0b00000111;
-	
-	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
-	
+	uint8_t srcMode = (instr[1] & 0b00111000) >> 3;
+	uint8_t srcReg = instr[1] & 0b00000111;
 	uint8_t size = ((instr[0] >> 4) & 0b11);
 	
 	/* convert the weird size into a normal size */
@@ -207,14 +200,41 @@ void instrMovea(void)
 		size ^= 0b01;
 	--size;
 	
-	uint32_t newAddr = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
-	if (size == SIZE_WORD)
-		newAddr = signExtend16to32(newAddr);
+	uint32_t srcAddr;
+	const uint8_t *extWord1 = instr + instrLen;
+	instrLen += calcEA(extWord1, srcMode, srcReg, size, &srcAddr);
 	
-	uint8_t actualReg = (instr[0] >> 1) & 0b111;
-	cpu.ureg.a[actualReg].l = newAddr;
+	uint8_t dstMode = ((instr[0] & 0b1) << 2) | ((instr[1] >> 6) & 0b11);
+	uint8_t dstReg = ((instr[0] >> 1) & 0b00000111);
 	
-	/* does not affect condition codes */
+	uint32_t dstAddr;
+	const uint8_t *extWord2 = instr + instrLen;
+	instrLen += calcEA(extWord2, dstMode, dstReg, size, &dstAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	/* get the data from the source */
+	uint32_t data = accessEA(extWord1, srcAddr, srcMode, srcReg, 0, size,
+		false);
+	
+	/* write the data to the destination */
+	accessEA(extWord2, dstAddr, dstMode, dstReg, data, size, true);
+	
+	/* sign extend to make condition codes easier to calculate */
+	if (size == SIZE_BYTE)
+		data = signExtend8to32(data);
+	else if (size == SIZE_WORD)
+		data = signExtend16to32(data);
+	else if (size != SIZE_LONG)
+		assert(0);
+	
+	/* update condition codes */
+	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	if ((int32_t)data == 0)
+		cpu.ureg.sr.b[0] |= SR_ZERO;
+	else if ((int32_t)data < 0)
+		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
 }
 
 void instrMoveFromSr(void)
