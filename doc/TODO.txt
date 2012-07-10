@@ -28,6 +28,11 @@ Tests:
   - Absolute short
   - Absolute long
   - Immediate
+  - NOTE: pc-relative addr modes appear to be broken somewhat
+- Instructions:
+  - pea (check stack)
+  - jmp (wrong addrs)
+  - rts
 
 Optimizations:
 - Remember to BENCHMARK/PROFILE all optimizations for determining efficacy
