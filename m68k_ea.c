@@ -274,7 +274,7 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 		if (reg == AMODE_EXTRA_IMMEDIATE)
 		{
 			assert(!write);
-		
+			
 			switch (size)
 			{
 			case SIZE_BYTE:
