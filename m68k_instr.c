@@ -158,5 +158,7 @@ void instrLea(void)
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
 	
-	cpu.ureg.a[reg].l = effAddr;
+	uint8_t actualReg = (instr[0] >> 1) & 0b111;
+	
+	cpu.ureg.a[actualReg].l = effAddr;
 }
