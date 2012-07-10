@@ -38,11 +38,7 @@ static void m68kExecute(void)
 	case 0b0001: // move byte
 	case 0b0010: // move long
 	case 0b0011: // move word
-		if (((instr[0] & 0b11100001) == 0b00100000) &&
-			((instr[1] & 0b11000000) == 0b01000000))
-			instrMovea();
-		else
-			assert(0);
+		instrMove();
 		break;
 	case 0b0100: // miscellaneous
 		if (instr[0] == 0x4e && instr[1] == 0x71)
