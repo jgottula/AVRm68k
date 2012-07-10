@@ -65,6 +65,8 @@ static void m68kExecute(void)
 			instrNot();
 		else if (instr[0] == 0x4e && ((instr[1] & 0b11000000) == 0b11000000))
 			instrJmp();
+		else if (instr[0] == 0x4e && instr[1] == 0x75)
+			instrRts();
 		else
 			assert(0);
 		break;
