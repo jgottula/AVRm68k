@@ -86,7 +86,7 @@ void instrMoveFromCcr(void)
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
@@ -113,11 +113,11 @@ void instrMoveq(void)
 	cpu.ureg.d[reg].l = signExtend8to32(instr[1]);
 	
 	/* update condition codes */
-	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if ((int8_t)data == 0)
-		cpu.ureg.sr.l |= SR_ZERO;
+		cpu.ureg.sr.b[0] |= SR_ZERO;
 	else if ((int8_t)data < 0)
-		cpu.ureg.sr.l |= SR_NEGATIVE;
+		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
 }
 
 void instrClr(void)
@@ -128,20 +128,19 @@ void instrClr(void)
 	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, size, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
 	
-	uint8_t size = instr[1] >> 6;
-	
 	accessEA(instr + 2, effAddr, mode, reg, 0, size, true);
 	
 	/* update condition codes */
-	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
-	cpu.ureg.sr.l |= SR_ZERO;
+	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
+	cpu.ureg.sr.b[0] |= SR_ZERO;
 }
 
 void instrLea(void)
@@ -154,7 +153,7 @@ void instrLea(void)
 	uint8_t reg = instr[1] & 0b00000111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, SIZE_LONG, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
@@ -175,7 +174,7 @@ void instrPea(void)
 	uint8_t reg = instr[1] & 0b00000111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, SIZE_LONG, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
@@ -228,7 +227,7 @@ void instrMoveFromSr(void)
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
@@ -251,7 +250,7 @@ void instrMoveToCcr(void)
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
