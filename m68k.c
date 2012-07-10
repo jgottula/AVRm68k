@@ -54,6 +54,8 @@ static void m68kExecute(void)
 			else
 				instrClr();
 		}
+		else if (instr[0] == 0x44 && ((instr[1] & 0b11000000) == 0b11000000))
+			instrMoveToCcr();
 		else if (instr[0] == 0x40 && ((instr[1] & 0b11000000) == 0b11000000))
 			instrMoveFromSr();
 		else if ((instr[0] & 0b11110001) == 0b01000001 &&

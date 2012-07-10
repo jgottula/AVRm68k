@@ -92,7 +92,7 @@ void instrMoveFromCcr(void)
 	/* calculations can now take place */
 	
 	/* get just the user portion of the SR */
-	uint16_t ccr = cpu.ureg.sr.l & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
+	uint16_t ccr = cpu.ureg.sr.w[0] & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
 		SR_NEGATIVE | SR_EXTEND);
 	
 	accessEA(instr + 2, effAddr, mode, reg, ccr, SIZE_WORD, true);
@@ -237,6 +237,31 @@ void instrMoveFromSr(void)
 	uint16_t sr = cpu.ureg.sr.w[0];
 	
 	accessEA(instr + 2, effAddr, mode, reg, sr, SIZE_WORD, true);
+	
+	/* does not affect condition codes */
+}
+
+void instrMoveToCcr(void)
+{
+	uartWritePSTR("move <ea>,%ccr\n");
+	
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	/* get the new CCR value */
+	uint16_t newCCR = accessEA(instr + 2, effAddr, mode, reg, 0, SIZE_WORD,
+		false);
+	
+	/* store only the low-order byte */
+	cpu.ureg.sr.b[0] = (uint8_t)newCCR;
 	
 	/* does not affect condition codes */
 }
