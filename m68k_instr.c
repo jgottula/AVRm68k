@@ -378,3 +378,15 @@ void instrJmp(void)
 	
 	/* does not affect condition codes */
 }
+
+void instrRts(void)
+{
+	uartWritePSTR("rts\n");
+	
+	cpu.ureg.pc.l += 2;
+	/* calculations can now take place */
+	
+	cpu.ureg.pc.l = popLong();
+	
+	/* does not affect condition codes */
+}
