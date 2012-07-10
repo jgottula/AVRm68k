@@ -161,3 +161,22 @@ void instrLea(void)
 	uint8_t actualReg = (instr[0] >> 1) & 0b111;
 	cpu.ureg.a[actualReg].l = effAddr;
 }
+
+void instrPea(void)
+{
+	uartWritePSTR("pea <ea>\n");
+	
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	cpu.ureg.a[7].l -= 4;
+	memWrite(cpu.ureg.a[7].l, SIZE_LONG, effAddr);
+}
