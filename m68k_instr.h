@@ -13,5 +13,6 @@ void instrClr(void);
 void instrLea(void);
 void instrPea(void);
 void instrMovea(void);
+void instrMoveFromSr(void);
 
 #endif

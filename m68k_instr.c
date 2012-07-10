@@ -161,6 +161,8 @@ void instrLea(void)
 	
 	uint8_t actualReg = (instr[0] >> 1) & 0b111;
 	cpu.ureg.a[actualReg].l = effAddr;
+	
+	/* does not affect condition codes */
 }
 
 void instrPea(void)
@@ -180,6 +182,8 @@ void instrPea(void)
 	
 	cpu.ureg.a[7].l -= 4;
 	memWrite(cpu.ureg.a[7].l, SIZE_LONG, effAddr);
+	
+	/* does not affect condition codes */
 }
 
 void instrMovea(void)
@@ -210,4 +214,29 @@ void instrMovea(void)
 	
 	uint8_t actualReg = (instr[0] >> 1) & 0b111;
 	cpu.ureg.a[actualReg].l = newAddr;
+	
+	/* does not affect condition codes */
+}
+
+void instrMoveFromSr(void)
+{
+	uartWritePSTR("move %sr,<ea>\n");
+	
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	/* get the entire SR */
+	uint16_t sr = cpu.ureg.sr.w[0];
+	
+	accessEA(instr + 2, effAddr, mode, reg, sr, SIZE_WORD, true);
+	
+	/* does not affect condition codes */
 }
