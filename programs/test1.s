@@ -23,6 +23,11 @@
 	move.l #0xffffffff,%d0
 	not.l %d0
 	
+	pea 0x0000002e
+	rts
+	
+	jmp 0x00000000
+	
 	.word EMU_DUMPREG
 	.word EMU_DUMPMEM
 		.long 0x00000000
