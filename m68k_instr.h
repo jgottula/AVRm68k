@@ -16,5 +16,6 @@ void instrMove(void);
 void instrMoveFromSr(void);
 void instrMoveToCcr(void);
 void instrNot(void);
+void instrJmp(void);
 
 #endif

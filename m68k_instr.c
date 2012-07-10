@@ -337,3 +337,31 @@ void instrNot(void)
 	else if (negative)
 		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
 }
+
+void instrJmp(void)
+{
+	uartWritePSTR("jmp <ea>\n");
+	
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	/* get the new program counter value */
+	uint32_t newPC = accessEA(instr + 2, effAddr, mode, reg, 0, SIZE_LONG,
+		false);
+	uartWriteHex32(newPC, false); uartWriteChr('\n');
+	uartWriteHex4(mode, false); uartWriteChr('\n');
+	uartWriteHex4(reg, false); uartWriteChr('\n');
+	
+	/* store the new program counter */
+	cpu.ureg.pc.l = newPC;
+	
+	/* does not affect condition codes */
+}

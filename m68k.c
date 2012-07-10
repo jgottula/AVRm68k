@@ -63,6 +63,8 @@ static void m68kExecute(void)
 			instrPea();
 		else if (instr[0] == 0x46)
 			instrNot();
+		else if (instr[0] == 0x4e && ((instr[1] & 0b11000000) == 0b11000000))
+			instrJmp();
 		else
 			assert(0);
 		break;
