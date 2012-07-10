@@ -54,6 +54,9 @@ static void m68kExecute(void)
 			else
 				instrClr();
 		}
+		else if ((instr[0] & 0b11110001) == 0b01000001 &&
+			(instr[1] & 0b11000000) == 0b11000000)
+			instrLea();
 		else
 			assert(0);
 		break;

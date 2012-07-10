@@ -42,7 +42,7 @@ void instrNop(void)
 
 void instrExg(void)
 {
-	uartWritePSTR("exg\n");
+	uartWritePSTR("exg %dn|%an,%dn|%an\n");
 	
 	cpu.ureg.pc.l += 2;
 	
@@ -78,7 +78,7 @@ void instrExg(void)
 
 void instrMoveFromCcr(void)
 {
-	uartWritePSTR("move ccr,<ea>\n");
+	uartWritePSTR("move %ccr,<ea>\n");
 	
 	uint8_t instrLen = 2;
 	
@@ -102,7 +102,7 @@ void instrMoveFromCcr(void)
 
 void instrMoveq(void)
 {
-	uartWritePSTR("moveq\n");
+	uartWritePSTR("moveq #<data>,%dn\n");
 	
 	uint8_t reg = (instr[0] & 0b1110) >> 1;
 	uint8_t data = instr[1];
@@ -122,7 +122,7 @@ void instrMoveq(void)
 
 void instrClr(void)
 {
-	uartWritePSTR("clr\n");
+	uartWritePSTR("clr \n");
 	
 	uint8_t instrLen = 2;
 	
@@ -141,4 +141,22 @@ void instrClr(void)
 	/* update condition codes */
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
 	cpu.ureg.sr.l |= SR_ZERO;
+}
+
+void instrLea(void)
+{
+	uartWritePSTR("lea <ea>,%an\n");
+	
+	uint8_t instrLen = 2;
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint32_t effAddr;
+	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
+	
+	cpu.ureg.pc.l += instrLen;
+	/* calculations can now take place */
+	
+	cpu.ureg.a[reg].l = effAddr;
 }
