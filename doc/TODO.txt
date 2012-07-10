@@ -6,7 +6,7 @@ Priorities:
 - Emulator: memory system
 - Emulator: addressing modes
 - Emulator: instructions
-  - Next: clr, cmp, eor, or, and
+  - Next: bra, jmp, tst, cmp, eor, or, and, addq, addi, add
 - SD
   - Because of no card detect, throw fatal error upon early init problems
 - Linux from scratch
@@ -35,6 +35,7 @@ Optimizations:
 - Use fast page mode to read WORD or LONG values from dram
 - Implement DMA using second microcontroller such as ATtiny13 (for cache
   writeback to DRAM, or SD writes, or for buffered asynchronous serial, etc)
+- Reorder if/else statements so more likely instructions etc are first
 - Remove debug code
 
 Program size:
