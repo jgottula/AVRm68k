@@ -15,14 +15,7 @@ Priorities:
 - RTC chip for date/time
 
 Tests:
-- m68k_mem: read and write, for all sizes
 - Address modes:
-  - Data reg direct
-  - Addr reg direct
-  - Addr reg indirect
-  - Addr reg indirect post incr
-  - Addr reg indirect pre decr
-  - Addr reg indirect displacement
   - Addr reg indirect index
   - Addr reg indirect index base displacement
   - Memory indirect postindex
