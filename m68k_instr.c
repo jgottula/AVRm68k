@@ -122,7 +122,7 @@ void instrMoveq(void)
 
 void instrClr(void)
 {
-	uartWritePSTR("clr \n");
+	uartWritePSTR("clr <ea>\n");
 	
 	uint8_t instrLen = 2;
 	
