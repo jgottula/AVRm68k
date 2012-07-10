@@ -50,7 +50,7 @@ Overclocking:
   - ATmega324A: abs max 6V, 5.5V reasonable
   - OWC DRAM: abs max 7V, 5.5V reasonable
   - MAX232: abs max 6V, 5.5V reasonable
-  - FT232R: don't want to touch this
+  - FT232R: abs max 6V, 5.25V reasonable
 - Check that 3.3V outputs from SPI devices will actually register above the Vih
   threshold of the AVR (5.5-6V WILL be a problem)
   - Check if 4050 with Vcc 5V will actually pull 3.3V up to 5V
