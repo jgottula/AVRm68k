@@ -50,6 +50,10 @@
 #define EXT_BRIEF 0
 #define EXT_FULL  1
 
+#define SIZE_MOVE_BYTE 0b01
+#define SIZE_MOVE_WORD 0b11
+#define SIZE_MOVE_LONG 0b10
+
 #define EMUINSTR_DUMPREG 0xa001
 #define EMUINSTR_DUMPMEM 0xa002
 
