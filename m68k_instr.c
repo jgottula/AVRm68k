@@ -6,6 +6,8 @@
 #include "m68k_mem.h"
 #include "uart.h"
 
+extern const uint8_t *instr;
+
 bool instrEmu(void)
 {
 	uint16_t instrWord = decodeBigEndian16(instr);
@@ -86,7 +88,7 @@ void instrMoveFromCcr(void)
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
@@ -95,7 +97,7 @@ void instrMoveFromCcr(void)
 	uint16_t ccr = cpu.ureg.sr.l & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
 		SR_NEGATIVE | SR_EXTEND);
 	
-	accessEA(effAddr, mode, reg, ccr, SIZE_WORD, true);
+	accessEA(instr + 2, effAddr, mode, reg, ccr, SIZE_WORD, true);
 	
 	/* does not affect condition codes */
 }
@@ -132,12 +134,12 @@ void instrClr(void)
 	uint8_t reg = instr[1] & 0b00000111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(mode, reg, &effAddr);
+	instrLen += calcEA(instr + 2, mode, reg, &effAddr);
 	
 	cpu.ureg.pc.l += instrLen;
 	/* calculations can now take place */
 	
-	accessEA(effAddr, mode, reg, 0, size, true);
+	accessEA(instr + 2, effAddr, mode, reg, 0, size, true);
 	
 	/* update condition codes */
 	cpu.ureg.sr.l &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);

@@ -250,8 +250,8 @@ static uint8_t calcFull(const uint8_t *ptr, uint8_t reg, uint32_t *addrOut,
 	return extWords * 2;
 }
 
-uint32_t accessEA(uint32_t addr, uint8_t mode, uint8_t reg, uint32_t data,
-	uint8_t size, bool write)
+uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
+	uint32_t data, uint8_t size, bool write)
 {
 	uint32_t rtn = 0;
 	
@@ -262,17 +262,38 @@ uint32_t accessEA(uint32_t addr, uint8_t mode, uint8_t reg, uint32_t data,
 	{
 	case AMODE_DREGDIRECT:
 	case AMODE_AREGDIRECT:
+	{
 		if (write)
 			writeReg(mode, reg, data, size);
 		else
 			rtn = readReg(mode, reg, size);
 		break;
+	}
+	case AMODE_EXTRA_IMMEDIATE:
+	{
+		assert(!write);
+		
+		switch (size)
+		{
+		case SIZE_BYTE:
+			return *ptr;
+		case SIZE_WORD:
+			return decodeBigEndian16(ptr);
+		case SIZE_LONG:
+			return decodeBigEndian32(ptr);
+		default:
+			assert(0);
+		}
+		break;
+	}
 	default:
+	{
 		if (write)
 			memWrite(addr, size, data);
 		else
 			rtn = memRead(addr, size);
 		break;
+	}
 	}
 	
 	if (mode == AMODE_AREGPOSTINC)
@@ -319,20 +340,20 @@ uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
 		{
 		case AMODE_EXTRA_ABSSHORT:
 		{
-			
+			*addrOut = signExtend16to32(decodeBigEndian16(ptr));
+			return 2;
 		}
 		case AMODE_EXTRA_ABSLONG:
 		{
-			
+			*addrOut = decodeBigEndian32(ptr);
+			return 4;
 		}
 		case AMODE_EXTRA_PCDISPLACE:
 			return calcBrief(ptr, reg, addrOut, true);
 		case AMODE_EXTRA_PCINDEXED:
 			return calcFull(ptr, reg, addrOut, true);
 		case AMODE_EXTRA_IMMEDIATE:
-		{
-			
-		}
+			return 0;
 		default:
 			assert(0);
 		}
