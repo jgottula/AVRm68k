@@ -357,9 +357,19 @@ uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint32_t *addrOut)
 			return 4;
 		}
 		case AMODE_EXTRA_PCDISPLACE:
-			return calcBrief(ptr, reg, addrOut, true);
+		{
+			uint16_t displacement = decodeBigEndian16(ptr);
+			*addrOut = cpu.ureg.pc.l + signExtend16to32(displacement);
+			
+			return 2;
+		}
 		case AMODE_EXTRA_PCINDEXED:
-			return calcFull(ptr, reg, addrOut, true);
+		{
+			if (extWordType(ptr)) // full ext word
+				return calcFull(ptr, reg, addrOut, true);
+			else // brief ext word
+				return calcBrief(ptr, reg, addrOut, true);
+		}
 		case AMODE_EXTRA_IMMEDIATE:
 			return 0;
 		default:
