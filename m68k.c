@@ -179,8 +179,8 @@ void m68kInit(void)
 	
 	for (uint8_t i = 0; i < 8; ++i)
 	{
-		cpu.ureg.d[i].l = 0x11111111 * (7 - i);
-		cpu.ureg.a[i].l = 0x11111111 * (15 - i);
+		cpu.ureg.d[i].l = 0x00000000;
+		cpu.ureg.a[i].l = 0x00000000;
 	}
 	
 	/* debug */
