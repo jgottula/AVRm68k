@@ -269,22 +269,28 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 			rtn = readReg(mode, reg, size);
 		break;
 	}
-	case AMODE_EXTRA_IMMEDIATE:
+	case AMODE_EXTRA:
 	{
-		assert(!write);
-		
-		switch (size)
+		if (reg == AMODE_EXTRA_IMMEDIATE)
 		{
-		case SIZE_BYTE:
-			return *ptr;
-		case SIZE_WORD:
-			return decodeBigEndian16(ptr);
-		case SIZE_LONG:
-			return decodeBigEndian32(ptr);
-		default:
-			assert(0);
+			assert(!write);
+		
+			switch (size)
+			{
+			case SIZE_BYTE:
+				return *ptr;
+			case SIZE_WORD:
+				return decodeBigEndian16(ptr);
+			case SIZE_LONG:
+				return decodeBigEndian32(ptr);
+			default:
+				assert(0);
+			}
+			
+			break;
 		}
-		break;
+		
+		/* intentional fall-through to default */
 	}
 	default:
 	{
