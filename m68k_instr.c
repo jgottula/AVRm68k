@@ -40,7 +40,6 @@ void instrNop(void)
 	/* does not affect condition codes */
 }
 
-#warning exg: TEST!
 void instrExg(void)
 {
 	uartWritePSTR("exg\n");
@@ -77,7 +76,6 @@ void instrExg(void)
 	/* does not affect condition codes */
 }
 
-#warning ccr: TEST!
 void instrMoveFromCcr(void)
 {
 	uartWritePSTR("move ccr,<ea>\n");
@@ -102,15 +100,15 @@ void instrMoveFromCcr(void)
 	/* does not affect condition codes */
 }
 
-#warning moveq: TEST!
 void instrMoveq(void)
 {
 	uartWritePSTR("moveq\n");
 	
-	cpu.ureg.pc.l += 2;
-	
 	uint8_t reg = (instr[0] & 0b1110) >> 1;
 	uint8_t data = instr[1];
+	
+	cpu.ureg.pc.l += 2;
+	/* calculations can now take place */
 	
 	cpu.ureg.d[reg].l = signExtend8to32(instr[1]);
 	
@@ -122,7 +120,6 @@ void instrMoveq(void)
 		cpu.ureg.sr.l |= SR_NEGATIVE;
 }
 
-#warning clr: REWRITE!
 void instrClr(void)
 {
 	uartWritePSTR("clr\n");
