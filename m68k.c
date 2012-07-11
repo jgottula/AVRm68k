@@ -78,7 +78,10 @@ static void m68kExecute(void)
 			assert(0);
 		break;
 	case 0b0101: // ADDQ, SUBQ, Scc, DBcc, TRAPcc
-		assert(0);
+		if ((instr[1] & 0b11000000) == 0b11000000)
+			instrScc();
+		else
+			assert(0);
 		break;
 	case 0b0110: // Bcc, BSR, BRA
 		if (instr[0] == 0x60)

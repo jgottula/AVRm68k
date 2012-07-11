@@ -22,6 +22,56 @@ static uint32_t popLong(void)
 	return value;
 }
 
+static bool condTest(uint8_t nibble)
+{
+	uint8_t ccr = cpu.ureg.sr.b[1];
+	bool carry = ((ccr & SR_CARRY) != 0);
+	bool overflow = ((ccr & SR_OVERFLOW) != 0);
+	bool zero = ((ccr & SR_ZERO) != 0);
+	bool negative = ((ccr & SR_NEGATIVE) != 0);
+	
+	/* order the cases AND the expressions to speed up common cases */
+	
+	switch (nibble)
+	{
+	case COND_T: // true
+		return true;
+	case COND_F: // false
+		return false;
+	case COND_HI: // high
+		return (!carry && !zero);
+	case COND_LS: // low or same
+		return (carry || zero);
+	case COND_CC: // carry clear
+		return !carry;
+	case COND_CS: // carry set
+		return carry;
+	case COND_NE: // not equal
+		return !zero;
+	case COND_EQ: // equal
+		return zero;
+	case COND_VC: // overflow clear
+		return !overflow;
+	case COND_VS: // overflow set
+		return overflow;
+	case COND_PL: // plus
+		return !negative;
+	case COND_MI: // minus
+		return negative;
+	case COND_GE: // greater or equal
+		return ((negative && overflow) || (!negative && !overflow));
+	case COND_LT: // less than
+		return ((negative && !overflow) || (!negative && overflow));
+	case COND_GT: // greater than
+		return ((negative && overflow && !zero) ||
+			(!negative && !overflow && !zero));
+	case COND_LE: // less or equal
+		return ((negative && !overflow) || (!negative && overflow) || zero);
+	default:
+		assert(0);
+	}
+}
+
 bool instrEmu(void)
 {
 	uint16_t instrWord = decodeBigEndian16(instr);
@@ -410,3 +460,28 @@ void instrBsr(void)
 	
 	/* does not affect condition codes */
 }
+
+void instrScc(void)
+{
+	uartWritePSTR("scc <ea>\n");
+	
+	bool cond = condTest(instr[0] && 0b00001111);
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_BYTE, &effAddr);
+	
+	/* write all ones if true, all zeroes if false */
+	if (cond)
+		accessEA(instr + 2, effAddr, mode, reg, 0xff, SIZE_BYTE, true);
+	else
+		accessEA(instr + 2, effAddr, mode, reg, 0x00, SIZE_BYTE, true);
+	
+	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
+}
+
+

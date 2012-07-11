@@ -21,5 +21,6 @@ void instrRts(void);
 void instrJsr(void);
 void instrBra(void);
 void instrBsr(void);
+void instrScc(void);
 
 #endif
