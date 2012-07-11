@@ -727,7 +727,6 @@ void instrBcc(void)
 	uartWritePSTR("bcc <ea>\n");
 	
 	bool cond = condTest(instr[0] & 0b00001111);
-	uartWriteBool(cond);
 	
 	uint8_t dispByte = instr[1];
 	
