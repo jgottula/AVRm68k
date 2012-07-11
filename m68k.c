@@ -31,6 +31,8 @@ static void m68kExecute(void)
 	
 	uartWritePSTR("[Instr] ");
 	
+	assert(cpu.ureg.pc.l % 2 == 0);
+	
 	/* advance the program counter past the instruction word */
 	cpu.ureg.pc.l += 2;
 	
@@ -111,7 +113,10 @@ static void m68kExecute(void)
 		assert(instrEmu());
 		break;
 	case 0b1011: // CMP, EOR
-		assert(0);
+		if ((instr[0] & 0b00000001) == 0b00000001)
+			instrEor();
+		else
+			assert(0);
 		break;
 	case 0b1100: // AND, MUL, ABCD, EXG
 		if (instr[0] & 0b00000001)

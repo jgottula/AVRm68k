@@ -24,5 +24,6 @@ void instrBsr(void);
 void instrScc(void);
 void instrTst(void);
 void instrAddq(void);
+void instrEor(void);
 
 #endif
