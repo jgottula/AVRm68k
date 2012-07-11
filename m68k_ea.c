@@ -288,11 +288,9 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 			default:
 				assert(0);
 			}
-			
-			break;
 		}
 		
-		/* intentional fall-through to default */
+		/* all other modes will fall through to default (for mem read/write) */
 	}
 	default:
 	{
