@@ -43,7 +43,9 @@ static void m68kExecute(void)
 	{
 	case 0b0000: // bit manipulation, MOVEP, immediate
 		if (instr[0] == 0x0a)
-			instrEori();
+			instrEoriOri(true);
+		else if (instr[0] == 0x00)
+			instrEoriOri(false);
 		else
 			assert(0);
 		break;
