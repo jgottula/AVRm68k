@@ -19,5 +19,6 @@ void instrNot(void);
 void instrJmp(void);
 void instrRts(void);
 void instrJsr(void);
+void instrBra(void);
 
 #endif

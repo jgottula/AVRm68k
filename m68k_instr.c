@@ -365,4 +365,18 @@ void instrJsr(void)
 	/* does not affect condition codes */
 }
 
-
+void instrBra(void)
+{
+	uartWritePSTR("bra <ea>\n");
+	
+	uint8_t dispByte = instr[1];
+	
+	if (dispByte == 0x00) // word
+		cpu.ureg.pc.l += signExtend16to32(decodeBigEndian16(instr + 2));
+	else if (dispByte == 0xff) // long
+		cpu.ureg.pc.l += decodeBigEndian32(instr + 2);
+	else // byte
+		cpu.ureg.pc.l += signExtend8to32(dispByte);
+	
+	/* does not affect condition codes */
+}

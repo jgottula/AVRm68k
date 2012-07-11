@@ -81,7 +81,10 @@ static void m68kExecute(void)
 		assert(0);
 		break;
 	case 0b0110: // Bcc, BSR, BRA
-		assert(0);
+		if (instr[0] == 0x60)
+			instrBra();
+		else
+			assert(0);
 		break;
 	case 0b0111: // MOVEQ
 		if ((instr[0] & 0b1) == 0)
