@@ -5,11 +5,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define SR_CARRY    _BV(0)
-#define SR_OVERFLOW _BV(1)
-#define SR_ZERO     _BV(2)
-#define SR_NEGATIVE _BV(3)
-#define SR_EXTEND   _BV(4)
+#define SR_CARRY    _BV(1)
+#define SR_OVERFLOW _BV(2)
+#define SR_ZERO     _BV(3)
+#define SR_NEGATIVE _BV(4)
+#define SR_EXTEND   _BV(5)
 
 #define SR_INTPRIO0  _BV(7)
 #define SR_INTPRIO1  _BV(9)

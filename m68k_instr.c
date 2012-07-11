@@ -24,7 +24,7 @@ static uint32_t popLong(void)
 
 static bool condTest(uint8_t nibble)
 {
-	uint8_t ccr = cpu.ureg.sr.b[1];
+	uint8_t ccr = cpu.ureg.sr.b[0];
 	bool carry = ((ccr & SR_CARRY) != 0);
 	bool overflow = ((ccr & SR_OVERFLOW) != 0);
 	bool zero = ((ccr & SR_ZERO) != 0);
