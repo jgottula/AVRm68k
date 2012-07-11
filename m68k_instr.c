@@ -556,9 +556,20 @@ void instrAddq(void)
 	cpu.ureg.pc.l += eaLen;
 }
 
-void instrEor(void)
+void instrEorOr(bool exclusive, bool dataRegDest)
 {
-	uartWritePSTR("eor %dn,<ea>\n");
+	/* exclusive and not data dest should not happen */
+	assert(!exclusive || !dataRegDest);
+	
+	if (exclusive)
+		uartWritePSTR("eor %dn,<ea>\n");
+	else
+	{
+		if (dataRegDest)
+			uartWritePSTR("or <ea>,%dn\n");
+		else
+			uartWritePSTR("or %dn,<ea>\n");
+	}
 	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
@@ -573,8 +584,11 @@ void instrEor(void)
 	/* get the second operand */
 	uint32_t operand = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
 	
-	/* perform the exclusive or operation */
-	operand ^= dataReg->l;
+	/* perform the operation */
+	if (exclusive)
+		operand ^= dataReg->l;
+	else
+		operand |= dataReg->l;
 	
 	bool negative, zero;
 	
@@ -597,7 +611,11 @@ void instrEor(void)
 	}
 	
 	/* write the operand back */
-	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
+	if (dataRegDest)
+		accessEA(instr + 2, effAddr, AMODE_DREGDIRECT, reg, operand, size,
+			true);
+	else
+		accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
 	
 	/* update condition codes */
 	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);

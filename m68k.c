@@ -104,7 +104,11 @@ static void m68kExecute(void)
 			assert(0);
 		break;
 	case 0b1000: // OR, DIV, SBCD
-		assert(0);
+		if (((instr[0] & 0b00000001) == 0b00000000) ||
+			(((instr[1] >> 3) & 0b00000111) > 0b001))
+			instrEorOr(false, ((instr[0] & 0b00000001) == 0));
+		else
+			assert(0);
 		break;
 	case 0b1001: // SUB, SUBX
 		assert(0);
@@ -114,7 +118,7 @@ static void m68kExecute(void)
 		break;
 	case 0b1011: // CMP, EOR
 		if ((instr[0] & 0b00000001) == 0b00000001)
-			instrEor();
+			instrEorOr(true, false);
 		else
 			assert(0);
 		break;
