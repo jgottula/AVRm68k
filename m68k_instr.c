@@ -380,3 +380,33 @@ void instrBra(void)
 	
 	/* does not affect condition codes */
 }
+
+void instrBsr(void)
+{
+	uartWritePSTR("bsr <ea>\n");
+	
+	uint8_t dispByte = instr[1];
+	uint32_t add;
+	uint8_t size = 1;
+	
+	if (dispByte == 0x00) // word
+	{
+		add = signExtend16to32(decodeBigEndian16(instr + 2));
+		size = 2;
+	}
+	else if (dispByte == 0xff) // long
+	{
+		add = decodeBigEndian32(instr + 2);
+		size = 4;
+	}
+	else // byte
+		add = signExtend8to32(dispByte);
+	
+	/* push the current program counter */
+	pushLong(cpu.ureg.pc.l + size);
+	
+	/* store the new program counter */
+	cpu.ureg.pc.l += add;
+	
+	/* does not affect condition codes */
+}

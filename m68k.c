@@ -83,6 +83,8 @@ static void m68kExecute(void)
 	case 0b0110: // Bcc, BSR, BRA
 		if (instr[0] == 0x60)
 			instrBra();
+		else if (instr[0] == 0x61)
+			instrBsr();
 		else
 			assert(0);
 		break;

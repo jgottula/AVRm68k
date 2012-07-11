@@ -20,5 +20,6 @@ void instrJmp(void);
 void instrRts(void);
 void instrJsr(void);
 void instrBra(void);
+void instrBsr(void);
 
 #endif
