@@ -642,12 +642,17 @@ void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest)
 	cpu.ureg.pc.l += eaLen;
 }
 
-void instrEoriOri(bool exclusive)
+void instrEoriOriAndi(bool or, bool exclusive)
 {
-	if (exclusive)
-		uartWritePSTR("eori #<data>,<ea>\n");
+	if (or)
+	{
+		if (exclusive)
+			uartWritePSTR("eori #<data>,<ea>\n");
+		else
+			uartWritePSTR("ori #<data>,<ea>\n");
+	}
 	else
-		uartWritePSTR("ori #<data>,<ea>\n");
+		uartWritePSTR("andi #<data>,<ea>\n");
 	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
@@ -674,10 +679,15 @@ void instrEoriOri(bool exclusive)
 		false);
 	
 	/* perform the operation */
-	if (exclusive)
-		operand ^= data;
+	if (or)
+	{
+		if (exclusive)
+			operand ^= data;
+		else
+			operand |= data;
+	}
 	else
-		operand |= data;
+		operand &= data;
 	
 	/* write back the sum */
 	accessEA(instr + eaOffset, effAddr, mode, reg, operand, size, true);
