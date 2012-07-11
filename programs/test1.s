@@ -25,7 +25,7 @@
 	not.l %d6
 	
 	bsr subroutine
-	jmp done
+	bra done
 	
 subroutine:
 	nop
