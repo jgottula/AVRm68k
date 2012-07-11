@@ -102,7 +102,7 @@ static void m68kExecute(void)
 		else if (instr[0] == 0x61)
 			instrBsr();
 		else
-			assert(0);
+			instrBcc();
 		break;
 	case 0b0111: // MOVEQ
 		if ((instr[0] & 0b1) == 0)

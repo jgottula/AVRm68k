@@ -721,3 +721,34 @@ void instrEoriOriAndi(bool or, bool exclusive)
 	
 	cpu.ureg.pc.l += eaLen + (eaOffset - 2);
 }
+
+void instrBcc(void)
+{
+	uartWritePSTR("bcc <ea>\n");
+	
+	bool cond = condTest(instr[0] & 0b00001111);
+	uartWriteBool(cond);
+	
+	uint8_t dispByte = instr[1];
+	
+	if (cond)
+	{
+		if (dispByte == 0x00) // word
+			cpu.ureg.pc.l += signExtend16to32(decodeBigEndian16(instr + 2));
+		else if (dispByte == 0xff) // long
+			cpu.ureg.pc.l += decodeBigEndian32(instr + 2);
+		else // byte
+			cpu.ureg.pc.l += signExtend8to32(dispByte);
+	}
+	else
+	{
+		if (dispByte == 0x00) // word
+			cpu.ureg.pc.l += 2;
+		else if (dispByte == 0xff) // long
+			cpu.ureg.pc.l += 4;
+		else // byte
+			cpu.ureg.pc.l += 2;
+	}
+	
+	/* does not affect condition codes */
+}
