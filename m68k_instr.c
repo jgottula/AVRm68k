@@ -49,16 +49,12 @@ void instrNop(void)
 {
 	uartWritePSTR("nop\n");
 	
-	cpu.ureg.pc.l += 2;
-	
 	/* does not affect condition codes */
 }
 
 void instrExg(void)
 {
 	uartWritePSTR("exg %dn|%an,%dn|%an\n");
-	
-	cpu.ureg.pc.l += 2;
 	
 	uint8_t regIdx1 = (instr[0] & 0b00001110) >> 1;
 	uint8_t regIdx2 = (instr[1] & 0b00000111);
@@ -94,22 +90,19 @@ void instrMoveFromCcr(void)
 {
 	uartWritePSTR("move %ccr,<ea>\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* get just the user portion of the SR */
 	uint16_t ccr = cpu.ureg.sr.w[0] & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
 		SR_NEGATIVE | SR_EXTEND);
 	
 	accessEA(instr + 2, effAddr, mode, reg, ccr, SIZE_WORD, true);
+	
+	cpu.ureg.pc.l += eaLen;
 	
 	/* does not affect condition codes */
 }
@@ -120,9 +113,6 @@ void instrMoveq(void)
 	
 	uint8_t reg = (instr[0] & 0b1110) >> 1;
 	uint8_t data = instr[1];
-	
-	cpu.ureg.pc.l += 2;
-	/* calculations can now take place */
 	
 	cpu.ureg.d[reg].l = signExtend8to32(instr[1]);
 	
@@ -138,71 +128,60 @@ void instrClr(void)
 {
 	uartWritePSTR("clr <ea>\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	uint8_t size = instr[1] >> 6;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, size, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
 	
 	accessEA(instr + 2, effAddr, mode, reg, 0, size, true);
 	
 	/* update condition codes */
 	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
 	cpu.ureg.sr.b[0] |= SR_ZERO;
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrLea(void)
 {
 	uartWritePSTR("lea <ea>,%an\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, SIZE_LONG, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_LONG, &effAddr);
 	
 	uint8_t actualReg = (instr[0] >> 1) & 0b111;
 	cpu.ureg.a[actualReg].l = effAddr;
 	
 	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrPea(void)
 {
 	uartWritePSTR("pea <ea>\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, SIZE_LONG, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_LONG, &effAddr);
 	
 	pushLong(effAddr);
 	
 	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrMove(void)
 {
 	uartWritePSTR("move <ea>,<ea>\n");
-	
-	uint8_t instrLen = 2;
 	
 	uint8_t srcMode = (instr[1] & 0b00111000) >> 3;
 	uint8_t srcReg = instr[1] & 0b00000111;
@@ -214,18 +193,15 @@ void instrMove(void)
 	--size;
 	
 	uint32_t srcAddr;
-	const uint8_t *extWord1 = instr + instrLen;
-	instrLen += calcEA(extWord1, srcMode, srcReg, size, &srcAddr);
+	const uint8_t *extWord1 = instr + 2;
+	uint8_t eaLen = calcEA(extWord1, srcMode, srcReg, size, &srcAddr);
 	
 	uint8_t dstMode = ((instr[0] & 0b1) << 2) | ((instr[1] >> 6) & 0b11);
 	uint8_t dstReg = ((instr[0] >> 1) & 0b00000111);
 	
 	uint32_t dstAddr;
-	const uint8_t *extWord2 = instr + instrLen;
-	instrLen += calcEA(extWord2, dstMode, dstReg, size, &dstAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	const uint8_t *extWord2 = instr + eaLen;
+	eaLen += calcEA(extWord2, dstMode, dstReg, size, &dstAddr);
 	
 	/* get the data from the source */
 	uint32_t data = accessEA(extWord1, srcAddr, srcMode, srcReg, 0, size,
@@ -248,22 +224,19 @@ void instrMove(void)
 		cpu.ureg.sr.b[0] |= SR_ZERO;
 	else if ((int32_t)data < 0)
 		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrMoveFromSr(void)
 {
 	uartWritePSTR("move %sr,<ea>\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* get the entire SR */
 	uint16_t sr = cpu.ureg.sr.w[0];
@@ -271,22 +244,19 @@ void instrMoveFromSr(void)
 	accessEA(instr + 2, effAddr, mode, reg, sr, SIZE_WORD, true);
 	
 	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrMoveToCcr(void)
 {
 	uartWritePSTR("move <ea>,%ccr\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* get the new CCR value */
 	uint16_t newCCR = accessEA(instr + 2, effAddr, mode, reg, 0, SIZE_WORD,
@@ -296,23 +266,20 @@ void instrMoveToCcr(void)
 	cpu.ureg.sr.b[0] = (uint8_t)newCCR;
 	
 	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrNot(void)
 {
 	uartWritePSTR("not <ea>\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
 	uint8_t size = instr[1] >> 6;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, size, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
 	
 	/* get the operand */
 	uint32_t operand = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
@@ -349,34 +316,26 @@ void instrNot(void)
 		cpu.ureg.sr.b[0] |= SR_ZERO;
 	else if (negative)
 		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrJmp(void)
 {
 	uartWritePSTR("jmp <ea>\n");
 	
-	uint8_t instrLen = 2;
-	
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	instrLen += calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
-	
-	cpu.ureg.pc.l += instrLen;
-	/* calculations can now take place */
-	
-	/* get the new program counter value */
-	uint32_t newPC = accessEA(instr + 2, effAddr, mode, reg, 0, SIZE_LONG,
-		false);
-	uartWriteHex32(newPC, false); uartWriteChr('\n');
-	uartWriteHex4(mode, false); uartWriteChr('\n');
-	uartWriteHex4(reg, false); uartWriteChr('\n');
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* store the new program counter */
-	cpu.ureg.pc.l = newPC;
+	cpu.ureg.pc.l = effAddr;
 	
 	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrRts(void)
@@ -386,6 +345,25 @@ void instrRts(void)
 	/* program counter increment not necessary (pc overwritten; no ea calc) */
 	
 	cpu.ureg.pc.l = popLong();
+	
+	/* does not affect condition codes */
+}
+
+void instrJsr(void)
+{
+	uartWritePSTR("jsr <ea>\n");
+	
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
+	
+	/* push the current program counter */
+	pushLong(cpu.ureg.pc.l + eaLen);
+	
+	/* store the new program counter */
+	cpu.ureg.pc.l = effAddr;
 	
 	/* does not affect condition codes */
 }

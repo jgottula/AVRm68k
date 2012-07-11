@@ -13,7 +13,9 @@ static void m68kFetch(void)
 		sizeof(fetchBuffer));
 	
 	/* debug */
-	uartWritePSTR("\n[Fetch]");
+	uartWritePSTR("\n[Fetch @ 0x");
+	uartWriteHex32(cpu.ureg.pc.l, false);
+	uartWriteChr(']');
 	for (uint8_t i = 0; i < sizeof(fetchBuffer) / 2; ++i)
 	{
 		uartWriteChr(' ');
@@ -28,6 +30,9 @@ static void m68kExecute(void)
 	instr = fetchBuffer;
 	
 	uartWritePSTR("[Instr] ");
+	
+	/* advance the program counter past the instruction word */
+	cpu.ureg.pc.l += 2;
 	
 	/* ensure that more likely instructions are first in if/else blocks */
 	
@@ -65,6 +70,8 @@ static void m68kExecute(void)
 			instrNot();
 		else if (instr[0] == 0x4e && ((instr[1] & 0b11000000) == 0b11000000))
 			instrJmp();
+		else if (instr[0] == 0x4e && ((instr[1] & 0b11000000) == 0b10000000))
+			instrJsr();
 		else if (instr[0] == 0x4e && instr[1] == 0x75)
 			instrRts();
 		else
@@ -110,6 +117,8 @@ static void m68kExecute(void)
 		assert(0);
 		break;
 	}
+	
+	uartWritePSTR("[Done]\n");
 }
 
 void m68kDumpReg(void)

@@ -18,5 +18,6 @@ void instrMoveToCcr(void);
 void instrNot(void);
 void instrJmp(void);
 void instrRts(void);
+void instrJsr(void);
 
 #endif
