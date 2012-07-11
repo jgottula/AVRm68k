@@ -484,4 +484,34 @@ void instrScc(void)
 	cpu.ureg.pc.l += eaLen;
 }
 
-
+void instrTst(void)
+{
+	uartWritePSTR("tst <ea>\n");
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
+	
+	uint32_t test = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
+	
+	if (size == SIZE_BYTE)
+		test = signExtend8to32(test);
+	else if (size == SIZE_WORD)
+		test = signExtend16to32(test);
+	
+	uartWriteHex8(size, false); uartWriteChr('\n');
+	uartWriteHex32(test, false); uartWriteChr('\n');
+	uartWriteHex8(instr[1], false); uartWriteChr('\n');
+	
+	/* update condition codes */
+	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	if ((int32_t)test == 0)
+		cpu.ureg.sr.b[0] |= SR_ZERO;
+	else if ((int32_t)test < 0)
+		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+	
+	cpu.ureg.pc.l += eaLen;
+}

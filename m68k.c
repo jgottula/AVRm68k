@@ -74,6 +74,8 @@ static void m68kExecute(void)
 			instrJsr();
 		else if (instr[0] == 0x4e && instr[1] == 0x75)
 			instrRts();
+		else if (instr[0] == 0x4a)
+			instrTst();
 		else
 			assert(0);
 		break;
