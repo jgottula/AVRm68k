@@ -106,7 +106,7 @@ static void m68kExecute(void)
 	case 0b1000: // OR, DIV, SBCD
 		if (((instr[0] & 0b00000001) == 0b00000000) ||
 			(((instr[1] >> 3) & 0b00000111) > 0b001))
-			instrEorOr(false, ((instr[0] & 0b00000001) == 0));
+			instrEorOrAnd(true, false, ((instr[0] & 0b00000001) == 0));
 		else
 			assert(0);
 		break;
@@ -118,15 +118,27 @@ static void m68kExecute(void)
 		break;
 	case 0b1011: // CMP, EOR
 		if ((instr[0] & 0b00000001) == 0b00000001)
-			instrEorOr(true, false);
+			instrEorOrAnd(true, true, false);
 		else
 			assert(0);
 		break;
 	case 0b1100: // AND, MUL, ABCD, EXG
-		if (instr[0] & 0b00000001)
+		if (((instr[0] & 0b00000001) == 0b00000001) &&
+			((instr[1] & 0b00110000) == 0b00000000) &&
+			(((instr[1] >> 3) & 0b00000111) <= 0b001))
 			instrExg();
+		else if (((instr[0] & 0b00000001) == 0b00000000) &&
+			((instr[1] & 0b11000000) == 0b11000000))
+		{
+			assert(0); // mulu
+		}
+		else if (((instr[0] & 0b00000001) == 0b00000001) &&
+			((instr[1] >> 4) == 0b0000))
+		{
+			assert(0); // abcd
+		}
 		else
-			assert(0);
+			instrEorOrAnd(false, false, ((instr[0] & 0b00000001) == 0));
 		break;
 	case 0b1101: // ADD, ADDX
 		assert(0);
