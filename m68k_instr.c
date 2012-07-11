@@ -30,15 +30,14 @@ bool instrEmu(void)
 	{
 	case EMUINSTR_DUMPREG:
 		uartWritePSTR("emu: dumpreg\n");
-		cpu.ureg.pc.l += 2;
 		m68kDumpReg();
 		return true;
 	case EMUINSTR_DUMPMEM:
 		uartWritePSTR("emu: dumpmem\n");
-		cpu.ureg.pc.l += 8;
 		uint32_t addr = decodeBigEndian32(instr + 2);
 		uint16_t lines = decodeBigEndian16(instr + 6);
 		memDump(addr, lines);
+		cpu.ureg.pc.l += 6;
 		return true;
 	default:
 		return false;
