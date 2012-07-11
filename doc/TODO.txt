@@ -4,9 +4,10 @@ Priorities:
   - Implement fast page mode functions for accessing words and longs
   - Implement read-modify-write (for incrementing memory locations, etc)
 - Emulator: memory system
-- Emulator: addressing modes
 - Emulator: instructions
-  - Next: bra, jmp, tst, cmp, eor, or, and, addq, addi, add
+  - Next: bra, bsr, s_cc, rtr, rtd, tst, cmp, eor, or, and, addq, addi, add
+- Emulator: emu instructions
+  - dumpstack
 - SD
   - Because of no card detect, throw fatal error upon early init problems
 - Linux from scratch
@@ -31,8 +32,7 @@ Tests:
   - NOTE: pc-relative addr modes appear to be broken somewhat
 - Instructions:
   - pea (check stack)
-  - jmp (wrong addrs)
-  - rts
+  - jmp, jsr (check stack)
 
 Optimizations:
 - Remember to BENCHMARK/PROFILE all optimizations for determining efficacy
