@@ -502,10 +502,6 @@ void instrTst(void)
 	else if (size == SIZE_WORD)
 		test = signExtend16to32(test);
 	
-	uartWriteHex8(size, false); uartWriteChr('\n');
-	uartWriteHex32(test, false); uartWriteChr('\n');
-	uartWriteHex8(instr[1], false); uartWriteChr('\n');
-	
 	/* update condition codes */
 	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if ((int32_t)test == 0)
