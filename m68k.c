@@ -13,7 +13,7 @@ static void m68kFetch(void)
 		sizeof(fetchBuffer));
 	
 	/* debug */
-	uartWritePSTR("\n[Fetch @ 0x");
+	uartWritePSTR("\n[Fetch 0x");
 	uartWriteHex32(cpu.ureg.pc.l, false);
 	uartWriteChr(']');
 	for (uint8_t i = 0; i < sizeof(fetchBuffer) / 2; ++i)
