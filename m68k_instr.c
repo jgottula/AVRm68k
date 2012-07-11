@@ -327,14 +327,12 @@ void instrJmp(void)
 	uint8_t reg = instr[1] & 0b111;
 	
 	uint32_t effAddr;
-	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
+	calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* store the new program counter */
 	cpu.ureg.pc.l = effAddr;
 	
 	/* does not affect condition codes */
-	
-	cpu.ureg.pc.l += eaLen;
 }
 
 void instrRts(void)
@@ -366,3 +364,5 @@ void instrJsr(void)
 	
 	/* does not affect condition codes */
 }
+
+
