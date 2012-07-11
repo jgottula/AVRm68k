@@ -8,6 +8,14 @@
 #include "io.h"
 #include "uart.h"
 
+#if DRAM_SAFE_MODE
+#define delay() _NOP(); _NOP()
+#else
+#define delay() 
+#endif
+
+#define delayAlways() _NOP(); _NOP()
+
 /* WARNING: because the refresh routine is called from an ISR and could
  * interrupt at any time, these functions MUST use ATOMIC_BLOCKs */
 
@@ -29,20 +37,32 @@ uint8_t dramRead(uint32_t addr)
 		writeIO(&DDR_DATA, DATA_ALL, 0);
 		writeIO(&PORT_DATA, DATA_ALL, DATA_ALL);
 		
+		delay();
+		
 		/* put the row number on the address bus */
 		dramLoadAddrBus(addr >> 12);
+		
+		delay();
 		
 		/* bring RAS low to load the row */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
 		
+		delay();
+		
 		/* put the column number on the address bus */
 		dramLoadAddrBus(addr);
+		
+		delay();
 		
 		/* bring CAS low to load the column (15 ns) */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
 		
+		delayAlways();
+		
 		/* read from the data bus */
 		byte = readIO(&PIN_DATA, DATA_ALL);
+		
+		delay();
 		
 		/* reset all control lines */
 		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
@@ -60,11 +80,17 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		/* set the data bus to output */
 		writeIO(&DDR_DATA, DATA_ALL, DATA_ALL);
 		
+		delay();
+		
 		/* put the row number on the address bus */
 		dramLoadAddrBus(addr >> 12);
 		
+		delay();
+		
 		/* bring RAS low to load the row */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		
+		delay();
 		
 		/* wait 15 ns for the address to load */
 		
@@ -72,11 +98,17 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		writeIO(&PORT_DATA, DATA_ALL, byte);
 		writeIO(&PORT_DRAM, DRAM_WE, 0);
 		
+		delay();
+		
 		/* put the column number on the address bus */
 		dramLoadAddrBus(addr);
 		
+		delay();
+		
 		/* bring CAS low to load the column (15 ns) */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
+		
+		delayAlways();
 		
 		/* reset all control lines */
 		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
@@ -96,12 +128,14 @@ void dramRefresh(void)
 	for (uint16_t i = 0; i < DRAM_REFRESH_ROWS; ++i)
 	{
 		/* wait for RAS precharge (40 ns = 1 cycle @ 20 MHz) */
+		delay();
 		
 		/* bring RAS low to refresh the next row */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
 		
 		/* wait for the RAS pulse time (60 ns = 2 cycles @ 20 MHz) */
-		_NOP();
+		delayAlways();
+		delay();
 		
 		/* bring RAS high again */
 		writeIO(&PORT_DRAM, DRAM_RAS, DRAM_RAS);
