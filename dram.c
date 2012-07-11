@@ -38,9 +38,8 @@ uint8_t dramRead(uint32_t addr)
 		/* put the column number on the address bus */
 		dramLoadAddrBus(addr);
 		
-		/* bring CAS low to load the column (60 ns = 2 cycles @ 20 MHz) */
+		/* bring CAS low to load the column (15 ns) */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
-		_NOP();
 		
 		/* read from the data bus */
 		byte = readIO(&PIN_DATA, DATA_ALL);
@@ -67,16 +66,17 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		/* bring RAS low to load the row */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
 		
-		/* set WE low for write and put the byte on the data bus */
-		writeIO(&PORT_DRAM, DRAM_WE, 0);
+		/* wait 15 ns for the address to load */
+		
+		/* put the byte on the data bus and assert WE */
 		writeIO(&PORT_DATA, DATA_ALL, byte);
+		writeIO(&PORT_DRAM, DRAM_WE, 0);
 		
 		/* put the column number on the address bus */
 		dramLoadAddrBus(addr);
 		
-		/* bring CAS low to load the column (60 ns = 2 cycles @ 20 MHz) */
+		/* bring CAS low to load the column (15 ns) */
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
-		_NOP();
 		
 		/* reset all control lines */
 		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
@@ -90,13 +90,12 @@ void dramRefresh(void)
 	
 	/* this function uses the cas-before-ras refresh method */
 	
+	/* bring CAS low to start the refresh sequence */
 	writeIO(&PORT_DRAM, DRAM_CAS, 0);
 	
-	for (uint16_t i = 0x0000; i < DRAM_SIZE / (1 << 12); ++i)
+	for (uint16_t i = 0; i < DRAM_REFRESH_ROWS; ++i)
 	{
-		/* wait for RAS precharge (100 ns = 2 cycles @ 20 MHz) */
-		_NOP();
-		_NOP();
+		/* wait for RAS precharge (40 ns = 1 cycle @ 20 MHz) */
 		
 		/* bring RAS low to refresh the next row */
 		writeIO(&PORT_DRAM, DRAM_RAS, 0);
@@ -125,11 +124,16 @@ void dramInit(void)
 	/* delay on init as required by the spec */
 	_delay_us(200);
 	
-	/* run 8 refresh cycles (spec) */
-	for (uint8_t i = 8; i != 0; --i)
+	/* precaution, in case interrupts are already enabled */
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		_delay_ms(DRAM_REFRESH_FREQ);
-		dramRefresh();
+		/* run 8 ras cycles as per spec */
+		for (uint8_t i = 8; i != 0; --i)
+		{
+			writeIO(&PORT_DRAM, DRAM_RAS, 0);
+			_NOP();
+			writeIO(&PORT_DRAM, DRAM_RAS, DRAM_RAS);
+		}
 	}
 	
 	uartWritePSTR("DRAM initialized.\n");

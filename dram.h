@@ -4,10 +4,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* 16 MiB */
-#define DRAM_SIZE 0x1000000
 
-#define DRAM_REFRESH_FREQ 64
+#define DRAM_SIZE 0x1000000    // 16 x 8 Mbit
+#define DRAM_REFRESH_FREQ 64   // milliseconds
+#define DRAM_REFRESH_ROWS 4096 // 4k
 
 uint8_t dramRead(uint32_t addr);
 void dramWrite(uint32_t addr, uint8_t byte);
