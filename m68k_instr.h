@@ -25,5 +25,6 @@ void instrScc(void);
 void instrTst(void);
 void instrAddq(void);
 void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest);
+void instrEori(void);
 
 #endif

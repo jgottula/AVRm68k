@@ -641,3 +641,67 @@ void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest)
 	
 	cpu.ureg.pc.l += eaLen;
 }
+
+void instrEori(void)
+{
+	uartWritePSTR("eori #<data>,<ea>\n");
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
+	
+	/* get the first operand */
+	uint32_t data;
+	if (size == SIZE_BYTE)
+		data = instr[3];
+	else if (size == SIZE_WORD)
+		data = decodeBigEndian16(instr + 2);
+	else if (size == SIZE_LONG)
+		data = decodeBigEndian32(instr + 2);
+	else
+		assert(0);
+	
+	uint8_t eaOffset = (size == SIZE_LONG ? 6 : 4);
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + eaOffset, mode, reg, size, &effAddr);
+	
+	/* get the second operand */
+	uint32_t operand = accessEA(instr + eaOffset, effAddr, mode, reg, 0, size,
+		false);
+	
+	/* perform the operation */
+	operand ^= data;
+	
+	/* write back the sum */
+	accessEA(instr + eaOffset, effAddr, mode, reg, operand, size, true);
+	
+	bool negative, zero;
+	
+	switch (size)
+	{
+	case SIZE_BYTE:
+		negative = ((int8_t)operand < 0);
+		zero = ((int8_t)operand == 0);
+		break;
+	case SIZE_WORD:
+		negative = ((int16_t)operand < 0);
+		zero = ((int16_t)operand == 0);
+		break;
+	case SIZE_LONG:
+		negative = ((int32_t)operand < 0);
+		zero = ((int32_t)operand == 0);
+		break;
+	default:
+		assert(0);
+	}
+	
+	/* update condition codes */
+	cpu.ureg.sr.b[0] = 0;
+	if (zero)
+		cpu.ureg.sr.b[0] |= SR_ZERO;
+	else if (negative)
+		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+	
+	cpu.ureg.pc.l += eaLen + (eaOffset - 2);
+}

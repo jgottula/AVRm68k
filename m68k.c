@@ -42,7 +42,10 @@ static void m68kExecute(void)
 	switch (instr[0] >> 4)
 	{
 	case 0b0000: // bit manipulation, MOVEP, immediate
-		assert(0);
+		if (instr[0] == 0x0a)
+			instrEori();
+		else
+			assert(0);
 		break;
 	case 0b0001: // move byte
 	case 0b0010: // move long
