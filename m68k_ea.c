@@ -308,7 +308,6 @@ uint32_t accessEA(const uint8_t *ptr, uint32_t addr, uint8_t mode, uint8_t reg,
 	return rtn;
 }
 
-#warning calcEA: TEST!
 uint8_t calcEA(const uint8_t *ptr, uint8_t mode, uint8_t reg, uint8_t size,
 	uint32_t *addrOut)
 {
