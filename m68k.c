@@ -175,7 +175,7 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.d[6].l, false);
 	uartWritePSTR(" a2: 0x");
 	uartWriteHex32(cpu.ureg.a[2].l, false);
-	uartWritePSTR(" a6: 0x");
+	uartWritePSTR(" bp: 0x");
 	uartWriteHex32(cpu.ureg.a[6].l, false);
 	uartWriteChr('\n');
 	
@@ -185,7 +185,7 @@ void m68kDumpReg(void)
 	uartWriteHex32(cpu.ureg.d[7].l, false);
 	uartWritePSTR(" a3: 0x");
 	uartWriteHex32(cpu.ureg.a[3].l, false);
-	uartWritePSTR(" a7: 0x");
+	uartWritePSTR(" sp: 0x");
 	uartWriteHex32(cpu.ureg.a[7].l, false);
 	uartWriteChr('\n');
 }
