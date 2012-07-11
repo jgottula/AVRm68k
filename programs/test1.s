@@ -23,10 +23,13 @@
 	move.l #0xffffffff,%d0
 	not.l %d0
 	
-	pea 0x0000002e
-	rts
+	jsr subroutine
 	
-	jmp 0x00000000
+subroutine:
+	nop
+	nop
+	nop
+	rts
 	
 	.word EMU_DUMPREG
 	.word EMU_DUMPMEM
