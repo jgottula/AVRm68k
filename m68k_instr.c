@@ -511,3 +511,47 @@ void instrTst(void)
 	
 	cpu.ureg.pc.l += eaLen;
 }
+
+void instrAddq(void)
+{
+	uartWritePSTR("addq #<data>,<ea>\n");
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
+	uint8_t data = (instr[0] >> 1) & 0b00000111;
+	
+	/* special case for address registers: always use long size */
+	if (mode == AMODE_AREGDIRECT)
+		size = SIZE_LONG;
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
+	
+	/* get addend */
+	uint32_t operand = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
+	
+	if (size == SIZE_BYTE)
+		operand = signExtend8to32(operand);
+	else if (size == SIZE_WORD)
+		operand = signExtend16to32(operand);
+	
+	/* perform the add operation */
+	operand += data;
+	
+	/* write back the sum */
+	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
+	
+	/* update condition codes (except for address registers) */
+	if (mode != AMODE_AREGDIRECT)
+	{
+		cpu.ureg.sr.b[0] = 0;
+		if ((int8_t)operand == 0)
+			cpu.ureg.sr.b[0] |= SR_ZERO;
+		else if ((int8_t)operand < 0)
+			cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		uartWritePSTR("warning, need to implement carry/ext, overflow\n");
+	}
+	
+	cpu.ureg.pc.l += eaLen;
+}

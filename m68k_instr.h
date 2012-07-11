@@ -23,5 +23,6 @@ void instrBra(void);
 void instrBsr(void);
 void instrScc(void);
 void instrTst(void);
+void instrAddq(void);
 
 #endif

@@ -82,6 +82,8 @@ static void m68kExecute(void)
 	case 0b0101: // ADDQ, SUBQ, Scc, DBcc, TRAPcc
 		if ((instr[1] & 0b11000000) == 0b11000000)
 			instrScc();
+		else if ((instr[0] & 0b00000001) == 0b00000000)
+			instrAddq();
 		else
 			assert(0);
 		break;
