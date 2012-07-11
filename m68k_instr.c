@@ -465,7 +465,8 @@ void instrScc(void)
 {
 	uartWritePSTR("scc <ea>\n");
 	
-	bool cond = condTest(instr[0] && 0b00001111);
+	bool cond = condTest(instr[0] & 0b00001111);
+	uartWriteBool(cond);
 	
 	uint8_t mode = (instr[1] & 0b00111000) >> 3;
 	uint8_t reg = instr[1] & 0b00000111;
