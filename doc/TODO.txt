@@ -5,7 +5,7 @@ Priorities:
   - Implement read-modify-write (for incrementing memory locations, etc)
 - Emulator: memory system
 - Emulator: instructions
-  - Next: bra, bsr, s_cc, rtr, rtd, tst, cmp, eor, or, and, addq, addi, add
+  - Next: movem, addi, add, cmp, rtr, rtd
 - Emulator: emu instructions
   - dumpstack
 - SD
@@ -21,18 +21,19 @@ Tests:
   - Addr reg indirect index base displacement
   - Memory indirect postindex
   - Memory indirect preindex
-  - PC indirect displacement
   - PC indirect index
   - PC indirect index base displacement
   - PC memory indirect postindex
   - PC memory indirect preindex
-  - Absolute short
-  - Absolute long
-  - Immediate
-  - NOTE: pc-relative addr modes appear to be broken somewhat
 - Instructions:
   - pea (check stack)
-  - jmp, jsr (check stack)
+  - jmp, jsr, bra, bsr (check stack)
+  - all 16 conditional codes
+  - tst (cond codes)
+  - addq (all cond codes)
+  - and/exg instr bits
+  - or/sbcd instr bits
+  - eor/or interaction
 
 Optimizations:
 - Remember to BENCHMARK/PROFILE all optimizations for determining efficacy
@@ -53,9 +54,10 @@ Overclocking:
 - Check that all TTL components (i.e. those not buffered with 4050) can
   withstand the overvolt
   - ATmega324A: abs max 6V, 5.5V reasonable
-  - OWC DRAM: abs max 7V, 5.5V reasonable
+  - SMART DRAM: abs max 5.5V (pins can input abs max 7V though)
   - MAX232: abs max 6V, 5.5V reasonable
   - FT232R: abs max 6V, 5.25V reasonable
+- Keep 3.3V devices at regular voltage
 - Check that 3.3V outputs from SPI devices will actually register above the Vih
   threshold of the AVR (5.5-6V WILL be a problem)
   - Check if 4050 with Vcc 5V will actually pull 3.3V up to 5V
