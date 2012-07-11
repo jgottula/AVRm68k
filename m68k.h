@@ -54,6 +54,23 @@
 #define SIZE_MOVE_WORD 0b11
 #define SIZE_MOVE_LONG 0b10
 
+#define COND_T  0b0000
+#define COND_F  0b0001
+#define COND_HI 0b0010
+#define COND_LS 0b0011
+#define COND_CC 0b0100
+#define COND_CS 0b0101
+#define COND_NE 0b0110
+#define COND_EQ 0b0111
+#define COND_VC 0b1000
+#define COND_VS 0b1001
+#define COND_PL 0b1010
+#define COND_MI 0b1011
+#define COND_GE 0b1100
+#define COND_LT 0b1101
+#define COND_GT 0b1110
+#define COND_LE 0b1111
+
 #define EMUINSTR_DUMPREG 0xa001
 #define EMUINSTR_DUMPMEM 0xa002
 
