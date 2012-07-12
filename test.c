@@ -4,6 +4,7 @@
 #include <util/delay.h>
 #include "debug.h"
 #include "dram.h"
+#include "io.h"
 #include "intr.h"
 #include "m68k.h"
 #include "m68k_mem.h"
@@ -44,65 +45,35 @@ static void benchmarkSRAM(void)
 	uint16_t before, after;
 	
 	before = msec;
-	for (uint32_t i = 0x0000; i < 0x0400; ++i)
+	for (uint32_t i = 0x0000; i < 0x1000; ++i)
 		sramReadByte(i);
 	after = msec;
 	
-	uartWritePSTR("sram byte read speed: 1024 B / ");
+	uartWritePSTR("sram byte read speed: 4 KiB / ");
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 	
 	before = msec;
-	uint8_t dest[0x400];
-	sramReadSeq(0x0000, 0x400, dest);
+	uint8_t dest[1024];
+	sramReadSeq(0x0000, sizeof(dest), dest);
+	sramReadSeq(0x0000, sizeof(dest), dest);
+	sramReadSeq(0x0000, sizeof(dest), dest);
+	sramReadSeq(0x0000, sizeof(dest), dest);
 	after = msec;
 	
-	uartWritePSTR("sram seq read speed: 1024 B / ");
+	uartWritePSTR("sram seq read speed: (x4) 4 KiB / ");
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 }
 
 static void testDRAM(void)
 {
+#if 0
 	const uint32_t chunkSize = 0x8000;
 	const uint16_t delayTime = 100;
 	
 	uint16_t errors = 0;
 	uint32_t min = 0xffffff, max = 0x000000;
-	
-	/*for (uint32_t addr = 0x000000; addr < DRAM_SIZE; addr += 0x10)
-	{
-		uartWritePSTR("\n0x");
-		uartWriteHex24(addr, false);
-		uartWriteChr(':');
-		
-		for (uint8_t off = 0; off < 0x10; ++off)
-		{
-			uartWriteChr(' ');
-			uartWriteHex8(dramRead(addr + off), false);
-		}
-	}*/
-	
-	/*for (uint32_t addr = 0x03f000; addr < 0x03f800; addr += 0x100)
-	{
-		uint8_t val = 0;
-		
-		uartWritePSTR("\n0x");
-		uartWriteHex24(addr, false);
-		
-		do
-		{
-			dramWrite(addr, val);
-			uint8_t byte = dramRead(addr);
-			
-			if (byte == val)
-			{
-				uartWriteChr(' ');
-				uartWriteHex8(val, false);
-			}
-		}
-		while (--val != 0);
-	}*/
 	
 	uartWritePSTR("dram test: 32KiB chunks, incr addr, pat 55/aa, 100ms wait, "
 		"1us spacing...\n");
@@ -188,7 +159,6 @@ static void testDRAM(void)
 			goto redo;
 	}
 	
-#if 0
 	for (uint32_t i = 0xffffff; (int32_t)i >= 0; --i)
 		dramWrite(i, 0xff);
 	_delay_ms(1000);
@@ -225,6 +195,43 @@ static void testDRAM(void)
 	uartWriteHex24(max, false);
 	uartWritePSTR(")\n");
 #endif
+	
+	uartWritePSTR("writing.\n");
+	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 256)
+	{
+		uint8_t arr[256];
+		
+		for (uint16_t j = 0; j < 256; ++j)
+			arr[j] = j;
+		
+		dramWriteFPM(i, 256, arr);
+	}
+	uartWritePSTR("done writing.\n");
+	/*uartWritePSTR("3 minutes left.\n");
+	_delay_ms(60000);
+	uartWritePSTR("2 minutes left.\n");
+	_delay_ms(60000);
+	uartWritePSTR("1 minute left.\n");
+	_delay_ms(60000);*/
+	uartWritePSTR("reading.\n");
+	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 256)
+	{
+		uint8_t arr[256];
+		
+		dramReadFPM(i, 256, arr);
+		
+		for (uint16_t j = 0; j < 256; ++j)
+		{
+			if (arr[j] != (j & 0xff))
+			{
+				uartWritePSTR("err: 0x");
+				uartWriteHex24(i, false);
+				uartWriteChr('\n');
+			}
+		}
+
+	}
+	uartWritePSTR("done.\n");
 }
 
 static void benchmarkDRAM(void)
@@ -232,20 +239,44 @@ static void benchmarkDRAM(void)
 	uint16_t before, after;
 	
 	before = msec;
-	for (uint32_t i = 0x000000; i < 0x00ffff; ++i)
+	for (uint32_t i = 0x000000; i < 0x001000; ++i)
 		dramRead(i);
 	after = msec;
 	
-	uartWritePSTR("dram read speed: 64 KiB / ");
+	uartWritePSTR("dram read speed: 4 KiB / ");
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 	
 	before = msec;
-	for (uint32_t i = 0x000000; i < 0x00ffff; ++i)
+	for (uint32_t i = 0x000000; i < 0x001000; ++i)
 		dramWrite(i, 0);
 	after = msec;
 	
-	uartWritePSTR("dram write speed: 64 KiB / ");
+	uartWritePSTR("dram write speed: 4 KiB / ");
+	uartWriteDec16(after - before);
+	uartWritePSTR(" ms\n");
+	
+	uint8_t arr[1024];
+	
+	before = msec;
+	dramReadFPM(0x000000, sizeof(arr), arr);
+	dramReadFPM(0x000000, sizeof(arr), arr);
+	dramReadFPM(0x000000, sizeof(arr), arr);
+	dramReadFPM(0x000000, sizeof(arr), arr);
+	after = msec;
+	
+	uartWritePSTR("dram fpm read speed: (x4) 4 KiB / ");
+	uartWriteDec16(after - before);
+	uartWritePSTR(" ms\n");
+	
+	before = msec;
+	dramWriteFPM(0x000000, sizeof(arr), arr);
+	dramWriteFPM(0x000000, sizeof(arr), arr);
+	dramWriteFPM(0x000000, sizeof(arr), arr);
+	dramWriteFPM(0x000000, sizeof(arr), arr);
+	after = msec;
+	
+	uartWritePSTR("dram fpm write speed: (x4) 4 KiB / ");
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 }
@@ -268,38 +299,19 @@ void testAll(void)
 {
 	uartWritePSTR("-------- Unit Tests --------\n");
 	
-	/* write to ram */
-	for (uint32_t addr = 0x000000; addr < 0x000100; ++addr)
-		dramWrite(addr, 0xaa);
-	
 	testSRAM();
 	benchmarkSRAM();
 	benchmarkDRAM();
 	testRefresh();
 	testDRAM();
 	
-	/*writeReg(0b000, 0, 0x12345678, SIZE_LONG);
-	writeReg(0b000, 1, 0x1234, SIZE_WORD);
-	writeReg(0b000, 2, 0x12, SIZE_BYTE);
-	writeReg(0b001, 0, 0x87654321, SIZE_LONG);
-	writeReg(0b001, 1, 0x4321, SIZE_WORD);
-	writeReg(0b001, 2, 0x21, SIZE_BYTE);
-	m68kDumpReg();*/
+	/*uint8_t arr[] = { 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55,
+		0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55,
+		0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55
+	};
 	
-	/*cpu.ureg.d[0].l = 0xdeadbeef;
-	cpu.ureg.a[0].l = 0xcafebabe;
-	
-	uartWriteHex8(cpu.ureg.d[0].b[0], false); uartWriteChr('\n');
-	uartWriteHex8(cpu.ureg.d[0].b[1], false); uartWriteChr('\n');
-	uartWriteHex8(cpu.ureg.d[0].b[2], false); uartWriteChr('\n');
-	uartWriteHex8(cpu.ureg.d[0].b[3], false); uartWriteChr('\n');
-	
-	uartWriteHex8(readReg(0b000, 0, SIZE_BYTE), false); uartWriteChr('\n');
-	uartWriteHex16(readReg(0b000, 0, SIZE_WORD), false); uartWriteChr('\n');
-	uartWriteHex32(readReg(0b000, 0, SIZE_LONG), false); uartWriteChr('\n');
-	uartWriteHex8(readReg(0b001, 0, SIZE_BYTE), false); uartWriteChr('\n');
-	uartWriteHex16(readReg(0b001, 0, SIZE_WORD), false); uartWriteChr('\n');
-	uartWriteHex32(readReg(0b001, 0, SIZE_LONG), false); uartWriteChr('\n');*/
+	dramWriteFPM(0x00446688, sizeof(arr), arr);
+	dramReadFPM(0x00446688, sizeof(arr), arr);*/
 	
 	uartWritePSTR("------ Tests Complete ------\n");
 }
