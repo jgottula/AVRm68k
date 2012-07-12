@@ -12,6 +12,8 @@
 
 uint8_t dramRead(uint32_t addr);
 void dramWrite(uint32_t addr, uint8_t byte);
+void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest);
+void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src);
 void dramRefresh(void);
 void dramTest(void);
 void dramInit(void);

@@ -21,7 +21,7 @@
 
 static void dramLoadAddrBus(uint16_t addr12)
 {
-	writeIO(&PORT_ADDRL, ADDRL_ALL, (uint8_t)addr12);
+	PORT_ADDRL = (uint8_t)addr12;
 	writeIO(&PORT_ADDRH, ADDRH_ALL, (uint8_t)(addr12 >> 4));
 }
 
@@ -34,8 +34,8 @@ uint8_t dramRead(uint32_t addr)
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		/* set the data bus to input with pull-ups */
-		writeIO(&DDR_DATA, DATA_ALL, 0);
-		writeIO(&PORT_DATA, DATA_ALL, DATA_ALL);
+		DDR_DATA = 0;
+		PORT_DATA = DATA_ALL;
 		
 		delay();
 		
@@ -60,7 +60,7 @@ uint8_t dramRead(uint32_t addr)
 		delayAlways();
 		
 		/* read from the data bus */
-		byte = readIO(&PIN_DATA, DATA_ALL);
+		byte = PIN_DATA;
 		
 		delay();
 		
@@ -78,7 +78,7 @@ void dramWrite(uint32_t addr, uint8_t byte)
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		/* set the data bus to output */
-		writeIO(&DDR_DATA, DATA_ALL, DATA_ALL);
+		DDR_DATA = DATA_ALL;
 		
 		delay();
 		
@@ -92,10 +92,8 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		
 		delay();
 		
-		/* wait 15 ns for the address to load */
-		
 		/* put the byte on the data bus and assert WE */
-		writeIO(&PORT_DATA, DATA_ALL, byte);
+		PORT_DATA = byte;
 		writeIO(&PORT_DRAM, DRAM_WE, 0);
 		
 		delay();
@@ -109,6 +107,122 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		writeIO(&PORT_DRAM, DRAM_CAS, 0);
 		
 		delayAlways();
+		
+		/* reset all control lines */
+		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+	}
+}
+
+void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
+{
+	/* this function uses fast page mode */
+	
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	{
+		/* set the data bus to input with pull-ups */
+		DDR_DATA = 0;
+		PORT_DATA = DATA_ALL;
+		
+		delay();
+		
+		/* put the row number on the address bus */
+		dramLoadAddrBus(addr >> 12);
+		
+		delay();
+		
+		/* bring RAS low to load the row */
+		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		
+		delay();
+		
+		/* put the column number on the address bus */
+		dramLoadAddrBus(addr);
+		
+		delay();
+		
+		do
+		{
+			/* bring CAS low to load the column (15 ns) */
+			writeIO(&PORT_DRAM, DRAM_CAS, 0);
+			
+			delayAlways();
+			
+			/* read from the data bus */
+			*(dest++) = PIN_DATA;
+			
+			delay();
+			
+			/* bring CAS high again */
+			writeIO(&PORT_DRAM, DRAM_CAS, DRAM_CAS);
+			
+			delay();
+			
+			/* increment the column number */
+			PORT_ADDRL = ++addr;
+			
+			delay();
+		}
+		while (--len != 0);
+		
+		/* reset all control lines */
+		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+	}
+}
+
+void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src)
+{
+	/* this function uses fast page mode */
+	
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	{
+		/* set the data bus to output */
+		DDR_DATA = DATA_ALL;
+		
+		delay();
+		
+		/* put the row number on the address bus */
+		dramLoadAddrBus(addr >> 12);
+		
+		delay();
+		
+		/* bring RAS low to load the row */
+		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		
+		delay();
+		
+		/* assert the write enable bit */
+		writeIO(&PORT_DRAM, DRAM_WE, 0);
+		
+		delay();
+		
+		/* put the column number on the address bus */
+		dramLoadAddrBus(addr);
+		
+		delay();
+		
+		do
+		{
+			/* put the data on the data bus */
+			PORT_DATA = *(src++);
+			
+			delay();
+			
+			/* bring CAS low to load the column (15 ns) */
+			writeIO(&PORT_DRAM, DRAM_CAS, 0);
+			
+			delayAlways();
+			
+			/* bring CAS high again */
+			writeIO(&PORT_DRAM, DRAM_CAS, DRAM_CAS);
+			
+			delay();
+			
+			/* increment the column number */
+			PORT_ADDRL = ++addr;
+			
+			delay();
+		}
+		while (--len != 0);
 		
 		/* reset all control lines */
 		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
