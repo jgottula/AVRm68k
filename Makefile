@@ -6,7 +6,7 @@ M68K_ASFLAGS:=-mcpu=68030 -mno-68851 -mno-68881 -mno-68882 -mno-float
 M68K_CFLAGS:=-S -Wa,-mcpu=68030,-mno-68851,-mno-68881,-mno-68882,-mno-float
 OBJCOPYFLAGS:=-R .eeprom
 M68K_OBJCOPYFLAGS:=-R .flash
-AVRDUDEFLAGS:=-c usbasp -p m324a
+AVRDUDEFLAGS:=-c ftdifriend -p m324a -B 460800
 SOURCES:=$(wildcard *.c)
 HEADERS:=$(wildcard *.h)
 TEST1_SOURCES:=programs/test1.s
@@ -36,7 +36,9 @@ test2: $(TEST2_ASM)
 clean:
 	-rm -rf *.out *.hex *.bin *.lst *.dump
 program: $(HEX) $(TEST_HEX)
-	sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX) -U eeprom:w:$(TEST1_HEX)
+	-sudo modprobe -r ftdi_sio
+	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX) -U eeprom:w:$(TEST1_HEX)
+	-sudo modprobe ftdi_sio
 
 
 asm: $(SOURCES) $(HEADERS) Makefile
