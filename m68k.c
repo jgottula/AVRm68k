@@ -73,7 +73,8 @@ static void m68kExecute(void)
 		else if ((instr[0] & 0b11110001) == 0b01000001 &&
 			(instr[1] & 0b11000000) == 0b11000000)
 			instrLea();
-		else if (instr[0] == 0x48 && (instr[1] & 0b11000000) == 0b01000000)
+		else if (instr[0] == 0x48 && ((instr[1] & 0b11000000) == 0b01000000) &&
+			((instr[1] & 0b00111000) != 0b00000000))
 			instrPea();
 		else if (instr[0] == 0x46)
 			instrNot();
@@ -85,6 +86,11 @@ static void m68kExecute(void)
 			instrRts();
 		else if (instr[0] == 0x4a)
 			instrTst();
+		/*else if (((instr[0] & 0b11111011) == 0b01001000) &&
+			((instr[1] & 0b10000000) == 0b10000000))
+			instrMovem();*/
+		else if (instr[0] == 0x48 && ((instr[1] & 0b11111000) == 0b001000000))
+			instrSwap();
 		else
 			assert(0);
 		break;

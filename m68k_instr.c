@@ -751,3 +751,25 @@ void instrBcc(void)
 	
 	/* does not affect condition codes */
 }
+
+void instrSwap(void)
+{
+	uartWritePSTR("swap %dn\n");
+	
+	uint8_t reg = instr[1] & 0b111;
+	
+	uint16_t lsw, msw;
+	
+	lsw = cpu.ureg.d[reg].w[0];
+	msw = cpu.ureg.d[reg].w[1];
+	
+	cpu.ureg.d[reg].w[0] = msw;
+	cpu.ureg.d[reg].w[1] = lsw;
+	
+	/* update condition codes */
+	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	if (lsw == 0 && msw == 0)
+		cpu.ureg.sr.b[0] |= SR_ZERO;
+	else if (lsw & 0b1000000000000000)
+		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+}
