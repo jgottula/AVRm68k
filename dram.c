@@ -118,7 +118,7 @@ void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 	/* this function uses fast page mode */
 	
 	/* rolling over within the page is unexpected behavior */
-	assert(addr + len < (((addr / DRAM_COLS) + 1) * DRAM_COLS));
+	assert(addr + len <= (((addr / DRAM_COLS) + 1) * DRAM_COLS));
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
@@ -177,7 +177,7 @@ void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src)
 	/* this function uses fast page mode */
 	
 	/* rolling over within the page is unexpected behavior */
-	assert(addr + len < (((addr / DRAM_COLS) + 1) * DRAM_COLS));
+	assert(addr + len <= (((addr / DRAM_COLS) + 1) * DRAM_COLS));
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
