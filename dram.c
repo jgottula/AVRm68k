@@ -117,6 +117,9 @@ void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 {
 	/* this function uses fast page mode */
 	
+	/* rolling over within the page is unexpected behavior */
+	assert(addr + len < (((addr / DRAM_COLS) + 1) * DRAM_COLS));
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		/* set the data bus to input with pull-ups */
@@ -172,6 +175,9 @@ void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src)
 {
 	/* this function uses fast page mode */
+	
+	/* rolling over within the page is unexpected behavior */
+	assert(addr + len < (((addr / DRAM_COLS) + 1) * DRAM_COLS));
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
@@ -239,7 +245,7 @@ void dramRefresh(void)
 	/* bring CAS low to start the refresh sequence */
 	writeIO(&PORT_DRAM, DRAM_CAS, 0);
 	
-	for (uint16_t i = 0; i < DRAM_REFRESH_ROWS; ++i)
+	for (uint16_t i = 0; i < DRAM_ROWS; ++i)
 	{
 		/* wait for RAS precharge (40 ns = 1 cycle @ 20 MHz) */
 		delay();
