@@ -197,7 +197,7 @@ static void testDRAM(void)
 #endif
 	
 	uartWritePSTR("writing.\n");
-	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 256)
+	for (uint32_t i = 0x000000; i < DRAM_SIZE / 8; i += 256)
 	{
 		uint8_t arr[256];
 		
@@ -214,7 +214,7 @@ static void testDRAM(void)
 	uartWritePSTR("1 minute left.\n");
 	_delay_ms(60000);*/
 	uartWritePSTR("reading.\n");
-	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 256)
+	for (uint32_t i = 0x000000; i < DRAM_SIZE / 8; i += 256)
 	{
 		uint8_t arr[256];
 		
