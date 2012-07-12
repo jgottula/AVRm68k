@@ -1,0 +1,131 @@
+68030 implementation status
+
+
+features (see MC68030UM.pdf)
+- exception/interrupt handling (see UM 4.3, page 123)
+- mmu (see PM appx A.6.1, page 627)
+- fpu (only if necessary)
+
+
+instructions
+
+instr		status
+abcd		
+add			
+adda		
+addi		
+addq		done, except for carry/overflow
+addx		
+and			done
+andi		done
+andi -> ccr	
+andi -> sr	
+asl/asr		
+bcc			done
+bchg		
+bclr		
+bfchg		
+bfclr		
+bfexts		
+bfextu		
+bfffo		
+bfins		
+bfset		
+bstst		
+bkpt		NEXT
+bra			done
+bset		NEXT
+bsr			done
+btst		NEXT
+cas			
+cas2		
+chk			
+chk2		
+clr			done
+cmp			
+cmpa		
+cmpi		
+cmpm		
+cmp2		
+dbcc		NEXT
+divs		
+divu		
+eor			done
+eori		done
+eori -> ccr	
+eori -> sr	
+exg			done
+ext			NEXT
+illegal		NEXT
+jmp			done
+jsr			done
+lea			done
+link		NEXT
+lsl/lsr		
+move		done
+movea		done
+move <- ccr	
+move -> ccr	done
+move <- sr	done
+move -> sr	
+move usp	
+movec		
+movem		NEXT
+movep		
+moveq		done
+moves		
+muls		
+mulu		
+nbcd		
+neg			NEXT
+negx		NEXT
+nop			done
+not			done
+or			done
+ori			done
+ori -> ccr	
+ori -> sr	
+pack		
+pea			done
+reset		NEXT
+rol/ror		
+roxl/roxr	
+rtd			
+rte			
+rtr			
+rts			done
+sbcd		
+scc			done
+stop		NEXT
+sub			
+suba		
+subi		
+subq		
+subx		
+swap		NEXT
+tas			
+trap		NEXT
+trapcc		
+trapv		
+tst			done
+unlk		NEXT
+unpk		
+
+
+68851 (mmu) instructions
+
+instr		status
+pbcc		
+pdbcc		
+pflush		
+pflusha		
+pflushr		
+pflushs		
+pload		
+pmove		
+prestore	
+psave		
+pscc		
+ptest		
+ptrapcc		
+pvalid		
