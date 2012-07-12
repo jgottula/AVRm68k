@@ -80,6 +80,13 @@ typedef union {
 	uint8_t b[4];
 } Reg;
 
+typedef union {
+	uint64_t q;
+	uint32_t l[2];
+	uint16_t w[4];
+	uint8_t b[8];
+} Reg64;
+
 struct {
 	/* user registers */
 	struct {
@@ -104,12 +111,13 @@ struct {
 		Reg dfc;
 		
 		/* supervisor */
-		Reg msp, sfc, sr, ssp, isp, tt1, tt0, vbr;
+		Reg msp, sfc, sr, isp, tt1, tt0, vbr;
 	} sreg;
 	
 	/* mmu registers */
 	struct {
-		Reg crp, pmmusr, mmusr, srp, tc;
+		Reg pmmusr, mmusr, tc;
+		Reg64 crp, srp;
 	} mreg;
 } cpu;
 
