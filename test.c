@@ -1,5 +1,6 @@
 #include "test.h"
 #include <string.h>
+#include <avr/eeprom.h>
 #include <util/atomic.h>
 #include <util/delay.h>
 #include "debug.h"
@@ -8,13 +9,52 @@
 #include "intr.h"
 #include "m68k.h"
 #include "m68k_mem.h"
+#include "shift.h"
 #include "sram.h"
 #include "uart.h"
+
+static void benchmarkShift(void)
+{
+	uint8_t shift_save = shift;
+	uint16_t before = msec;
+	for (uint16_t i = 0; i < 1024; ++i)
+		shiftSet(i);
+	uint16_t after = msec;
+	shift = shift_save;
+	uartWritePSTR("shift duration: (x1024) ");
+	uartWriteDec16(after - before);
+	uartWritePSTR(" ms\n");
+}
+
+static void benchmarkEEPROM(void)
+{
+	uint16_t before, after;
+	
+	uint8_t dest[1024];
+	int8_t byte;
+	
+	before = msec;
+	for (uint8_t j = 0; j < 128; ++j)
+		for (uint16_t i = 0x0000; i < 0x400; ++i)
+	after = msec;
+	
+	uartWritePSTR("eeprom byte read speed: (x128) 128 KiB / ");
+	uartWriteDec16(after - before);
+	uartWritePSTR(" ms\n");
+	
+	before = msec;
+	for (uint8_t j = 0; j < 16; ++j)
+		eeprom_read_block(dest, 0, 1024);
+	after = msec;
+	
+	uartWritePSTR("eeprom block read speed: (x16) 16 KiB / ");
+	uartWriteDec16(after - before);
+	uartWritePSTR(" ms\n");
+}
 
 static void testSRAM(void)
 {
 	bool fail = false;
-	
 	uartWritePSTR("sram byte mode: ");
 	sramWriteByte(0x100, 0x55);
 	if (sramReadByte(0x100) != 0x55)
@@ -197,14 +237,14 @@ static void testDRAM(void)
 #endif
 	
 	uartWritePSTR("writing.\n");
-	for (uint32_t i = 0x000000; i < DRAM_SIZE / 8; i += 256)
+	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 4096)
 	{
-		uint8_t arr[256];
+		uint8_t arr[4096];
 		
-		for (uint16_t j = 0; j < 256; ++j)
+		for (uint16_t j = 0; j < 4096; ++j)
 			arr[j] = j;
 		
-		dramWriteFPM(i, 256, arr);
+		dramWriteFPM(i, 4096, arr);
 	}
 	uartWritePSTR("done writing.\n");
 	/*uartWritePSTR("3 minutes left.\n");
@@ -214,19 +254,25 @@ static void testDRAM(void)
 	uartWritePSTR("1 minute left.\n");
 	_delay_ms(60000);*/
 	uartWritePSTR("reading.\n");
-	for (uint32_t i = 0x000000; i < DRAM_SIZE / 8; i += 256)
+	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 4096)
 	{
-		uint8_t arr[256];
+		uint8_t arr[4096];
 		
-		dramReadFPM(i, 256, arr);
+		dramReadFPM(i, 4096, arr);
 		
-		for (uint16_t j = 0; j < 256; ++j)
+		for (uint16_t j = 0; j < 4096; ++j)
 		{
 			if (arr[j] != (j & 0xff))
 			{
 				uartWritePSTR("err: 0x");
-				uartWriteHex24(i, false);
+				uartWriteHex24(i + j, false);
+				uartWritePSTR(" exp: 0x");
+				uartWriteHex8(j, false);
+				uartWritePSTR(" act: 0x");
+				uartWriteHex8(arr[j], false);
 				uartWriteChr('\n');
+				
+				break;
 			}
 		}
 
@@ -259,39 +305,36 @@ static void benchmarkDRAM(void)
 	uint8_t arr[1024];
 	
 	before = msec;
-	dramReadFPM(0x000000, sizeof(arr), arr);
-	dramReadFPM(0x000000, sizeof(arr), arr);
-	dramReadFPM(0x000000, sizeof(arr), arr);
-	dramReadFPM(0x000000, sizeof(arr), arr);
+	for (uint8_t i = 16; i > 0; --i)
+		dramReadFPM(0x000000, sizeof(arr), arr);
 	after = msec;
 	
-	uartWritePSTR("dram fpm read speed: (x4) 4 KiB / ");
+	uartWritePSTR("dram fpm read speed: (x16) 16 KiB / ");
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 	
 	before = msec;
-	dramWriteFPM(0x000000, sizeof(arr), arr);
-	dramWriteFPM(0x000000, sizeof(arr), arr);
-	dramWriteFPM(0x000000, sizeof(arr), arr);
-	dramWriteFPM(0x000000, sizeof(arr), arr);
+	for (uint8_t i = 16; i > 0; --i)
+		dramWriteFPM(0x000000, sizeof(arr), arr);
 	after = msec;
 	
-	uartWritePSTR("dram fpm write speed: (x4) 4 KiB / ");
+	uartWritePSTR("dram fpm write speed: (x16) 16 KiB / ");
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 }
 
-static void testRefresh(void)
+static void benchmarkRefresh(void)
 {
 	/* protect from competing ISR refreshes */
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		uint16_t t0 = msec;
-		dramRefresh();
-		uint16_t t1 = msec;
-		uartWritePSTR("dram refresh duration: ");
-		uartWriteDec16(t1 - t0);
-		uartWritePSTR(" +/- 1 ms\n");
+		uint16_t before = msec;
+		for (uint16_t i = 0; i < 1024; ++i)
+			dramRefresh();
+		uint16_t after = msec;
+		uartWritePSTR("dram refresh duration: (x1024) ");
+		uartWriteDec16(after - before);
+		uartWritePSTR(" ms\n");
 	}
 }
 
@@ -300,18 +343,12 @@ void testAll(void)
 	uartWritePSTR("-------- Unit Tests --------\n");
 	
 	testSRAM();
+	testDRAM();
+	benchmarkShift();
+	benchmarkEEPROM();
 	benchmarkSRAM();
 	benchmarkDRAM();
-	testRefresh();
-	testDRAM();
-	
-	/*uint8_t arr[] = { 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55,
-		0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55,
-		0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55
-	};
-	
-	dramWriteFPM(0x00446688, sizeof(arr), arr);
-	dramReadFPM(0x00446688, sizeof(arr), arr);*/
+	benchmarkRefresh();
 	
 	uartWritePSTR("------ Tests Complete ------\n");
 }
