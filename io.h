@@ -22,7 +22,8 @@ enum PortA {
 	DATA_5   = _BV(PA5),
 	DATA_6   = _BV(PA6),
 	DATA_7   = _BV(PA7),
-	DATA_ALL = 0xff
+	DATA_ALL = DATA_0 | DATA_1 | DATA_2 | DATA_3 |
+	           DATA_4 | DATA_5 | DATA_6 | DATA_7
 };
 
 
@@ -40,14 +41,13 @@ enum PortB {
 	DRAM_RAS    = _BV(PB2),
 	DRAM_ALL    = DRAM_CAS | DRAM_WE | DRAM_RAS,
 	
-	SPI_SS_SD   = _BV(PB3),
-	SPI_SS_SRAM = _BV(PB4),
-	SPI_SS_ALL  = SPI_SS_SD | SPI_SS_SRAM,
+	/* PB3 is open */
 	
+	SPI_SS_NULL = _BV(PB4),
 	SPI_MOSI    = _BV(PB5),
 	SPI_MISO    = _BV(PB6),
 	SPI_SCK     = _BV(PB7),
-	SPI_ALL     = SPI_MOSI | SPI_MISO | SPI_SCK
+	SPI_ALL     = SPI_SS_NULL | SPI_MOSI | SPI_MISO | SPI_SCK
 };
 
 
@@ -73,9 +73,9 @@ enum PortC {
 #define PORT_UART PORTD
 #define PIN_UART  PIND
 
-#define DDR_ADDRH  DDRD
-#define PORT_ADDRH PORTD
-#define PIN_ADDRH  PIND
+#define DDR_SHIFT  DDRD
+#define PORT_SHIFT PORTD
+#define PIN_SHIFT  PIND
 
 enum PortD {
 	UART_RX   = _BV(PD0),
@@ -84,11 +84,11 @@ enum PortD {
 	
 	/* PD2 and PD3 are open */
 	
-	ADDRH_8   = _BV(PD4),
-	ADDRH_9   = _BV(PD5),
-	ADDRH_10  = _BV(PD6),
-	ADDRH_11  = _BV(PD7),
-	ADDRH_ALL = ADDRH_8 | ADDRH_9 | ADDRH_10 | ADDRH_11
+	SHIFT_CLEAR = _BV(PD4),
+	SHIFT_DATA  = _BV(PD5),
+	SHIFT_CLK   = _BV(PD6),
+	SHIFT_LATCH = _BV(PD7),
+	SHIFT_ALL   = SHIFT_CLEAR | SHIFT_DATA | SHIFT_CLK | SHIFT_LATCH
 };
 
 
