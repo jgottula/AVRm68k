@@ -57,6 +57,8 @@ Overclocking:
   - SMART DRAM: abs max 5.5V (pins can input abs max 7V though)
   - MAX232: abs max 6V, 5.5V reasonable
   - FT232R: abs max 6V, 5.25V reasonable
+  - 74HC595 (TI): abs max 7V, 6V reasonable
+  - 4050 inputs: should be fine (good up to 20V)
 - Keep 3.3V devices at regular voltage
 - Check that 3.3V outputs from SPI devices will actually register above the Vih
   threshold of the AVR (5.5-6V WILL be a problem)
