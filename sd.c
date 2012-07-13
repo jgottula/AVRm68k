@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "intr.h"
 #include "io.h"
+#include "shift.h"
 #include "spi.h"
 
 static struct {
@@ -48,7 +49,7 @@ static bool sdCmd4(uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2,
 {
 	uint8_t cmdByte = 0b01000000 | (cmd & 0b00111111), r1Byte;
 	
-	spiBegin(SPI_SS_SD, SPIMODE_SD, SPIENDIAN_SD, sdCtx.spiDiv);
+	spiBegin(SHIFT_SS_SD, SPIMODE_SD, SPIENDIAN_SD, sdCtx.spiDiv);
 	
 	/* command byte */
 	spiByte(cmdByte);
@@ -144,7 +145,7 @@ void sdInit()
 	
 	memset(&sdCtx, 0, sizeof(sdCtx));
 	
-	/* start at 0 MHz / 64 = 312 kHz */
+	/* start at 20 MHz / 64 = 312 kHz */
 	sdCtx.spiDiv = SPIDIV_64;
 	
 	/* wait for the card to power up */
@@ -157,14 +158,14 @@ void sdInit()
 	/* send a CMD0 with the select line low to enter SPI mode */
 	if (sdCmd0(SDCMD0, true, 1000, &resp))
 	{
-		uartWritePSTR("No card, or error.\n");
+		uartWritePSTR("No SD card, or error.\n");
 		
 		die();
 	}
 	
 	if (resp.r1.resp != SDR1_IDLE)
 	{
-		uartWritePSTR("CMD0 error: 0x");
+		uartWritePSTR("SD CMD0 error: 0x");
 		uartWriteHex8(resp.r1.resp, true);
 		uartWriteChr('\n');
 		
@@ -174,14 +175,14 @@ void sdInit()
 	/* send a CMD8 to check for SD version >= 2.00 (long timeout) */
 	if (sdCmd2(SDCMD8, 0b10101010, SDVOLT_33, true, 2000, &resp))
 	{
-		uartWritePSTR("Card unresponsive.\n");
+		uartWritePSTR("SD card unresponsive.\n");
 		
 		die();
 	}
 	
 	if (resp.r7.resp & SDR1_ILLEGAL_CMD)
 	{
-		uartWritePSTR("SDv1/MMC card.\n");
+		uartWritePSTR("Detected SDv1 or MMC card.\n");
 		
 		sdCtx.ver2 = false;
 	}
@@ -189,7 +190,7 @@ void sdInit()
 	{
 		if (resp.r7.data[3] != 0b10101010)
 		{
-			uartWritePSTR("CMD8 pattern fail.\nExp: 0xAA Act: 0x");
+			uartWritePSTR("SD CMD8 pattern fail.\nExp: 0xAA Act: 0x");
 			uartWriteHex8(resp.r7.data[3], true);
 			uartWriteChr('\n');
 			
@@ -197,18 +198,18 @@ void sdInit()
 		}
 		else if ((resp.r7.data[2] & 0xf) != SDVOLT_33)
 		{
-			uartWritePSTR("Bad voltage range.\n");
+			uartWritePSTR("SD card accepts bad voltage range.\n");
 			
 			die();
 		}
 		
-		uartWritePSTR("SDv2 card.\n");
+		uartWritePSTR("Detected SDv2 card.\n");
 		
 		sdCtx.ver2 = true;
 	}
 	else
 	{
-		uartWritePSTR("CMD8 error: 0x");
+		uartWritePSTR("SD CMD8 error: 0x");
 		uartWriteHex8(resp.r7.resp, true);
 		uartWriteChr('\n');
 		
@@ -218,7 +219,7 @@ void sdInit()
 	/* load the OCR register, which has information on supported voltages */
 	if (sdCmd0(SDCMD58, false, 100, &resp))
 	{
-		uartWritePSTR("CMD58 timeout.\n");
+		uartWritePSTR("SD CMD58 timeout.\n");
 		
 		die();
 	}
@@ -229,7 +230,7 @@ void sdInit()
 	}
 	
 	sdCtx.init = true;
-	uartWritePSTR("Init OK.\n");
+	uartWritePSTR("SD card initialized.\n");
 	
 	/* TODO: set the SPI clock rate to what the card says is its max;
 	 * then continue following the init flowchart */
