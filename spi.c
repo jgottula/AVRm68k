@@ -1,18 +1,23 @@
 #include "spi.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include "debug.h"
 #include "io.h"
+#include "shift.h"
 
 static void spiSelect(uint8_t slave)
 {
+	/* ensure valid input */
+	assert((slave & ~SHIFT_SS_ALL) == 0);
+	
 	/* set only the given slave select pin low */
-	writeIO(&PORT_SPI, SPI_SS_ALL, SPI_SS_ALL ^ slave);
+	shiftSet((shift | SHIFT_SS_ALL) & ~slave);
 }
 
 static void spiUnselect(void)
 {
 	/* set all slave select pins high */
-	writeIO(&PORT_SPI, SPI_SS_ALL, SPI_SS_ALL);
+	shiftSet(shift | SHIFT_SS_ALL);
 }
 
 static void spiSetMode(uint8_t mode, uint8_t endian, uint8_t divider)
@@ -71,15 +76,16 @@ void spiEnd(void)
 
 void spiInit(void)
 {
-	/* set SCLK, MOSI, and all SS to output mode, and MISO to input mode */
-	writeIO(&DDR_SPI, SPI_ALL | SPI_SS_ALL, (SPI_ALL ^ SPI_MISO) | SPI_SS_ALL);
+	/* set SS, SCLK and MOSI to output mode, and MISO to input mode */
+	writeIO(&DDR_SPI, SPI_ALL, SPI_ALL ^ SPI_MISO);
+	writeIO(&PORT_SPI, SPI_SS_NULL, SPI_SS_NULL);
 	
 	/* ensure that all slave select pins are high */
 	spiUnselect();
 	
 	/* disable power saving for SPI, and enable hardware SPI with interrupts
 	 * disabled and master mode enabled */
-	writeIO(&PRR, _BV(PRSPI), 0);
+	writeIO(&PRR0, _BV(PRSPI), 0);
 	writeIO(&SPCR, _BV(SPE) | _BV(MSTR), _BV(SPE) | _BV(MSTR));
 	
 	/* read the status and data registers to clear the state */
