@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "intr.h"
 #include "io.h"
+#include "shift.h"
 #include "uart.h"
 
 #if DRAM_SAFE_MODE
@@ -21,8 +22,15 @@
 
 static void dramLoadAddrBus(uint16_t addr12)
 {
-	PORT_ADDRL = (uint8_t)addr12;
-	writeIO(&PORT_ADDRH, ADDRH_ALL, (uint8_t)(addr12 >> 4));
+	uint8_t addrl = (uint8_t)addr12;
+	uint8_t addrh = (uint8_t)((addr12 >> 8) & 0x0f);
+	
+	PORT_ADDRL = addrl;
+	
+	_Static_assert(SHIFT_ADDRH_ALL == 0b01111000,
+		"high addr shift indexes changed!");
+	
+	shiftSet((shift & ~SHIFT_ADDRH_ALL) | (addrh << 3));
 }
 
 uint8_t dramRead(uint32_t addr)
@@ -268,7 +276,6 @@ void dramRefresh(void)
 void dramInit(void)
 {
 	/* set the address bus and control lines to output mode */
-	writeIO(&DDR_ADDRH, ADDRH_ALL, ADDRH_ALL);
 	writeIO(&DDR_ADDRL, ADDRL_ALL, ADDRL_ALL);
 	writeIO(&DDR_DRAM, DRAM_ALL, DRAM_ALL);
 	
