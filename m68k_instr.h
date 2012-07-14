@@ -23,6 +23,7 @@ void instrMoveFromSr(void);
 void instrMovem(bool regToMem);
 void instrMoveq(void);
 void instrMoveToCcr(void);
+void instrMoveToSr(void);
 void instrNop(void);
 void instrNot(void);
 void instrPea(void);

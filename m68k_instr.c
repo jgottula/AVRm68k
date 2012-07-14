@@ -599,6 +599,9 @@ void instrMoveFromSr(void)
 {
 	uartWritePSTR("move %sr,<ea>\n");
 	
+	/* privileged instruction */
+	assert(cpu.sreg.sr.w[0] & SR_USERSTATE);
+	
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
 	
@@ -779,6 +782,31 @@ void instrMoveToCcr(void)
 	
 	/* store only the low-order byte */
 	cpu.sreg.sr.b[0] = (uint8_t)newCCR;
+	
+	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
+}
+
+void instrMoveToSr(void)
+{
+	uartWritePSTR("move <ea>,%sr\n");
+	
+	/* privileged instruction */
+	assert(cpu.sreg.sr.w[0] & SR_USERSTATE);
+	
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
+	
+	/* get the new SR value */
+	uint16_t newSR = accessEA(instr + 2, effAddr, mode, reg, 0, SIZE_WORD,
+		false);
+	
+	/* store the whole word */
+	cpu.sreg.sr.w[0] = (uint8_t)newSR;
 	
 	/* does not affect condition codes */
 	

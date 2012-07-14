@@ -163,9 +163,7 @@ static void m68kDecode(void)
 			case 0b0110:
 			{
 				if ((instr[1] & 0b11000000) == 0b11000000) // size
-				{
-					assert(0); /* instruction without size bits goes here */
-				}
+					instrMoveToSr();
 				else
 				{
 					if ((instr[1] & 0b00111000) != 0b00001000) // mode
