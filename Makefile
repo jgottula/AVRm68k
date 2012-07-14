@@ -8,15 +8,15 @@ SOURCES:=$(wildcard *.c)
 HEADERS:=$(wildcard *.h)
 INCLUDE:=
 LINK:=
-OUT:=$(PROJNAME).out
-HEX:=$(PROJNAME).hex
-BIN:=$(PROJNAME).bin
-LST:=$(PROJNAME).lst
-DUMP:=$(PROJNAME).dump
+OUT:=out/$(PROJNAME)/$(PROJNAME).out
+HEX:=out/$(PROJNAME)/$(PROJNAME).hex
+BIN:=out/$(PROJNAME)/$(PROJNAME).bin
+LST:=out/$(PROJNAME)/$(PROJNAME).lst
+DUMP:=out/$(PROJNAME)/$(PROJNAME).dump
 
-.PHONY: all avr program asm clean
+.PHONY: all avr asm program clean
 
-all: avr
+all: avr asm
 
 avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
 
@@ -24,11 +24,12 @@ avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
 program: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
 clean:
-	-rm -rf *.out *.hex *.bin *.lst *.dump
+	-find out/ -type f -delete
 
 
 asm: $(SOURCES) $(HEADERS) Makefile
-	avr-gcc $(CFLAGS) $(INCLUDE) $(LINK) -S $(SOURCES)
+	cd out/asm && find ../.. -maxdepth 1 -type f -iname '*.c' -print0 | \
+		xargs -0 avr-gcc $(CFLAGS) $(INCLUDE) $(LINK) -S
 
 
 $(OUT): $(SOURCES) $(HEADERS) Makefile
