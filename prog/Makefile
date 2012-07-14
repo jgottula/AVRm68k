@@ -30,7 +30,7 @@ program: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
 
 clean:
-	-find $(GLOBAL_OUT) -type f -delete
+	-find $(GLOBAL_OUT) -type f -print -delete
 
 
 $(PROG1_OUT): prog1.s Makefile

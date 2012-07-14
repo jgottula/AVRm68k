@@ -30,7 +30,7 @@ load: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
 
 clean:
-	-find out/ -type f -delete
+	-find out/ -type f -print -delete
 
 
 asm: $(SOURCES) $(HEADERS) Makefile
