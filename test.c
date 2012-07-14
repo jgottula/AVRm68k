@@ -20,7 +20,7 @@ static void benchmarkShift(void)
 	uint8_t shiftBefore = shift;
 	uint16_t before = msec;
 	for (uint16_t i = 0; i < 1024; ++i)
-		shiftSet(shift ^ 0xff);
+		shiftSet(shift ^ SHIFT_ADDRH_ALL);
 	uint16_t after = msec;
 	shift = shiftBefore;
 	uartWritePSTR("shift duration: (x1024) ");
@@ -65,9 +65,9 @@ static void testSRAM(void)
 		fail = true;
 	
 	if (fail)
-		uartWritePSTR("failed\n");
+		uartWritePSTR("failed.\n");
 	else
-		uartWritePSTR("passed\n");
+		uartWritePSTR("passed.\n");
 	
 	uartWritePSTR("sram seq mode: ");
 	const uint8_t src[] = "hello world";
@@ -76,9 +76,9 @@ static void testSRAM(void)
 	sramReadSeq(0x100, 12, dest);
 	
 	if (memcmp(src, dest, 12) != 0)
-		uartWritePSTR("failed\n");
+		uartWritePSTR("failed.\n");
 	else
-		uartWritePSTR("passed\n");
+		uartWritePSTR("passed.\n");
 }
 
 static void benchmarkSRAM(void)
@@ -237,7 +237,7 @@ static void testDRAM(void)
 	uartWritePSTR(")\n");
 #endif
 	
-	uartWritePSTR("writing.\n");
+	uartWritePSTR("dram test: writing.\n");
 	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 4096)
 	{
 		uint8_t arr[4096];
@@ -247,14 +247,14 @@ static void testDRAM(void)
 		
 		dramWriteFPM(i + 0x400000, 4096, arr);
 	}
-	uartWritePSTR("done writing.\n");
+	uartWritePSTR("dram test: done.\n");
 	/*uartWritePSTR("3 minutes left.\n");
 	_delay_ms(60000);
 	uartWritePSTR("2 minutes left.\n");
 	_delay_ms(60000);
 	uartWritePSTR("1 minute left.\n");
 	_delay_ms(60000);*/
-	uartWritePSTR("reading.\n");
+	uartWritePSTR("dram test: reading.\n");
 	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 4096)
 	{
 		uint8_t arr[4096];
@@ -278,7 +278,7 @@ static void testDRAM(void)
 		}
 
 	}
-	uartWritePSTR("done.\n");
+	uartWritePSTR("dram test: done.\n");
 }
 
 static void benchmarkDRAM(void)
