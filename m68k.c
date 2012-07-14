@@ -71,7 +71,8 @@ static void m68kExecute(void)
 		else if (instr[0] == 0x40 && ((instr[1] & 0b11000000) == 0b11000000))
 			instrMoveFromSr();
 		else if ((instr[0] & 0b11110001) == 0b01000001 &&
-			(instr[1] & 0b11000000) == 0b11000000)
+			(instr[1] & 0b11000000) == 0b11000000 &&
+			((instr[1] & 0b00111000) != 0b00000000))
 			instrLea();
 		else if (instr[0] == 0x48 && ((instr[1] & 0b11000000) == 0b01000000) &&
 			((instr[1] & 0b00111000) != 0b00000000))
