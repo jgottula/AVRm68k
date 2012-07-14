@@ -8,20 +8,21 @@ SOURCES:=$(wildcard *.c)
 HEADERS:=$(wildcard *.h)
 INCLUDE:=
 LINK:=
-OUT:=out/$(PROJNAME)/$(PROJNAME).out
-HEX:=out/$(PROJNAME)/$(PROJNAME).hex
-BIN:=out/$(PROJNAME)/$(PROJNAME).bin
-LST:=out/$(PROJNAME)/$(PROJNAME).lst
-DUMP:=out/$(PROJNAME)/$(PROJNAME).dump
+GLOBAL_OUT:=out/$(PROJNAME)
+OUT:=$(GLOBAL_OUT)/$(PROJNAME).out
+HEX:=$(GLOBAL_OUT)/$(PROJNAME).hex
+BIN:=$(GLOBAL_OUT)/$(PROJNAME).bin
+LST:=$(GLOBAL_OUT)/$(PROJNAME).lst
+DUMP:=$(GLOBAL_OUT)/$(PROJNAME).dump
 
-.PHONY: all avr asm program clean
+.PHONY: all avr asm load clean
 
 all: avr asm
 
 avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
 
 
-program: $(HEX) $(TEST_HEX)
+load: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
 clean:
 	-find out/ -type f -delete
