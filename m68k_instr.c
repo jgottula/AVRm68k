@@ -72,7 +72,7 @@ static bool condTest(uint8_t nibble)
 	}
 }
 
-bool instrEmu(void)
+void instrEmu(void)
 {
 	uint16_t instrWord = decodeBigEndian16(instr);
 	
@@ -81,16 +81,16 @@ bool instrEmu(void)
 	case EMUINSTR_DUMPREG:
 		uartWritePSTR("emu: dumpreg\n");
 		m68kDumpReg();
-		return true;
+		break;
 	case EMUINSTR_DUMPMEM:
 		uartWritePSTR("emu: dumpmem\n");
 		uint32_t addr = decodeBigEndian32(instr + 2);
 		uint16_t lines = decodeBigEndian16(instr + 6);
 		memDump(addr, lines);
 		cpu.ureg.pc.l += 6;
-		return true;
+		break;
 	default:
-		return false;
+		assert(0);
 	}
 }
 
@@ -613,6 +613,137 @@ void instrMoveFromSr(void)
 	/* does not affect condition codes */
 	
 	cpu.ureg.pc.l += eaLen;
+}
+
+static void instrMovemInternal(bool regToMem, uint8_t mode, uint8_t reg,
+	uint8_t size, uint32_t effAddr, uint8_t *offset, uint32_t postDecAddr,
+	bool addrReg, uint8_t regNum)
+{
+	assert(size == SIZE_WORD || size == SIZE_LONG);
+	
+	if (regToMem)
+	{
+		uint32_t value;
+			
+		/* special case for predec mode: write out the initial value of the 
+		 * register, minus the size of the operation */
+		if (mode == AMODE_AREGPREDEC && addrReg && regNum == reg)
+			value = postDecAddr;
+		else
+		{
+			if (addrReg)
+				value = cpu.ureg.a[regNum].l;
+			else
+				value = cpu.ureg.d[regNum].l;
+		}
+		
+		accessEA(instr + 4, effAddr + *offset, mode, reg, value, size, true);
+	}
+	else
+	{
+		uint32_t value;
+		
+		value = accessEA(instr + 4, effAddr + *offset, mode, reg, 0, size,
+			false);
+		
+		/* special case for postinc mode: don't overwrite that register */
+		if (mode != AMODE_AREGPOSTINC || !addrReg || regNum != reg)
+		{
+			if (size == SIZE_LONG)
+			{
+				if (addrReg)
+					cpu.ureg.a[regNum].l = value;
+				else
+					cpu.ureg.d[regNum].l = value;
+			}
+			else
+			{
+				if (addrReg)
+					cpu.ureg.a[regNum].l = signExtend16to32(value);
+				else
+					cpu.ureg.d[regNum].l = signExtend16to32(value);
+			}
+		}
+	}
+	
+	/* not sure why this needs be run for postinc, but this seems to work */
+	if (mode != AMODE_AREGPREDEC)
+	{
+		if (size == SIZE_LONG)
+			*offset += 4;
+		else if (size == SIZE_WORD)
+			*offset += 2;
+	}
+}
+
+void instrMovem(bool regToMem)
+{
+	if (regToMem)
+		uartWritePSTR("movem <list>,<ea>\n");
+	else
+		uartWritePSTR("movem <ea>,<list>\n");
+	
+	uint8_t mode = (instr[1] >> 3) & 0b111;
+	uint8_t reg = instr[1] & 0b111;
+	uint8_t size = ((instr[1] & 0b01000000) ? SIZE_LONG : SIZE_WORD);
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 4, mode, reg, size, &effAddr);
+	
+	uint16_t mask = decodeBigEndian16(instr + 2);
+	
+	uint16_t bit;
+	uint8_t offset = 0;
+	
+	uint32_t postDecAddr = effAddr - _BV(size);
+	
+	/* for predecrement mode, the register order is switched */
+	if (mode != AMODE_AREGPREDEC)
+	{
+		bit = _BV(0);
+		
+		for (int8_t i = 0; i < 8; ++i)
+		{
+			if (mask & bit)
+				instrMovemInternal(regToMem, mode, reg, size, effAddr, &offset,
+					postDecAddr, false, i);
+			
+			bit <<= 1;
+		}
+		
+		for (int8_t i = 0; i < 8; ++i)
+		{
+			if (mask & bit)
+				instrMovemInternal(regToMem, mode, reg, size, effAddr, &offset,
+					postDecAddr, true, i);
+			
+			bit <<= 1;
+		}
+	}
+	else
+	{
+		bit = _BV(0);
+		
+		for (int8_t i = 7; i >= 0; --i)
+		{
+			if (mask & bit)
+				instrMovemInternal(regToMem, mode, reg, size, effAddr, &offset,
+					postDecAddr, true, i);
+			
+			bit <<= 1;
+		}
+		
+		for (int8_t i = 7; i >= 0; --i)
+		{
+			if (mask & bit)
+				instrMovemInternal(regToMem, mode, reg, size, effAddr, &offset,
+					postDecAddr, false, i);
+			
+			bit <<= 1;
+		}
+	}
+	
+	cpu.ureg.pc.l += eaLen + 2;
 }
 
 void instrMoveq(void)

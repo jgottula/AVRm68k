@@ -197,13 +197,24 @@ static void m68kDecode(void)
 				else if ((instr[1] & 0b11000000) == 0b10000000 ||
 					(instr[1] & 0b11000000) == 0b11000000)
 				{
-					if (((instr[1] & 0b00111000) >> 3) == 0b000) // mode
+					switch ((instr[1] & 0b00111000) >> 3) // mode
+					{
+					case 0b000:
 						instrExt();
-					else
+						break;
+					case 0b010:
+					case 0b100:
+					case 0b101:
+					case 0b110:
+					case 0b111:
+						instrMovem(true); // reg to mem
+						break;
+					default:
 						assert(0);
+					}
 				}
 				else
-					assert(0); /* instruction with non-01 size bits goes here */
+					assert(0); /* instruction with 00 size bits goes here */
 				break;
 			}
 			case 0b1010:
@@ -214,6 +225,28 @@ static void m68kDecode(void)
 				}
 				else
 					instrTst();
+				break;
+			}
+			case 0b1100:
+			{
+				if ((instr[1] & 0b11000000) == 0b10000000 ||
+					(instr[1] & 0b11000000) == 0b11000000) // size
+				{
+					switch ((instr[1] & 0b00111000) >> 3) // mode
+					{
+					case 0b010:
+					case 0b011:
+					case 0b101:
+					case 0b110:
+					case 0b111:
+						instrMovem(false); // mem to reg
+						break;
+					default:
+						assert(0);
+					}
+				}
+				else
+					assert(0);
 				break;
 			}
 			case 0b1110:

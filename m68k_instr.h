@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-bool instrEmu(void);
+void instrEmu(void);
 void instrAddq(void);
 void instrBcc(void);
 void instrBra(void);
@@ -20,6 +20,7 @@ void instrLea(void);
 void instrMove(void);
 void instrMoveFromCcr(void);
 void instrMoveFromSr(void);
+void instrMovem(bool regToMem);
 void instrMoveq(void);
 void instrMoveToCcr(void);
 void instrNop(void);
