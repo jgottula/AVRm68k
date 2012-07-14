@@ -24,7 +24,7 @@ all: avr asm
 avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
 
 prog:
-	cd prog && make all
+	make -C prog all
 
 load: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
