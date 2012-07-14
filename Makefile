@@ -16,12 +16,15 @@ LST:=$(GLOBAL_OUT)/$(PROJNAME).lst
 DUMP:=$(GLOBAL_OUT)/$(PROJNAME).dump
 
 
-.PHONY: all avr asm load clean
+.PHONY: all avr asm prog load clean
 
 
 all: avr asm
 
 avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
+
+prog:
+	cd prog && make all
 
 load: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
