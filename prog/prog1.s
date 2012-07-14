@@ -3,8 +3,8 @@
 	.equ EMU_DUMPREG, 0xa001
 	.equ EMU_DUMPMEM, 0xa002
 	
-	/* init stack ptr */
-	lea (0x80),%sp
+	/* init stack ptr at end of memory */
+	lea (0x01000000),%sp
 	
 	move.l #0x00000000,%d0
 	move.l #0x22222222,%d1
@@ -45,9 +45,12 @@
 	movem.w (%sp)+,%a7-%a0/%d7-%d0
 	
 	.word EMU_DUMPREG
-	.word EMU_DUMPMEM
+	.word EMU_DUMPMEM /* stack */
+		.long 0x00ffff00
+		.word 0x0100
+	.word EMU_DUMPMEM /* vectors */
 		.long 0x00000000
-		.word 0x0080
+		.word 0x0100
 	
 	/* pad out the end */
 	.fill 128,1,0xff
