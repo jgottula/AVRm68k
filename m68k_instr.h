@@ -5,28 +5,29 @@
 #include <stdint.h>
 
 bool instrEmu(void);
-void instrNop(void);
-void instrExg(void);
-void instrMoveFromCcr(void);
-void instrMoveq(void);
-void instrClr(void);
-void instrLea(void);
-void instrPea(void);
-void instrMove(void);
-void instrMoveFromSr(void);
-void instrMoveToCcr(void);
-void instrNot(void);
-void instrJmp(void);
-void instrRts(void);
-void instrJsr(void);
+void instrAddq(void);
+void instrBcc(void);
 void instrBra(void);
 void instrBsr(void);
-void instrScc(void);
-void instrTst(void);
-void instrAddq(void);
+void instrClr(void);
 void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest);
 void instrEoriOriAndi(bool or, bool exclusive);
-void instrBcc(void);
+void instrExg(void);
+void instrExt(void);
+void instrJmp(void);
+void instrJsr(void);
+void instrLea(void);
+void instrMove(void);
+void instrMoveFromCcr(void);
+void instrMoveFromSr(void);
+void instrMoveq(void);
+void instrMoveToCcr(void);
+void instrNop(void);
+void instrNot(void);
+void instrPea(void);
+void instrRts(void);
+void instrScc(void);
 void instrSwap(void);
+void instrTst(void);
 
 #endif
