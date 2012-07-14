@@ -91,6 +91,9 @@ static void m68kExecute(void)
 			instrMovem();*/
 		else if (instr[0] == 0x48 && ((instr[1] & 0b11111000) == 0b001000000))
 			instrSwap();
+		else if (((instr[0] & 0b11111110) == 0b01001000) &&
+			((instr[1] & 0b00111000) == 0b00000000))
+			instrExt();
 		else
 			assert(0);
 		break;

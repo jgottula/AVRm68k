@@ -441,9 +441,35 @@ void instrExt(void)
 	uint8_t opMode = (((instr[0] & 0b00000001) << 2) | (instr[1] >> 6));
 	uint8_t reg = instr[1] & 0b00000111;
 	
-	/* TODO */
+	bool negative, zero;
+	
+	switch (opMode)
+	{
+	case 0b010: // byte to word
+		cpu.ureg.d[reg].w[0] = signExtend8to16(cpu.ureg.d[reg].b[0]);
+		negative = ((int16_t)cpu.ureg.d[reg].w[0] < 0);
+		zero = (cpu.ureg.d[reg].w[0] == 0);
+		break;
+	case 0b011: // word to long
+		cpu.ureg.d[reg].l = signExtend16to32(cpu.ureg.d[reg].w[0]);
+		negative = ((int32_t)cpu.ureg.d[reg].l < 0);
+		zero = (cpu.ureg.d[reg].l == 0);
+		break;
+	case 0b111: // byte to long
+		cpu.ureg.d[reg].l = signExtend8to32(cpu.ureg.d[reg].b[0]);
+		negative = ((int32_t)cpu.ureg.d[reg].l < 0);
+		zero = (cpu.ureg.d[reg].l == 0);
+		break;
+	default:
+		assert(0);
+	}
 	
 	/* update condition codes */
+	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	if (zero)
+		cpu.ureg.sr.b[0] |= SR_ZERO;
+	else if (negative)
+		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
 }
 
 void instrJmp(void)
