@@ -1,6 +1,7 @@
 #include "m68k.h"
 #include <avr/eeprom.h>
 #include "debug.h"
+#include "intr.h"
 #include "m68k_instr.h"
 #include "uart.h"
 
@@ -36,7 +37,7 @@ static void m68kDecode(void)
 	/* advance the program counter past the instruction word */
 	cpu.ureg.pc.l += 2;
 	
-	/* ensure that more likely instructions are first in if/else blocks */
+	uint16_t before = msec;
 	
 	/* separate operations by front nibble */
 	switch (instr[0] >> 4)
@@ -434,7 +435,11 @@ static void m68kDecode(void)
 	}
 	}
 	
-	uartWritePSTR("[Done]\n");
+	uint16_t after = msec;
+	
+	uartWritePSTR("[Done ");
+	uartWriteDec16(after - before);
+	uartWritePSTR("ms]\n");
 }
 
 void m68kDumpReg(void)
