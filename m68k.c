@@ -442,19 +442,23 @@ void m68kDumpReg(void)
 	uartWritePSTR("  pc: 0x");
 	uartWriteHex32(cpu.ureg.pc.l, false);
 	uartWritePSTR(" sr: 0x");
-	uartWriteHex32(cpu.sreg.sr.l, false);
+	uartWriteHex16(cpu.sreg.sr.w[0], false);
 	uartWriteChr('\n');
 	
 	uartWritePSTR("  [");
-	uartWriteChr((cpu.sreg.sr.l & SR_CARRY) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.w[0] & SR_USERSTATE) ? 'x' : ' ');
+	uartWritePSTR("] supervisor\n");
+	
+	uartWritePSTR("  [");
+	uartWriteChr((cpu.sreg.sr.w[0] & SR_CARRY) ? 'x' : ' ');
 	uartWritePSTR("] carry  [");
-	uartWriteChr((cpu.sreg.sr.l & SR_OVERFLOW) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.w[0] & SR_OVERFLOW) ? 'x' : ' ');
 	uartWritePSTR("] overflow  [");
-	uartWriteChr((cpu.sreg.sr.l & SR_ZERO) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.w[0] & SR_ZERO) ? 'x' : ' ');
 	uartWritePSTR("] zero  [");
-	uartWriteChr((cpu.sreg.sr.l & SR_NEGATIVE) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.w[0] & SR_NEGATIVE) ? 'x' : ' ');
 	uartWritePSTR("] negative  [");
-	uartWriteChr((cpu.sreg.sr.l & SR_EXTEND) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.w[0] & SR_EXTEND) ? 'x' : ' ');
 	uartWritePSTR("] extend\n");
 	
 	uartWritePSTR("  d0: 0x");
