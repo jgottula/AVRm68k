@@ -806,7 +806,7 @@ void instrMoveToSr(void)
 		false);
 	
 	/* store the whole word */
-	cpu.sreg.sr.w[0] = (uint8_t)newSR;
+	cpu.sreg.sr.w[0] = newSR;
 	
 	/* does not affect condition codes */
 	
