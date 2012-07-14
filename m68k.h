@@ -11,9 +11,9 @@
 #define SR_NEGATIVE _BV(4)
 #define SR_EXTEND   _BV(5)
 
-#define SR_INTPRIO0  _BV(7)
+#define SR_INTPRIO0  _BV(8)
 #define SR_INTPRIO1  _BV(9)
-#define SR_INTPRIO2  _BV(8)
+#define SR_INTPRIO2  _BV(10)
 #define SR_INTSTATE  _BV(12)
 #define SR_USERSTATE _BV(13)
 #define SR_TRACE0    _BV(14)
@@ -91,7 +91,7 @@ struct {
 	/* user registers */
 	struct {
 		/* control */
-		Reg pc, sr;
+		Reg pc;
 		
 		/* data */
 		Reg d[8];
