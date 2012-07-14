@@ -9,7 +9,7 @@ enum {
 	SHIFT_SS_FLASH     = _BV(0),
 	SHIFT_SS_SRAM      = _BV(1),
 	SHIFT_SS_SD        = _BV(2),
-	SHIFT_SS_RTC       = _BV(2),
+	SHIFT_SS_RTC       = _BV(3),
 	SHIFT_SS_ALL       = SHIFT_SS_FLASH | SHIFT_SS_SRAM |
 	                     SHIFT_SS_SD | SHIFT_SS_RTC,
 	
