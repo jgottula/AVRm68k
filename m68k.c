@@ -520,6 +520,9 @@ void m68kInit(void)
 		cpu.ureg.a[i].l = 0x00000000;
 	}
 	
+	/* start up in supervisor mode (but not master) */
+	cpu.sreg.sr = SR_USERSTATE;
+	
 	/* debug */
 	uartWritePSTR("CPU initialized.\n");
 }
