@@ -35,7 +35,7 @@ static void benchmarkEEPROM(void)
 	before = msec;
 	for (uint8_t j = 0; j < 64; ++j)
 		for (uint16_t i = 0x0000; i < 0x400; ++i)
-			global = eeprom_read_byte(i);
+			global = eeprom_read_byte((uint8_t *)i);
 	after = msec;
 	
 	uartWritePSTR("eeprom byte read speed: (x64) 64 KiB / ");
