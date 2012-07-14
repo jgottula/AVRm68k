@@ -92,8 +92,6 @@ static void m68kExecute(void)
 	}
 	case 0b0100: // miscellaneous
 	{
-		#warning TODO: reorder instr nibble 0b0100
-		
 		/* this is a badly written special case for lea, since it puts a
 		 * register field right in the second nibble */
 		if ((instr[0] & 0b00000001) == 0b00000001 &&
