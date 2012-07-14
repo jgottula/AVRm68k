@@ -27,10 +27,10 @@ static void dramLoadAddrBus(uint16_t addr12)
 	
 	PORT_ADDRL = addrl;
 	
-	_Static_assert(SHIFT_ADDRH_ALL == 0b01111000,
+	_Static_assert(SHIFT_ADDRH_ALL == 0b11110000,
 		"high addr shift indexes changed!");
 	
-	shiftSet((shift & ~SHIFT_ADDRH_ALL) | (addrh << 3));
+	shiftSet((shift & ~SHIFT_ADDRH_ALL) | (addrh << 4));
 }
 
 uint8_t dramRead(uint32_t addr)
