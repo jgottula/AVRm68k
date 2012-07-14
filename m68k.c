@@ -25,7 +25,7 @@ static void m68kFetch(void)
 	uartWriteChr('\n');
 }
 
-static void m68kExecute(void)
+static void m68kDecode(void)
 {
 	instr = fetchBuffer;
 	
@@ -467,8 +467,8 @@ void m68kNext(void)
 	/* fetch from EEPROM */
 	m68kFetch();
 	
-	/* execute */
-	m68kExecute();
+	/* decode and execute */
+	m68kDecode();
 }
 
 void m68kInit(void)
