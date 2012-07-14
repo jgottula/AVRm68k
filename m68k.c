@@ -136,10 +136,15 @@ static void m68kDecode(void)
 					if ((instr[1] & 0b00111000) != 0b00001000) // mode
 						instrMoveFromCcr();
 					else
-						instrClr();
+						assert(0);
 				}
 				else
-					assert(0); /* instruction with size bits goes here */
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrClr();
+					else
+						assert(0);
+				}
 				break;
 			}
 			case 0b0100:
