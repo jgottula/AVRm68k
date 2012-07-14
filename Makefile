@@ -15,12 +15,13 @@ BIN:=$(GLOBAL_OUT)/$(PROJNAME).bin
 LST:=$(GLOBAL_OUT)/$(PROJNAME).lst
 DUMP:=$(GLOBAL_OUT)/$(PROJNAME).dump
 
+
 .PHONY: all avr asm load clean
+
 
 all: avr asm
 
 avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
-
 
 load: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
