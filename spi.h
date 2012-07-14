@@ -37,7 +37,7 @@ enum {
 /* SPI parameters for each slave */
 #define SPIMODE_SRAM   SPIMODE_0
 #define SPIENDIAN_SRAM SPIENDIAN_BIG
-#define SPIDIV_SRAM    SPIDIV_2
+#define SPIDIV_SRAM    SPIDIV_4
 
 #define SPIMODE_SD   SPIMODE_0
 #define SPIENDIAN_SD SPIENDIAN_BIG

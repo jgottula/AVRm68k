@@ -42,7 +42,7 @@ uint8_t sramReadByte(uint16_t addr)
 	spiByte(addr);
 	
 	/* read the data */
-	byte = spiByte(0x00);
+	byte = spiByte(0xff);
 	
 	spiEnd();
 	

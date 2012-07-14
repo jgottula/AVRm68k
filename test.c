@@ -58,14 +58,24 @@ static void testSRAM(void)
 	bool fail = false;
 	uartWritePSTR("sram byte mode: ");
 	sramWriteByte(0x100, 0x55);
-	if (sramReadByte(0x100) != 0x55)
+	if ((global = sramReadByte(0x100)) != 0x55)
+	{
 		fail = true;
+		uartWritePSTR("exp 0x55; got 0x");
+		uartWriteHex8(global, false);
+		uartWritePSTR(".\n");
+	}
 	sramWriteByte(0x100, 0xaa);
-	if (sramReadByte(0x100) != 0xaa)
+	if ((global = sramReadByte(0x100)) != 0xaa)
+	{
 		fail = true;
+		uartWritePSTR("exp 0xaa; got 0x");
+		uartWriteHex8(global, false);
+		uartWritePSTR(".\n");
+	}
 	
 	if (fail)
-		uartWritePSTR("failed.\n");
+		uartWritePSTR("failed.");
 	else
 		uartWritePSTR("passed.\n");
 	
