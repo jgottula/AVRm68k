@@ -24,7 +24,7 @@ static uint32_t popLong(void)
 
 static bool condTest(uint8_t nibble)
 {
-	uint8_t ccr = cpu.ureg.sr.b[0];
+	uint8_t ccr = cpu.sreg.sr.b[0];
 	bool carry = ((ccr & SR_CARRY) != 0);
 	bool overflow = ((ccr & SR_OVERFLOW) != 0);
 	bool zero = ((ccr & SR_ZERO) != 0);
@@ -127,11 +127,11 @@ void instrAddq(void)
 	/* update condition codes (except for address registers) */
 	if (mode != AMODE_AREGDIRECT)
 	{
-		cpu.ureg.sr.b[0] = 0;
+		cpu.sreg.sr.b[0] = 0;
 		if ((int8_t)operand == 0)
-			cpu.ureg.sr.b[0] |= SR_ZERO;
+			cpu.sreg.sr.b[0] |= SR_ZERO;
 		else if ((int8_t)operand < 0)
-			cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+			cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 		uartWritePSTR("warning, need to implement carry/ext, overflow\n");
 	}
 	
@@ -228,8 +228,8 @@ void instrClr(void)
 	accessEA(instr + 2, effAddr, mode, reg, 0, size, true);
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
-	cpu.ureg.sr.b[0] |= SR_ZERO;
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] |= SR_ZERO;
 	
 	cpu.ureg.pc.l += eaLen;
 }
@@ -311,11 +311,11 @@ void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest)
 		accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if (zero)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if (negative)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 	
 	cpu.ureg.pc.l += eaLen;
 }
@@ -391,11 +391,11 @@ void instrEoriOriAndi(bool or, bool exclusive)
 	}
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] = 0;
+	cpu.sreg.sr.b[0] = 0;
 	if (zero)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if (negative)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 	
 	cpu.ureg.pc.l += eaLen + (eaOffset - 2);
 }
@@ -465,11 +465,11 @@ void instrExt(void)
 	}
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if (zero)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if (negative)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 }
 
 void instrJmp(void)
@@ -565,11 +565,11 @@ void instrMove(void)
 		assert(0);
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if ((int32_t)data == 0)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if ((int32_t)data < 0)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 	
 	cpu.ureg.pc.l += eaLen;
 }
@@ -585,14 +585,14 @@ void instrMoveFromCcr(void)
 	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* get just the user portion of the SR */
-	uint16_t ccr = cpu.ureg.sr.w[0] & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
+	uint16_t ccr = cpu.sreg.sr.w[0] & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
 		SR_NEGATIVE | SR_EXTEND);
 	
 	accessEA(instr + 2, effAddr, mode, reg, ccr, SIZE_WORD, true);
 	
-	cpu.ureg.pc.l += eaLen;
-	
 	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
 }
 
 void instrMoveFromSr(void)
@@ -606,7 +606,7 @@ void instrMoveFromSr(void)
 	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* get the entire SR */
-	uint16_t sr = cpu.ureg.sr.w[0];
+	uint16_t sr = cpu.sreg.sr.w[0];
 	
 	accessEA(instr + 2, effAddr, mode, reg, sr, SIZE_WORD, true);
 	
@@ -756,11 +756,11 @@ void instrMoveq(void)
 	cpu.ureg.d[reg].l = signExtend8to32(instr[1]);
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if ((int8_t)data == 0)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if ((int8_t)data < 0)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 }
 
 void instrMoveToCcr(void)
@@ -778,7 +778,7 @@ void instrMoveToCcr(void)
 		false);
 	
 	/* store only the low-order byte */
-	cpu.ureg.sr.b[0] = (uint8_t)newCCR;
+	cpu.sreg.sr.b[0] = (uint8_t)newCCR;
 	
 	/* does not affect condition codes */
 	
@@ -833,11 +833,11 @@ void instrNot(void)
 	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if (zero)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if (negative)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 	
 	cpu.ureg.pc.l += eaLen;
 }
@@ -908,11 +908,11 @@ void instrSwap(void)
 	cpu.ureg.d[reg].w[1] = lsw;
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if (lsw == 0 && msw == 0)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if (lsw & 0b1000000000000000)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 }
 
 void instrTst(void)
@@ -934,11 +934,11 @@ void instrTst(void)
 		test = signExtend16to32(test);
 	
 	/* update condition codes */
-	cpu.ureg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
 	if ((int32_t)test == 0)
-		cpu.ureg.sr.b[0] |= SR_ZERO;
+		cpu.sreg.sr.b[0] |= SR_ZERO;
 	else if ((int32_t)test < 0)
-		cpu.ureg.sr.b[0] |= SR_NEGATIVE;
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
 	
 	cpu.ureg.pc.l += eaLen;
 }

@@ -444,19 +444,19 @@ void m68kDumpReg(void)
 	uartWritePSTR("  pc: 0x");
 	uartWriteHex32(cpu.ureg.pc.l, false);
 	uartWritePSTR(" sr: 0x");
-	uartWriteHex32(cpu.ureg.sr.l, false);
+	uartWriteHex32(cpu.sreg.sr.l, false);
 	uartWriteChr('\n');
 	
 	uartWritePSTR("  [");
-	uartWriteChr((cpu.ureg.sr.l & SR_CARRY) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.l & SR_CARRY) ? 'x' : ' ');
 	uartWritePSTR("] carry  [");
-	uartWriteChr((cpu.ureg.sr.l & SR_OVERFLOW) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.l & SR_OVERFLOW) ? 'x' : ' ');
 	uartWritePSTR("] overflow  [");
-	uartWriteChr((cpu.ureg.sr.l & SR_ZERO) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.l & SR_ZERO) ? 'x' : ' ');
 	uartWritePSTR("] zero  [");
-	uartWriteChr((cpu.ureg.sr.l & SR_NEGATIVE) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.l & SR_NEGATIVE) ? 'x' : ' ');
 	uartWritePSTR("] negative  [");
-	uartWriteChr((cpu.ureg.sr.l & SR_EXTEND) ? 'x' : ' ');
+	uartWriteChr((cpu.sreg.sr.l & SR_EXTEND) ? 'x' : ' ');
 	uartWritePSTR("] extend\n");
 	
 	uartWritePSTR("  d0: 0x");
@@ -512,6 +512,7 @@ void m68kNext(void)
 void m68kInit(void)
 {
 	/* TODO: figure out which registers to initialize */
+	
 	cpu.ureg.pc.l = 0x00000000;
 	
 	for (uint8_t i = 0; i < 8; ++i)
@@ -521,7 +522,7 @@ void m68kInit(void)
 	}
 	
 	/* start up in supervisor mode (but not master) */
-	cpu.sreg.sr = SR_USERSTATE;
+	cpu.sreg.sr.l = SR_USERSTATE;
 	
 	/* debug */
 	uartWritePSTR("CPU initialized.\n");
