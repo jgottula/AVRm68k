@@ -8,6 +8,7 @@ static volatile uint8_t dramCounter = 0;
 static volatile uint16_t counter = 0;
 volatile uint16_t msec = 0, sec = 0;
 volatile bool badISR = false;
+volatile bool enableDRAMRefresh = true;
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -24,7 +25,9 @@ ISR(TIMER1_COMPA_vect)
 	/* refresh the dram at intervals */
 	if (++dramCounter == DRAM_REFRESH_FREQ)
 	{
-		dramRefresh();
+		if (enableDRAMRefresh)
+			dramRefresh();
+		
 		dramCounter = 0;
 	}
 }

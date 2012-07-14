@@ -8,6 +8,7 @@
  * sec counts seconds */
 extern volatile uint16_t msec, sec;
 extern volatile bool badISR;
+extern volatile bool enableDRAMRefresh;
 
 void intrInit(void);
 
