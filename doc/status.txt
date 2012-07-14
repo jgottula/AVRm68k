@@ -19,7 +19,7 @@ addx
 and			done
 andi		done
 andi -> ccr	
-andi -> sr	
+andi -> sr	PRIV
 asl/asr		
 bcc			done
 bchg		
@@ -32,11 +32,11 @@ bfffo
 bfins		
 bfset		
 bstst		
-bkpt		NEXT
+bkpt		SOON
 bra			done
-bset		NEXT
+bset		SOON
 bsr			done
-btst		NEXT
+btst		SOON
 cas			
 cas2		
 chk			
@@ -47,68 +47,68 @@ cmpa
 cmpi		
 cmpm		
 cmp2		
-dbcc		NEXT
+dbcc		SOON
 divs		
 divu		
 eor			done
 eori		done
 eori -> ccr	
-eori -> sr	
+eori -> sr	PRIV
 exg			done
-ext			NEXT
-illegal		NEXT
+ext			done
+illegal		SOON
 jmp			done
 jsr			done
 lea			done
-link		NEXT
+link		
 lsl/lsr		
 move		done
 movea		done
-move <- ccr	
+move <- ccr	done
 move -> ccr	done
 move <- sr	done
-move -> sr	
-move usp	
-movec		
-movem		NEXT
-movep		
+move -> sr	done
+move usp	PRIV
+movec		PRIV
+movem		done
+movep		SKIP
 moveq		done
-moves		
+moves		PRIV
 muls		
 mulu		
 nbcd		
-neg			NEXT
-negx		NEXT
+neg			SOON
+negx		SOON
 nop			done
 not			done
 or			done
 ori			done
 ori -> ccr	
-ori -> sr	
+ori -> sr	PRIV
 pack		
 pea			done
-reset		NEXT
-rol/ror		
-roxl/roxr	
+reset		SKIP
+rol/ror		SOON
+roxl/roxr	SOON
 rtd			
-rte			
+rte			PRIV
 rtr			
 rts			done
 sbcd		
 scc			done
-stop		NEXT
+stop		PRIV
 sub			
 suba		
 subi		
 subq		
 subx		
-swap		NEXT
+swap		done
 tas			
-trap		NEXT
+trap		
 trapcc		
 trapv		
 tst			done
-unlk		NEXT
+unlk		
 unpk		
 
 
