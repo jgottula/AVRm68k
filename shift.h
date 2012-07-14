@@ -19,8 +19,6 @@ enum {
 	SHIFT_ADDRH_11     = _BV(7),
 	SHIFT_ADDRH_ALL    = SHIFT_ADDRH_8 | SHIFT_ADDRH_9 |
 	                     SHIFT_ADDRH_10 | SHIFT_ADDRH_11
-	
-	/* bit 7 is currently unused */
 } ShiftBits;
 
 extern uint8_t shift;
