@@ -25,6 +25,7 @@ avr: $(OUT) $(HEX) $(BIN) $(DUMP) $(LST)
 
 load: $(HEX) $(TEST_HEX)
 	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
+
 clean:
 	-find out/ -type f -delete
 
