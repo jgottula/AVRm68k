@@ -199,6 +199,7 @@ static void m68kExecute(void)
 				}
 				else
 					assert(0); /* instruction with non-01 size bits goes here */
+				break;
 			}
 			case 0b1010:
 			{
@@ -208,6 +209,7 @@ static void m68kExecute(void)
 				}
 				else
 					instrTst();
+				break;
 			}
 			case 0b1110:
 			{
