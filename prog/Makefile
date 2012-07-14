@@ -26,8 +26,8 @@ prog1: $(PROG1_OUT) $(PROG1_HEX) $(PROG1_BIN) $(PROG1_DUMP)
 
 prog2: $(PROG2_ASM)
 
-program: $(HEX) $(TEST_HEX)
-	-sudo avrdude $(AVRDUDEFLAGS) -U flash:w:$(HEX)
+load1: $(PROG1_HEX)
+	-sudo avrdude $(AVRDUDEFLAGS) -U eeprom:w:$(PROG1_HEX)
 
 clean:
 	-find $(GLOBAL_OUT) -type f -print -delete
