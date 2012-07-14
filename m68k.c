@@ -42,38 +42,131 @@ static void m68kExecute(void)
 	switch (instr[0] >> 4)
 	{
 	case 0b0000: // bit manipulation, MOVEP, immediate
-		if (instr[0] == 0x0a)
-			instrEoriOriAndi(true, true);
-		else if (instr[0] == 0x00)
-			instrEoriOriAndi(true, false);
-		else if (instr[0] == 0x02)
-			instrEoriOriAndi(false, false);
-		else
+	{
+		switch (instr[0] & 0b1111)
+		{
+		case 0b0000:
+			if ((instr[1] & 0b11000000) != 0b11000000) // size
+			{
+				if ((instr[1] & 0b00111000) != 0b00001000) // mode
+					instrEoriOriAndi(true, false); // ori
+				else
+					assert(0);
+			}
+			else
+				assert(0);
+			break;
+		case 0b1010:
+			if ((instr[1] & 0b11000000) != 0b11000000) // size
+			{
+				if ((instr[1] & 0b00111000) != 0b00001000) // mode
+					instrEoriOriAndi(true, true); // eori
+				else
+					assert(0);
+			}
+			else
+				assert(0);
+			break;
+		case 0b0010:
+			if ((instr[1] & 0b11000000) != 0b11000000) // size
+			{
+				if ((instr[1] & 0b00111000) != 0b00001000) // mode
+					instrEoriOriAndi(false, false); // andi
+				else
+					assert(0);
+			}
+			else
+				assert(0);
+			break;
+		default:
 			assert(0);
+		}
 		break;
+	}
 	case 0b0001: // move byte
 	case 0b0010: // move long
 	case 0b0011: // move word
+	{
 		instrMove();
 		break;
+	}
 	case 0b0100: // miscellaneous
-		if (instr[0] == 0x4e && instr[1] == 0x71)
-			instrNop();
-		else if (instr[0] == 0x42)
+	{
+		#warning TODO: reorder instr nibble 0b0100
+		
+		switch (instr[0] & 0b1111)
 		{
-			if ((instr[1] & 0b11000000) == 0b11000000)
-				instrMoveFromCcr();
+		case 0b0000:
+		{
+			if ((instr[1] & 0b11000000) == 0b11000000) // size
+			{
+				if ((instr[1] & 0b00111000) != 0b00001000) // mode
+					instrMoveFromSr();
+				else
+					assert(0); /* instruction with size bits goes here */
+			}
 			else
-				instrClr();
+				assert(0);
+			break;
 		}
-		else if (instr[0] == 0x44 && ((instr[1] & 0b11000000) == 0b11000000))
-			instrMoveToCcr();
-		else if (instr[0] == 0x40 && ((instr[1] & 0b11000000) == 0b11000000))
-			instrMoveFromSr();
-		else if ((instr[0] & 0b11110001) == 0b01000001 &&
-			(instr[1] & 0b11000000) == 0b11000000 &&
-			((instr[1] & 0b00111000) != 0b00000000))
-			instrLea();
+		case 0b0010:
+		{
+			if ((instr[1] & 0b11000000) == 0b11000000) // size
+			{
+				if ((instr[1] & 0b00111000) != 0b00001000) // mode
+					instrMoveFromCcr();
+				else
+					instrClr();
+			}
+			else
+				assert(0);
+			break;
+		}
+		case 0b0100:
+		{
+			if ((instr[1] & 0b11000000) == 0b11000000) // size
+			{
+				if ((instr[1] & 0b00111000) != 0b00001000) // mode
+					instrMoveToCcr();
+				else
+					assert(0); /* instruction with size bits goes here */
+			}
+			else
+				assert(0);
+			break;
+		}
+		case 0b1000:
+		{
+			if ((instr[1] & 0b11000000) == 0b01000000) // size
+			{
+				switch (instr[1] & 0b00111000) // mode
+				{
+				case 0b010:
+				case 0b101:
+				case 0b110:
+				case 0b111:
+					instrPea();
+					break;
+				default:
+					assert(0);
+				}
+			}
+			else
+				assert(0);
+		}
+		case 0b1110:
+		{
+			if (instr[1] == 0x71)
+				instrNop();
+			else
+				assert(0);
+			break;
+		}
+		default:
+			assert(0);
+		}
+		
+		/*
 		else if (instr[0] == 0x48 && ((instr[1] & 0b11000000) == 0b01000000) &&
 			((instr[1] & 0b00111000) != 0b00000000))
 			instrPea();
@@ -87,18 +180,20 @@ static void m68kExecute(void)
 			instrRts();
 		else if (instr[0] == 0x4a)
 			instrTst();
-		/*else if (((instr[0] & 0b11111011) == 0b01001000) &&
+		else if (((instr[0] & 0b11111011) == 0b01001000) &&
 			((instr[1] & 0b10000000) == 0b10000000))
-			instrMovem();*/
+			instrMovem();
 		else if (instr[0] == 0x48 && ((instr[1] & 0b11111000) == 0b001000000))
 			instrSwap();
 		else if (((instr[0] & 0b11111110) == 0b01001000) &&
 			((instr[1] & 0b00111000) == 0b00000000))
 			instrExt();
 		else
-			assert(0);
+			assert(0);*/
 		break;
+	}
 	case 0b0101: // ADDQ, SUBQ, Scc, DBcc, TRAPcc
+	{
 		if ((instr[1] & 0b11000000) == 0b11000000)
 			instrScc();
 		else if ((instr[0] & 0b00000001) == 0b00000000)
@@ -106,7 +201,9 @@ static void m68kExecute(void)
 		else
 			assert(0);
 		break;
+	}
 	case 0b0110: // Bcc, BSR, BRA
+	{
 		if (instr[0] == 0x60)
 			instrBra();
 		else if (instr[0] == 0x61)
@@ -114,32 +211,44 @@ static void m68kExecute(void)
 		else
 			instrBcc();
 		break;
+	}
 	case 0b0111: // MOVEQ
+	{
 		if ((instr[0] & 0b1) == 0)
 			instrMoveq();
 		else
 			assert(0);
 		break;
+	}
 	case 0b1000: // OR, DIV, SBCD
+	{
 		if (((instr[0] & 0b00000001) == 0b00000000) ||
 			(((instr[1] >> 3) & 0b00000111) > 0b001))
 			instrEorOrAnd(true, false, ((instr[0] & 0b00000001) == 0));
 		else
 			assert(0);
 		break;
+	}
 	case 0b1001: // SUB, SUBX
+	{
 		assert(0);
 		break;
+	}
 	case 0b1010: // reserved (emulator instructions)
+	{
 		assert(instrEmu());
 		break;
+	}
 	case 0b1011: // CMP, EOR
+	{
 		if ((instr[0] & 0b00000001) == 0b00000001)
 			instrEorOrAnd(true, true, false);
 		else
 			assert(0);
 		break;
+	}
 	case 0b1100: // AND, MUL, ABCD, EXG
+	{
 		if (((instr[0] & 0b00000001) == 0b00000001) &&
 			((instr[1] & 0b00110000) == 0b00000000) &&
 			(((instr[1] >> 3) & 0b00000111) <= 0b001))
@@ -157,15 +266,22 @@ static void m68kExecute(void)
 		else
 			instrEorOrAnd(false, false, ((instr[0] & 0b00000001) == 0));
 		break;
+	}
 	case 0b1101: // ADD, ADDX
+	{
 		assert(0);
 		break;
+	}
 	case 0b1110: // shift, rotate, bitfield
+	{
 		assert(0);
 		break;
+	}
 	case 0b1111: // coprocessor interface, CPU32 extensions
+	{
 		assert(0);
 		break;
+	}
 	}
 	
 	uartWritePSTR("[Done]\n");
