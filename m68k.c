@@ -54,7 +54,7 @@ static void m68kExecute(void)
 					assert(0);
 			}
 			else
-				assert(0);
+				assert(0); /* instruction with size bits goes here */
 			break;
 		case 0b1010:
 			if ((instr[1] & 0b11000000) != 0b11000000) // size
@@ -65,7 +65,7 @@ static void m68kExecute(void)
 					assert(0);
 			}
 			else
-				assert(0);
+				assert(0); /* instruction with size bits goes here */
 			break;
 		case 0b0010:
 			if ((instr[1] & 0b11000000) != 0b11000000) // size
@@ -76,7 +76,7 @@ static void m68kExecute(void)
 					assert(0);
 			}
 			else
-				assert(0);
+				assert(0); /* instruction with size bits goes here */
 			break;
 		default:
 			assert(0);
@@ -94,109 +94,184 @@ static void m68kExecute(void)
 	{
 		#warning TODO: reorder instr nibble 0b0100
 		
-		switch (instr[0] & 0b1111)
+		/* this is a badly written special case for lea, since it puts a
+		 * register field right in the second nibble */
+		if ((instr[0] & 0b00000001) == 0b00000001 &&
+			(instr[1] & 0b11000000) == 0b11000000)
 		{
-		case 0b0000:
-		{
-			if ((instr[1] & 0b11000000) == 0b11000000) // size
+			switch ((instr[1] & 0b00111000) >> 3)
 			{
-				if ((instr[1] & 0b00111000) != 0b00001000) // mode
-					instrMoveFromSr();
-				else
-					assert(0); /* instruction with size bits goes here */
-			}
-			else
-				assert(0);
-			break;
-		}
-		case 0b0010:
-		{
-			if ((instr[1] & 0b11000000) == 0b11000000) // size
-			{
-				if ((instr[1] & 0b00111000) != 0b00001000) // mode
-					instrMoveFromCcr();
-				else
-					instrClr();
-			}
-			else
-				assert(0);
-			break;
-		}
-		case 0b0100:
-		{
-			if ((instr[1] & 0b11000000) == 0b11000000) // size
-			{
-				if ((instr[1] & 0b00111000) != 0b00001000) // mode
-					instrMoveToCcr();
-				else
-					assert(0); /* instruction with size bits goes here */
-			}
-			else
-				assert(0);
-			break;
-		}
-		case 0b1000:
-		{
-			if ((instr[1] & 0b11000000) == 0b01000000) // size
-			{
-				switch (instr[1] & 0b00111000) // mode
-				{
 				case 0b010:
 				case 0b101:
 				case 0b110:
 				case 0b111:
-					instrPea();
+					instrLea();
+					break;
+				case 0b000:
+					instrExt(); // extb
 					break;
 				default:
 					assert(0);
-				}
 			}
-			else
-				assert(0);
 		}
-		case 0b1110:
-		{
-			if (instr[1] == 0x71)
-				instrNop();
-			else
-				assert(0);
-			break;
-		}
-		default:
-			assert(0);
-		}
-		
-		/*
-		else if (instr[0] == 0x48 && ((instr[1] & 0b11000000) == 0b01000000) &&
-			((instr[1] & 0b00111000) != 0b00000000))
-			instrPea();
-		else if (instr[0] == 0x46)
-			instrNot();
-		else if (instr[0] == 0x4e && ((instr[1] & 0b11000000) == 0b11000000))
-			instrJmp();
-		else if (instr[0] == 0x4e && ((instr[1] & 0b11000000) == 0b10000000))
-			instrJsr();
-		else if (instr[0] == 0x4e && instr[1] == 0x75)
-			instrRts();
-		else if (instr[0] == 0x4a)
-			instrTst();
-		else if (((instr[0] & 0b11111011) == 0b01001000) &&
-			((instr[1] & 0b10000000) == 0b10000000))
-			instrMovem();
-		else if (instr[0] == 0x48 && ((instr[1] & 0b11111000) == 0b001000000))
-			instrSwap();
-		else if (((instr[0] & 0b11111110) == 0b01001000) &&
-			((instr[1] & 0b00111000) == 0b00000000))
-			instrExt();
 		else
-			assert(0);*/
+		{
+			switch (instr[0] & 0b1111)
+			{
+			case 0b0000:
+			{
+				if ((instr[1] & 0b11000000) == 0b11000000) // size
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrMoveFromSr();
+					else
+						assert(0);
+				}
+				else
+					assert(0); /* instruction with size bits goes here */
+				break;
+			}
+			case 0b0010:
+			{
+				if ((instr[1] & 0b11000000) == 0b11000000) // size
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrMoveFromCcr();
+					else
+						instrClr();
+				}
+				else
+					assert(0); /* instruction with size bits goes here */
+				break;
+			}
+			case 0b0100:
+			{
+				if ((instr[1] & 0b11000000) == 0b11000000) // size
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrMoveToCcr();
+					else
+						assert(0);
+				}
+				else
+					assert(0); /* instruction with size bits goes here */
+				break;
+			}
+			case 0b0110:
+			{
+				if ((instr[1] & 0b11000000) == 0b11000000) // size
+				{
+					assert(0); /* instruction without size bits goes here */
+				}
+				else
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrNot();
+					else
+						assert(0);
+				}
+				break;
+			}
+			case 0b1000:
+			{
+				if ((instr[1] & 0b11000000) == 0b01000000) // size
+				{
+					switch ((instr[1] & 0b00111000) >> 3) // mode
+					{
+					case 0b010:
+					case 0b101:
+					case 0b110:
+					case 0b111:
+						instrPea();
+						break;
+					case 0b000:
+						instrSwap();
+						break;
+					default:
+						assert(0);
+					}
+				}
+				else if ((instr[1] & 0b11000000) == 0b10000000 ||
+					(instr[1] & 0b11000000) == 0b11000000)
+				{
+					if (((instr[1] & 0b00111000) >> 3) == 0b000) // mode
+						instrExt();
+					else
+						assert(0);
+				}
+				else
+					assert(0); /* instruction with non-01 size bits goes here */
+			}
+			case 0b1010:
+			{
+				if ((instr[1] & 0b11000000) == 0b11000000) // size
+				{
+					assert(0); /* instruction without size bits goes here */
+				}
+				else
+					instrTst();
+			}
+			case 0b1110:
+			{
+				if (instr[1] == 0b01110101)
+					instrRts();
+				else if (instr[1] == 0b01110001)
+					instrNop();
+				else
+				{
+					if ((instr[1] & 0b11000000) == 0b11000000) // size
+					{
+						switch ((instr[1] & 0b00111000) >> 3) // mode
+						{
+						case 0b010:
+						case 0b101:
+						case 0b110:
+						case 0b111:
+							instrJmp();
+							break;
+						default:
+							assert(0);
+						}
+					}
+					else if ((instr[1] & 0b11000000) == 0b10000000) // size
+					{
+						switch ((instr[1] & 0b00111000) >> 3) // mode
+						{
+						case 0b010:
+						case 0b101:
+						case 0b110:
+						case 0b111:
+							instrJsr();
+							break;
+						default:
+							assert(0);
+						}
+					}
+					else
+						assert(0); /* instr with 00/01 size bits goes here */
+				}
+				break;
+			}
+			default:
+				assert(0);
+			}
+		}
 		break;
 	}
 	case 0b0101: // ADDQ, SUBQ, Scc, DBcc, TRAPcc
 	{
+		/* this is a badly written special case for scc, since it puts its
+		 * condition field right in the second nibble */
 		if ((instr[1] & 0b11000000) == 0b11000000)
-			instrScc();
-		else if ((instr[0] & 0b00000001) == 0b00000000)
+		{
+			if (((instr[1] & 0b00111000) >> 3) != 0b001)
+				instrScc();
+			else
+				assert(0); /* instruction with non-001 mode bits goes here */
+		}
+		/* another special case for addq, which has data in the second nibble */
+		else if ((instr[0] & 0b00000001) == 0b00000000 &&
+			(instr[1] & 0b11000000) != 0b11000000)
 			instrAddq();
 		else
 			assert(0);
@@ -204,17 +279,23 @@ static void m68kExecute(void)
 	}
 	case 0b0110: // Bcc, BSR, BRA
 	{
-		if (instr[0] == 0x60)
+		switch (instr[0] & 0b1111)
+		{
+		case 0b0000:
 			instrBra();
-		else if (instr[0] == 0x61)
+			break;
+		case 0b0001:
 			instrBsr();
-		else
+			break;
+		default:
 			instrBcc();
+			break;
+		}
 		break;
 	}
 	case 0b0111: // MOVEQ
 	{
-		if ((instr[0] & 0b1) == 0)
+		if ((instr[0] & 0b00000001) == 0)
 			instrMoveq();
 		else
 			assert(0);
@@ -222,9 +303,18 @@ static void m68kExecute(void)
 	}
 	case 0b1000: // OR, DIV, SBCD
 	{
-		if (((instr[0] & 0b00000001) == 0b00000000) ||
-			(((instr[1] >> 3) & 0b00000111) > 0b001))
-			instrEorOrAnd(true, false, ((instr[0] & 0b00000001) == 0));
+		if (((instr[1] & 0b00111000) >> 3) != 0b001) // mode
+		{
+			if ((instr[1] & 0b11000000) != 0b11000000) // size
+			{
+				if ((instr[0] & 0b00000001) == 0b00000000) // data reg dest
+					instrEorOrAnd(true, false, true); // or
+				else
+					instrEorOrAnd(true, false, false); // or
+			}
+			else
+				assert(0); /* instruction without size bits goes here */
+		}
 		else
 			assert(0);
 		break;
@@ -234,37 +324,61 @@ static void m68kExecute(void)
 		assert(0);
 		break;
 	}
-	case 0b1010: // reserved (emulator instructions)
+	case 0b1010: // reserved (used for emulator instructions)
 	{
-		assert(instrEmu());
+		instrEmu();
 		break;
 	}
 	case 0b1011: // CMP, EOR
 	{
-		if ((instr[0] & 0b00000001) == 0b00000001)
-			instrEorOrAnd(true, true, false);
+		if (((instr[1] & 0b00111000) >> 3) != 0b001) // mode
+		{
+			if ((instr[1] & 0b11000000) != 0b11000000) // size
+				instrEorOrAnd(true, true, false); // eor
+			else
+				assert(0); /* instruction without size bits goes here */
+		}
 		else
 			assert(0);
 		break;
 	}
 	case 0b1100: // AND, MUL, ABCD, EXG
 	{
-		if (((instr[0] & 0b00000001) == 0b00000001) &&
-			((instr[1] & 0b00110000) == 0b00000000) &&
-			(((instr[1] >> 3) & 0b00000111) <= 0b001))
-			instrExg();
-		else if (((instr[0] & 0b00000001) == 0b00000000) &&
-			((instr[1] & 0b11000000) == 0b11000000))
+		switch ((instr[1] & 0b00111000) >> 3) // mode
 		{
-			assert(0); // mulu
-		}
-		else if (((instr[0] & 0b00000001) == 0b00000001) &&
-			((instr[1] >> 4) == 0b0000))
+		case 0b000:
+		case 0b001:
 		{
-			assert(0); // abcd
+			if ((instr[0] & 0b00000001) == 0b00000001)
+			{
+				switch (instr[1] & 0b11000000) // size
+				{
+				case 0b01000000:
+				case 0b10000000:
+					instrExg();
+					break;
+				default:
+					assert(0); /* instruction with 00/11 size bits goes here */
+				}
+			}
+			else
+				assert(0);
+			break;
 		}
-		else
-			instrEorOrAnd(false, false, ((instr[0] & 0b00000001) == 0));
+		default:
+		{
+			if ((instr[1] & 0b11000000) != 0b11000000) // size
+			{
+				if ((instr[0] & 0b00000001) == 0b00000000) // data reg dest
+					instrEorOrAnd(false, false, true); // and
+				else
+					instrEorOrAnd(false, false, false); // and
+			}
+			else
+				assert(0); /* instruction without size bits goes here */
+			break;
+		}
+		}
 		break;
 	}
 	case 0b1101: // ADD, ADDX
