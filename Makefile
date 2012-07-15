@@ -1,6 +1,6 @@
 PROJNAME:=avrm68k
 CFLAGS:=-mmcu=atmega1284p -std=gnu11 -Wall -Wextra -Wno-unused-function -O2 \
-	-flto -ffreestanding -fwhole-program -fuse-linker-plugin \
+	-flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax \
 	-DF_CPU=20000000UL -DDEBUG
 OBJCOPYFLAGS:=-R .eeprom
 AVRDUDEFLAGS:=-c usbasp -p m1284p -B 460800
