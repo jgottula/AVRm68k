@@ -11,18 +11,37 @@
 		.long 0x00000000
 		.word 0x0400
 	
-	movea.l #0x00ffff00,%a0   
-	movea.l #0x00ffff04,%a1
+	move.l #0x10000000,%d0
+	move.l #0x00001000,%d1
+	move.l #0x00000010,%d2
 	
-	move.l #0x55555555,(%a0)
-	move.l #0xaaaaaaaa,(%a1)
-	
-	btst.l #0x00,(%a0)
+	move.w #0b100000,%ccr
 	.word EMU_DUMPREG
+	neg.l %d0
 	
-	move.l #0xffffff00,%d1
-	btst.l %d1,(%a1)
+	move.w #0b100000,%ccr
 	.word EMU_DUMPREG
+	neg.w %d1
+	
+	move.w #0b100000,%ccr
+	.word EMU_DUMPREG
+	neg.b %d2
+	
+	move.l #0x10000000,%d0
+	move.l #0x00001000,%d1
+	move.l #0x00000010,%d2
+	
+	move.w #0b100000,%ccr
+	.word EMU_DUMPREG
+	negx.l %d0
+	
+	move.w #0b100000,%ccr
+	.word EMU_DUMPREG
+	negx.w %d1
+	
+	move.w #0b100000,%ccr
+	.word EMU_DUMPREG
+	negx.b %d2
 	
 	.word EMU_DUMPREG
 	.word EMU_DUMPMEM /* stack */
