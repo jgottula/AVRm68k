@@ -1,14 +1,14 @@
 Priorities:
-- Replace SIMM
-  - Rewrite read & write with correct timings and other things
-  - Implement fast page mode functions for accessing words and longs
-  - Implement read-modify-write (for incrementing memory locations, etc)
+- Implement dram read-modify-write (for incrementing memory locations, etc)
+- Emulator: MMU!
 - Emulator: memory system
+  - Use fpm for words and longs
+  - Use rmw for increments, etc. (requires not doing the initial read in the
+    instruction)
 - Emulator: instructions
-  - Next: movem, addi, add, cmp, rtr, rtd
 - Emulator: emu instructions
   - dumpstack
-- SD
+- SD card
   - Because of no card detect, throw fatal error upon early init problems
 - Linux from scratch
 - Bootloader
@@ -17,6 +17,7 @@ Priorities:
 
 Tests:
 - Address modes:
+  - Immediate modes look broken!
   - Addr reg indirect index
   - Addr reg indirect index base displacement
   - Memory indirect postindex
@@ -43,9 +44,6 @@ Optimizations:
   writeback to DRAM, or SD writes, or for buffered asynchronous serial, etc)
 - Reorder if/else statements so more likely instructions etc are first
 - Remove debug code
-
-Program size:
-- Use decompressor stub + compressed code?
 
 Overclocking:
 - Get power as 12V (or 7.4V) and use another LM317 to get >5V
