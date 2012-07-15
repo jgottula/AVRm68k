@@ -46,13 +46,24 @@ static void m68kDecode(void)
 	case 0b0000: // bit manipulation, MOVEP, immediate
 	{
 		/* special case for btst, as it puts a reg field in the second nibble */
-		if ((instr[1] & 0b11000000) == 0b00000000 &&
-			(instr[1] & 0b00111000) != 0b00001000)
+		if (((instr[1] & 0b11000000) == 0b00000000 ||
+			(instr[1] & 0b11000000) == 0b11000000) && // size
+			(instr[1] & 0b00111000) != 0b00001000) // mode
 		{
-			if ((instr[0] & 0b00000001) == 0b0000001)
-				instrBtst(false); // register
-			else
-				instrBtst(true); // immediate
+			if ((instr[1] & 0b11000000) == 0b00000000)
+			{
+				if ((instr[0] & 0b00000001) == 0b0000001)
+					instrBsetBtst(false, false); // register
+				else
+					instrBsetBtst(false, true); // immediate
+			}
+			else if ((instr[1] & 0b11000000) == 0b11000000)
+			{
+				if ((instr[0] & 0b00000001) == 0b0000001)
+					instrBsetBtst(true, false); // register
+				else
+					instrBsetBtst(true, true); // immediate
+			}
 		}
 		else
 		{
@@ -109,9 +120,9 @@ static void m68kDecode(void)
 		/* this is a badly written special case for lea, since it puts a
 		 * register field right in the second nibble */
 		if ((instr[0] & 0b00000001) == 0b00000001 &&
-			(instr[1] & 0b11000000) == 0b11000000)
+			(instr[1] & 0b11000000) == 0b11000000) // size
 		{
-			switch ((instr[1] & 0b00111000) >> 3)
+			switch ((instr[1] & 0b00111000) >> 3) // mode
 			{
 				case 0b010:
 				case 0b101:
@@ -207,7 +218,7 @@ static void m68kDecode(void)
 					}
 				}
 				else if ((instr[1] & 0b11000000) == 0b10000000 ||
-					(instr[1] & 0b11000000) == 0b11000000)
+					(instr[1] & 0b11000000) == 0b11000000) // size
 				{
 					switch ((instr[1] & 0b00111000) >> 3) // mode
 					{

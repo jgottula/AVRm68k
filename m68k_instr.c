@@ -190,6 +190,69 @@ void instrBra(void)
 	/* does not affect condition codes */
 }
 
+void instrBsetBtst(bool set, bool immediate)
+{
+	if (set)
+		uartWritePSTR("bset");
+	else
+		uartWritePSTR("btst");
+	
+	if (immediate)
+		uartWritePSTR(" #<data>,<ea>\n");
+	else
+		uartWritePSTR(" %dn,<ea>\n");
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint8_t size = (mode == AMODE_DREGDIRECT ? SIZE_LONG : SIZE_BYTE);
+	
+	uint8_t offset = (immediate ? 2 : 0);
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2 + offset, mode, reg, size, &effAddr);
+	
+	uint8_t regNum = (instr[0] & 0b00001110) >> 1;
+	uint8_t bitNum;
+	
+	if (immediate)
+		bitNum = instr[3];
+	else
+		bitNum = cpu.ureg.d[regNum].b[0];
+	
+	uint32_t test = accessEA(instr + 2 + offset, effAddr, mode, reg, 0, size,
+		false);
+	
+	bool zero;
+	
+	/* operation is 32-bit if eff addr is a data register; 8-bit otherwise */
+	if (mode == AMODE_DREGDIRECT)
+	{
+		assert(bitNum < 32);
+		
+		zero = ((test & (1 << bitNum)) == 0);
+	}
+	else
+	{
+		assert(bitNum < 8);
+		
+		zero = ((test & (1 << bitNum)) == 0);
+	}
+	
+	/* for bset, set the bit we tested */
+	if (set)
+		accessEA(instr + 2 + offset, effAddr, mode, reg, test | (1 << bitNum),
+			size, true);
+	
+	/* update condition codes */
+	if (zero)
+		cpu.sreg.sr.b[0] |= SR_ZERO;
+	else
+		cpu.sreg.sr.b[0] &= ~SR_ZERO;
+	
+	cpu.ureg.pc.l += eaLen + offset;
+}
+
 void instrBsr(void)
 {
 	uartWritePSTR("bsr <ea>\n");
@@ -218,63 +281,6 @@ void instrBsr(void)
 	cpu.ureg.pc.l += add;
 	
 	/* does not affect condition codes */
-}
-
-void instrBtst(bool immediate)
-{
-	if (immediate)
-		uartWritePSTR("btst #<data>,<ea>\n");
-	else
-		uartWritePSTR("btst %dn,<ea>\n");
-	
-	uint8_t mode = (instr[1] & 0b00111000) >> 3;
-	uint8_t reg = instr[1] & 0b00000111;
-	
-	uint8_t size = (mode == AMODE_DREGDIRECT ? SIZE_LONG : SIZE_BYTE);
-	
-	uint8_t offset = (immediate ? 2 : 0);
-	
-	uint32_t effAddr;
-	uint8_t eaLen = calcEA(instr + 2 + offset, mode, reg, size, &effAddr);
-	
-	uint8_t regNum = (instr[0] & 0b00001110) >> 1;
-	uint8_t bitNum;
-	
-	if (immediate)
-		bitNum = instr[3];
-	else
-		bitNum = cpu.ureg.d[regNum].b[0];
-	
-	uint32_t test = accessEA(instr + 2 + offset, effAddr, mode, reg, 0, size,
-		false);
-	
-	bool zero;
-	
-	uartWriteHex8(bitNum, false); uartWriteChr('\n');
-	uartWriteHex32(test, false); uartWriteChr('\n');
-	uartWriteHex32(test & _BV(bitNum), false); uartWriteChr('\n');
-	
-	/* operation is 32-bit if eff addr is a data register; 8-bit otherwise */
-	if (mode == AMODE_DREGDIRECT)
-	{
-		assert(bitNum < 32);
-		
-		zero = ((test & (1 << bitNum)) == 0);
-	}
-	else
-	{
-		assert(bitNum < 8);
-		
-		zero = ((test & (1 << bitNum)) == 0);
-	}
-	
-	/* update condition codes */
-	if (zero)
-		cpu.sreg.sr.b[0] |= SR_ZERO;
-	else
-		cpu.sreg.sr.b[0] &= ~SR_ZERO;
-	
-	cpu.ureg.pc.l += eaLen + offset;
 }
 
 void instrClr(void)
