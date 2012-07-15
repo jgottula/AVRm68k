@@ -9,6 +9,7 @@ void instrAddq(void);
 void instrBcc(void);
 void instrBra(void);
 void instrBsr(void);
+void instrBtst(bool immediate);
 void instrClr(void);
 void instrDbcc(void);
 void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest);

@@ -45,43 +45,55 @@ static void m68kDecode(void)
 	{
 	case 0b0000: // bit manipulation, MOVEP, immediate
 	{
-		switch (instr[0] & 0b1111)
+		/* special case for btst, as it puts a reg field in the second nibble */
+		if ((instr[1] & 0b11000000) == 0b00000000 &&
+			(instr[1] & 0b00111000) != 0b00001000)
 		{
-		case 0b0000:
-			if ((instr[1] & 0b11000000) != 0b11000000) // size
-			{
-				if ((instr[1] & 0b00111000) != 0b00001000) // mode
-					instrEoriOriAndi(true, false); // ori
-				else
-					assert(0);
-			}
+			if ((instr[0] & 0b00000001) == 0b0000001)
+				instrBtst(false); // register
 			else
-				assert(0); /* instruction with size bits goes here */
-			break;
-		case 0b1010:
-			if ((instr[1] & 0b11000000) != 0b11000000) // size
+				instrBtst(true); // immediate
+		}
+		else
+		{
+			switch (instr[0] & 0b1111)
 			{
-				if ((instr[1] & 0b00111000) != 0b00001000) // mode
-					instrEoriOriAndi(true, true); // eori
+			case 0b0000:
+				if ((instr[1] & 0b11000000) != 0b11000000) // size
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrEoriOriAndi(true, false); // ori
+					else
+						assert(0);
+				}
 				else
-					assert(0);
-			}
-			else
-				assert(0); /* instruction with size bits goes here */
-			break;
-		case 0b0010:
-			if ((instr[1] & 0b11000000) != 0b11000000) // size
-			{
-				if ((instr[1] & 0b00111000) != 0b00001000) // mode
-					instrEoriOriAndi(false, false); // andi
+					assert(0); /* instruction without size bits goes here */
+				break;
+			case 0b1010:
+				if ((instr[1] & 0b11000000) != 0b11000000) // size
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrEoriOriAndi(true, true); // eori
+					else
+						assert(0);
+				}
 				else
-					assert(0);
+					assert(0); /* instruction without size bits goes here */
+				break;
+			case 0b0010:
+				if ((instr[1] & 0b11000000) != 0b11000000) // size
+				{
+					if ((instr[1] & 0b00111000) != 0b00001000) // mode
+						instrEoriOriAndi(false, false); // andi
+					else
+						assert(0);
+				}
+				else
+					assert(0); /* instruction without size bits goes here */
+				break;
+			default:
+				assert(0);
 			}
-			else
-				assert(0); /* instruction with size bits goes here */
-			break;
-		default:
-			assert(0);
 		}
 		break;
 	}
