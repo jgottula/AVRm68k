@@ -264,7 +264,7 @@ void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest)
 	uint8_t size = instr[1] >> 6;
 	
 	uint8_t dataRegNum = ((instr[0] >> 1) & 0b00000111);
-	Reg *dataReg = &cpu.ureg.d[dataRegNum];
+	Reg32 *dataReg = &cpu.ureg.d[dataRegNum];
 	
 	uint32_t effAddr;
 	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
@@ -407,7 +407,7 @@ void instrExg(void)
 	uint8_t regIdx1 = (instr[0] & 0b00001110) >> 1;
 	uint8_t regIdx2 = (instr[1] & 0b00000111);
 	
-	Reg *reg1, *reg2;
+	Reg32 *reg1, *reg2;
 	
 	switch ((instr[1] & 0b11111000) >> 3)
 	{
@@ -427,7 +427,7 @@ void instrExg(void)
 		assert(0);
 	}
 	
-	Reg temp = *reg1;
+	Reg32 temp = *reg1;
 	*reg1 = *reg2;
 	*reg2 = temp;
 	
@@ -585,7 +585,7 @@ void instrMoveFromCcr(void)
 	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* get just the user portion of the SR */
-	uint16_t ccr = cpu.sreg.sr.w[0] & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
+	uint16_t ccr = cpu.sreg.sr.b[0] & (SR_CARRY | SR_OVERFLOW | SR_ZERO |
 		SR_NEGATIVE | SR_EXTEND);
 	
 	accessEA(instr + 2, effAddr, mode, reg, ccr, SIZE_WORD, true);
@@ -600,7 +600,7 @@ void instrMoveFromSr(void)
 	uartWritePSTR("move %sr,<ea>\n");
 	
 	/* privileged instruction */
-	assert(cpu.sreg.sr.w[0] & SR_USERSTATE);
+	assert(cpu.sreg.sr.w & SR_USERSTATE);
 	
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
@@ -609,7 +609,7 @@ void instrMoveFromSr(void)
 	uint8_t eaLen = calcEA(instr + 2, mode, reg, SIZE_WORD, &effAddr);
 	
 	/* get the entire SR */
-	uint16_t sr = cpu.sreg.sr.w[0];
+	uint16_t sr = cpu.sreg.sr.w;
 	
 	accessEA(instr + 2, effAddr, mode, reg, sr, SIZE_WORD, true);
 	
@@ -793,7 +793,7 @@ void instrMoveToSr(void)
 	uartWritePSTR("move <ea>,%sr\n");
 	
 	/* privileged instruction */
-	assert(cpu.sreg.sr.w[0] & SR_USERSTATE);
+	assert(cpu.sreg.sr.w & SR_USERSTATE);
 	
 	uint8_t mode = (instr[1] >> 3) & 0b111;
 	uint8_t reg = instr[1] & 0b111;
@@ -806,7 +806,7 @@ void instrMoveToSr(void)
 		false);
 	
 	/* store the whole word */
-	cpu.sreg.sr.w[0] = newSR;
+	cpu.sreg.sr.w = newSR;
 	
 	/* does not affect condition codes */
 	

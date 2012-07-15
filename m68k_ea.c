@@ -12,7 +12,7 @@ static bool extWordType(const uint8_t *ptr)
 
 static uint32_t readReg(uint8_t mode, uint8_t reg, int8_t size)
 {
-	Reg *src;
+	Reg32 *src;
 	
 	switch (mode)
 	{
@@ -41,7 +41,7 @@ static uint32_t readReg(uint8_t mode, uint8_t reg, int8_t size)
 
 static void writeReg(uint8_t mode, uint8_t reg, uint32_t data, int8_t size)
 {
-	Reg *dest;
+	Reg32 *dest;
 	
 	switch (mode)
 	{
