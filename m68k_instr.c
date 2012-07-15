@@ -144,6 +144,172 @@ void instrAddq(void)
 	cpu.ureg.pc.l += eaLen;
 }
 
+void instrAndEorOr(bool or, bool exclusive, bool dataRegDest)
+{
+	/* exclusive and not data dest should not happen */
+	assert(!or || (!exclusive || !dataRegDest));
+	
+	if (or)
+	{
+		if (exclusive)
+			uartWritePSTR("eor %dn,<ea>\n");
+		else
+		{
+			if (dataRegDest)
+				uartWritePSTR("or <ea>,%dn\n");
+			else
+				uartWritePSTR("or %dn,<ea>\n");
+		}
+	}
+	else
+	{
+		if (dataRegDest)
+			uartWritePSTR("and <ea>,%dn\n");
+		else
+			uartWritePSTR("and %dn,<ea>\n");
+	}
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
+	
+	uint8_t dataRegNum = ((instr[0] >> 1) & 0b00000111);
+	Reg32 *dataReg = &cpu.ureg.d[dataRegNum];
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
+	
+	/* get the second operand */
+	uint32_t operand = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
+	
+	/* perform the operation */
+	if (or)
+	{
+		if (exclusive)
+			operand ^= dataReg->l;
+		else
+			operand |= dataReg->l;
+	}
+	else
+		operand &= dataReg->l;
+	
+	bool negative, zero;
+	
+	switch (size)
+	{
+	case SIZE_BYTE:
+		negative = ((int8_t)operand < 0);
+		zero = ((int8_t)operand == 0);
+		break;
+	case SIZE_WORD:
+		negative = ((int16_t)operand < 0);
+		zero = ((int16_t)operand == 0);
+		break;
+	case SIZE_LONG:
+		negative = ((int32_t)operand < 0);
+		zero = ((int32_t)operand == 0);
+		break;
+	default:
+		assert(0);
+	}
+	
+	/* write the operand back */
+	if (dataRegDest)
+		accessEA(instr + 2, effAddr, AMODE_DREGDIRECT, dataRegNum, operand, size,
+			true);
+	else
+		accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
+	
+	/* update condition codes */
+	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
+	if (zero)
+		cpu.sreg.sr.b[0] |= SR_ZERO;
+	else if (negative)
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
+	
+	cpu.ureg.pc.l += eaLen;
+}
+
+void instrAndiEoriOri(bool or, bool exclusive)
+{
+	if (or)
+	{
+		if (exclusive)
+			uartWritePSTR("eori #<data>,<ea>\n");
+		else
+			uartWritePSTR("ori #<data>,<ea>\n");
+	}
+	else
+		uartWritePSTR("andi #<data>,<ea>\n");
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
+	
+	/* get the first operand */
+	uint32_t data;
+	if (size == SIZE_BYTE)
+		data = instr[3];
+	else if (size == SIZE_WORD)
+		data = decodeBigEndian16(instr + 2);
+	else if (size == SIZE_LONG)
+		data = decodeBigEndian32(instr + 2);
+	else
+		assert(0);
+	
+	uint8_t eaOffset = (size == SIZE_LONG ? 6 : 4);
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + eaOffset, mode, reg, size, &effAddr);
+	
+	/* get the second operand */
+	uint32_t operand = accessEA(instr + eaOffset, effAddr, mode, reg, 0, size,
+		false);
+	
+	/* perform the operation */
+	if (or)
+	{
+		if (exclusive)
+			operand ^= data;
+		else
+			operand |= data;
+	}
+	else
+		operand &= data;
+	
+	/* write back the sum */
+	accessEA(instr + eaOffset, effAddr, mode, reg, operand, size, true);
+	
+	bool negative, zero;
+	
+	switch (size)
+	{
+	case SIZE_BYTE:
+		negative = ((int8_t)operand < 0);
+		zero = ((int8_t)operand == 0);
+		break;
+	case SIZE_WORD:
+		negative = ((int16_t)operand < 0);
+		zero = ((int16_t)operand == 0);
+		break;
+	case SIZE_LONG:
+		negative = ((int32_t)operand < 0);
+		zero = ((int32_t)operand == 0);
+		break;
+	default:
+		assert(0);
+	}
+	
+	/* update condition codes */
+	cpu.sreg.sr.b[0] = 0;
+	if (zero)
+		cpu.sreg.sr.b[0] |= SR_ZERO;
+	else if (negative)
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
+	
+	cpu.ureg.pc.l += eaLen + (eaOffset - 2);
+}
+
 void instrBcc(void)
 {
 	uartWritePSTR("bcc <ea>\n");
@@ -329,172 +495,6 @@ void instrDbcc(void)
 	/* does not affect condition codes */
 	
 	cpu.ureg.pc.l += 2;
-}
-
-void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest)
-{
-	/* exclusive and not data dest should not happen */
-	assert(!or || (!exclusive || !dataRegDest));
-	
-	if (or)
-	{
-		if (exclusive)
-			uartWritePSTR("eor %dn,<ea>\n");
-		else
-		{
-			if (dataRegDest)
-				uartWritePSTR("or <ea>,%dn\n");
-			else
-				uartWritePSTR("or %dn,<ea>\n");
-		}
-	}
-	else
-	{
-		if (dataRegDest)
-			uartWritePSTR("and <ea>,%dn\n");
-		else
-			uartWritePSTR("and %dn,<ea>\n");
-	}
-	
-	uint8_t mode = (instr[1] & 0b00111000) >> 3;
-	uint8_t reg = instr[1] & 0b00000111;
-	uint8_t size = instr[1] >> 6;
-	
-	uint8_t dataRegNum = ((instr[0] >> 1) & 0b00000111);
-	Reg32 *dataReg = &cpu.ureg.d[dataRegNum];
-	
-	uint32_t effAddr;
-	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
-	
-	/* get the second operand */
-	uint32_t operand = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
-	
-	/* perform the operation */
-	if (or)
-	{
-		if (exclusive)
-			operand ^= dataReg->l;
-		else
-			operand |= dataReg->l;
-	}
-	else
-		operand &= dataReg->l;
-	
-	bool negative, zero;
-	
-	switch (size)
-	{
-	case SIZE_BYTE:
-		negative = ((int8_t)operand < 0);
-		zero = ((int8_t)operand == 0);
-		break;
-	case SIZE_WORD:
-		negative = ((int16_t)operand < 0);
-		zero = ((int16_t)operand == 0);
-		break;
-	case SIZE_LONG:
-		negative = ((int32_t)operand < 0);
-		zero = ((int32_t)operand == 0);
-		break;
-	default:
-		assert(0);
-	}
-	
-	/* write the operand back */
-	if (dataRegDest)
-		accessEA(instr + 2, effAddr, AMODE_DREGDIRECT, dataRegNum, operand, size,
-			true);
-	else
-		accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
-	
-	/* update condition codes */
-	cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_ZERO | SR_NEGATIVE);
-	if (zero)
-		cpu.sreg.sr.b[0] |= SR_ZERO;
-	else if (negative)
-		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
-	
-	cpu.ureg.pc.l += eaLen;
-}
-
-void instrEoriOriAndi(bool or, bool exclusive)
-{
-	if (or)
-	{
-		if (exclusive)
-			uartWritePSTR("eori #<data>,<ea>\n");
-		else
-			uartWritePSTR("ori #<data>,<ea>\n");
-	}
-	else
-		uartWritePSTR("andi #<data>,<ea>\n");
-	
-	uint8_t mode = (instr[1] & 0b00111000) >> 3;
-	uint8_t reg = instr[1] & 0b00000111;
-	uint8_t size = instr[1] >> 6;
-	
-	/* get the first operand */
-	uint32_t data;
-	if (size == SIZE_BYTE)
-		data = instr[3];
-	else if (size == SIZE_WORD)
-		data = decodeBigEndian16(instr + 2);
-	else if (size == SIZE_LONG)
-		data = decodeBigEndian32(instr + 2);
-	else
-		assert(0);
-	
-	uint8_t eaOffset = (size == SIZE_LONG ? 6 : 4);
-	
-	uint32_t effAddr;
-	uint8_t eaLen = calcEA(instr + eaOffset, mode, reg, size, &effAddr);
-	
-	/* get the second operand */
-	uint32_t operand = accessEA(instr + eaOffset, effAddr, mode, reg, 0, size,
-		false);
-	
-	/* perform the operation */
-	if (or)
-	{
-		if (exclusive)
-			operand ^= data;
-		else
-			operand |= data;
-	}
-	else
-		operand &= data;
-	
-	/* write back the sum */
-	accessEA(instr + eaOffset, effAddr, mode, reg, operand, size, true);
-	
-	bool negative, zero;
-	
-	switch (size)
-	{
-	case SIZE_BYTE:
-		negative = ((int8_t)operand < 0);
-		zero = ((int8_t)operand == 0);
-		break;
-	case SIZE_WORD:
-		negative = ((int16_t)operand < 0);
-		zero = ((int16_t)operand == 0);
-		break;
-	case SIZE_LONG:
-		negative = ((int32_t)operand < 0);
-		zero = ((int32_t)operand == 0);
-		break;
-	default:
-		assert(0);
-	}
-	
-	/* update condition codes */
-	cpu.sreg.sr.b[0] = 0;
-	if (zero)
-		cpu.sreg.sr.b[0] |= SR_ZERO;
-	else if (negative)
-		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
-	
-	cpu.ureg.pc.l += eaLen + (eaOffset - 2);
 }
 
 void instrExg(void)
@@ -906,6 +906,90 @@ void instrMoveToSr(void)
 	cpu.sreg.sr.w = newSR;
 	
 	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += eaLen;
+}
+
+void instrNeg(bool extend)
+{
+	if (extend)
+		uartWritePSTR("negx <ea>\n");
+	else
+		uartWritePSTR("neg <ea>\n");
+	
+	uint8_t mode = (instr[1] & 0b00111000) >> 3;
+	uint8_t reg = instr[1] & 0b00000111;
+	uint8_t size = instr[1] >> 6;
+	
+	uint32_t effAddr;
+	uint8_t eaLen = calcEA(instr + 2, mode, reg, size, &effAddr);
+	
+	/* get the operand */
+	uint32_t operand = accessEA(instr + 2, effAddr, mode, reg, 0, size, false);
+	
+	/* the result is sign extended here to facilitate flag checking later; the
+	 * byte and word modes will work as intended by truncating the value */
+	switch (size)
+	{
+	case SIZE_BYTE:
+		operand = signExtend8to32(operand);
+		break;
+	case SIZE_WORD:
+		operand = signExtend16to32(operand);
+		break;
+	case SIZE_LONG:
+		break;
+	default:
+		assert(0);
+	}
+	
+	if (extend && (cpu.sreg.sr.b[0] & SR_EXTEND) != 0)
+		++operand;
+	
+	operand = -operand;
+	uint8_t sr = getStatusReg();
+	
+	/* write the operand back */
+	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
+	
+	/* update condition codes */
+	if (!extend)
+	{
+		/* carry and extend are set by default */
+		cpu.sreg.sr.b[0] = SR_CARRY | SR_EXTEND;
+		
+		if (operand == 0)
+		{
+			cpu.sreg.sr.b[0] |= SR_ZERO;
+			cpu.sreg.sr.b[0] &= ~SR_CARRY & ~SR_EXTEND;
+		}
+		else if ((int32_t)operand < 0)
+			cpu.sreg.sr.b[0] |= SR_NEGATIVE;
+		
+		if ((sr & SREG_V) != 0)
+			cpu.sreg.sr.b[0] |= SR_OVERFLOW;
+	}
+	else
+	{
+		/* don't touch zero except to clear it if applicable */
+		cpu.sreg.sr.b[0] &= ~SR_CARRY & ~SR_OVERFLOW & ~SR_NEGATIVE &
+			~SR_EXTEND;
+		
+		if (operand != 0)
+		{
+			cpu.sreg.sr.b[0] &= ~SR_ZERO;
+			
+			if ((int32_t)operand < 0)
+				cpu.sreg.sr.b[0] |= SR_NEGATIVE;
+		}
+		
+		/* set extend the same as carry */
+		if ((sr & SREG_C) != 0)
+			cpu.sreg.sr.b[0] |= SR_CARRY | SR_EXTEND;
+		
+		if ((sr & SREG_V) != 0)
+			cpu.sreg.sr.b[0] |= SR_OVERFLOW;
+	}
 	
 	cpu.ureg.pc.l += eaLen;
 }

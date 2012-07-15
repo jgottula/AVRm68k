@@ -6,14 +6,14 @@
 
 void instrEmu(void);
 void instrAddq(void);
+void instrAndEorOr(bool or, bool exclusive, bool dataRegDest);
+void instrAndiEoriOri(bool or, bool exclusive);
 void instrBcc(void);
 void instrBra(void);
 void instrBsetBtst(bool set, bool immediate);
 void instrBsr(void);
 void instrClr(void);
 void instrDbcc(void);
-void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest);
-void instrEoriOriAndi(bool or, bool exclusive);
 void instrExg(void);
 void instrExt(void);
 void instrJmp(void);
@@ -26,6 +26,7 @@ void instrMovem(bool regToMem);
 void instrMoveq(void);
 void instrMoveToCcr(void);
 void instrMoveToSr(void);
+void instrNeg(bool extend);
 void instrNop(void);
 void instrNot(void);
 void instrPea(void);
