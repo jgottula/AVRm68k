@@ -11,11 +11,11 @@ instructions
 
 instr		status
 abcd		
-add			
-adda		
-addi		
+add			SOON
+adda		SOON
+addi		SOON
 addq		done
-addx		
+addx		SOON
 and			done
 andi		done
 andi -> ccr	
@@ -32,9 +32,9 @@ bfffo
 bfins		
 bfset		
 bstst		
-bkpt		SOON
+bkpt		SKIP
 bra			done
-bset		SOON
+bset		done
 bsr			done
 btst		done
 cas			
@@ -42,7 +42,7 @@ cas2
 chk			
 chk2		
 clr			done
-cmp			
+cmp			SOON
 cmpa		
 cmpi		
 cmpm		
@@ -77,8 +77,8 @@ moves		PRIV
 muls		
 mulu		
 nbcd		
-neg			SOON
-negx		SOON
+neg			done
+negx		done
 nop			done
 not			done
 or			done
