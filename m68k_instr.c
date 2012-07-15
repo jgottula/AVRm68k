@@ -118,8 +118,9 @@ void instrAddq(void)
 	else if (size == SIZE_WORD)
 		operand = signExtend16to32(operand);
 	
-	/* perform the add operation */
+	/* perform the add operation and immediately save the flags */
 	operand += data;
+	uint8_t sr = getStatusReg();
 	
 	/* write back the sum */
 	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
@@ -128,11 +129,16 @@ void instrAddq(void)
 	if (mode != AMODE_AREGDIRECT)
 	{
 		cpu.sreg.sr.b[0] = 0;
+		
 		if ((int8_t)operand == 0)
 			cpu.sreg.sr.b[0] |= SR_ZERO;
 		else if ((int8_t)operand < 0)
 			cpu.sreg.sr.b[0] |= SR_NEGATIVE;
-		uartWritePSTR("warning, need to implement carry/ext, overflow\n");
+		
+		if (sr & SREG_C)
+			cpu.sreg.sr.b[0] |= SR_CARRY;
+		if (sr & SREG_V)
+			cpu.sreg.sr.b[0] |= SR_OVERFLOW;
 	}
 	
 	cpu.ureg.pc.l += eaLen;
