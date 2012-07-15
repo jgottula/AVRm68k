@@ -29,6 +29,6 @@ void uartWrite(uint8_t byte);
 bool uartEnabled(void);
 void uartInit(void);
 
-#define uartWritePSTR(str) (uartWritePStr(PSTR(str)))
+#define uartWritePSTR(_str) (uartWritePStr(PSTR(_str)))
 
 #endif
