@@ -11,13 +11,18 @@
 		.long 0x00000000
 		.word 0x0400
 	
-	move.l #0xaaaa0004,%d0
-	moveq.l #0x00000000,%d1
+	movea.l #0x00ffff00,%a0   
+	movea.l #0x00ffff04,%a1
 	
-loop:
-	addq.l #1,%d1
-	move.w %d0,-(%sp)
-	dbeq %d0,loop
+	move.l #0x55555555,(%a0)
+	move.l #0xaaaaaaaa,(%a1)
+	
+	btst.l #0x00,(%a0)
+	.word EMU_DUMPREG
+	
+	move.l #0xffffff00,%d1
+	btst.l %d1,(%a1)
+	.word EMU_DUMPREG
 	
 	.word EMU_DUMPREG
 	.word EMU_DUMPMEM /* stack */
