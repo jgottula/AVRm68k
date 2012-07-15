@@ -3,6 +3,7 @@
 #include "debug.h"
 #include "intr.h"
 #include "m68k_instr.h"
+#include "m68k_mem.h"
 #include "uart.h"
 
 static uint8_t fetchBuffer[22]; // must have even size
@@ -518,8 +519,6 @@ void m68kNext(void)
 
 void m68kInit(void)
 {
-	/* TODO: figure out which registers to initialize */
-	
 	cpu.ureg.pc.l = 0x00000000;
 	
 	for (uint8_t i = 0; i < 8; ++i)
@@ -530,6 +529,10 @@ void m68kInit(void)
 	
 	/* start up in supervisor mode (but not master) */
 	cpu.sreg.sr.w = SR_USERSTATE;
+	
+	/* vectors: initial ssp; initial pc */
+	memWrite(0x00000000, SIZE_LONG, 0x01000000);
+	memWrite(0x00000004, SIZE_LONG, 0x00000000); // currently maps to eeprom:0
 	
 	/* debug */
 	uartWritePSTR("CPU initialized.\n");
