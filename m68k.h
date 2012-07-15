@@ -75,10 +75,15 @@
 #define EMUINSTR_DUMPMEM 0xa002
 
 typedef union {
+	uint16_t w;
+	uint8_t b[2];
+} Reg16;
+
+typedef union {
 	uint32_t l;
 	uint16_t w[2];
 	uint8_t b[4];
-} Reg;
+} Reg32;
 
 typedef union {
 	uint64_t q;
@@ -91,13 +96,13 @@ struct {
 	/* user registers */
 	struct {
 		/* control */
-		Reg pc;
+		Reg32 pc;
 		
 		/* data */
-		Reg d[8];
+		Reg32 d[8];
 		
 		/* address */
-		Reg a[8];
+		Reg32 a[8];
 		
 		/* fp registers not implemented */
 	} ureg;
@@ -105,18 +110,17 @@ struct {
 	/* supervisor registers */
 	struct {
 		/* cache */
-		Reg caar, cacr;
-		
-		/* dest function code */
-		Reg dfc;
+		Reg32 caar, cacr;
 		
 		/* supervisor */
-		Reg msp, sfc, sr, isp, tt1, tt0, vbr;
+		Reg16 sr, tt0, tt1;
+		Reg32 msp, isp, sfc, dfc, vbr;
 	} sreg;
 	
 	/* mmu registers */
 	struct {
-		Reg pmmusr, mmusr, tc;
+		Reg16 pmmusr, mmusr;
+		Reg32 tc;
 		Reg64 crp, srp;
 	} mreg;
 } cpu;
