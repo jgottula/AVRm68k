@@ -14,7 +14,7 @@ abcd
 add			
 adda		
 addi		
-addq		done, except for carry/overflow
+addq		done
 addx		
 and			done
 andi		done
@@ -36,7 +36,7 @@ bkpt		SOON
 bra			done
 bset		SOON
 bsr			done
-btst		SOON
+btst		done
 cas			
 cas2		
 chk			
@@ -47,7 +47,7 @@ cmpa
 cmpi		
 cmpm		
 cmp2		
-dbcc		SOON
+dbcc		done
 divs		
 divu		
 eor			done
