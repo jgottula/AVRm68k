@@ -10,6 +10,7 @@ void instrBcc(void);
 void instrBra(void);
 void instrBsr(void);
 void instrClr(void);
+void instrDbcc(void);
 void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest);
 void instrEoriOriAndi(bool or, bool exclusive);
 void instrExg(void);

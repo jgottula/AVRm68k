@@ -298,19 +298,20 @@ static void m68kDecode(void)
 	}
 	case 0b0101: // ADDQ, SUBQ, Scc, DBcc, TRAPcc
 	{
-		/* this is a badly written special case for scc, since it puts its
-		 * condition field right in the second nibble */
-		if ((instr[1] & 0b11000000) == 0b11000000)
+		if ((instr[1] & 0b11000000) == 0b11000000) // size
 		{
-			if (((instr[1] & 0b00111000) >> 3) != 0b001)
+			if (((instr[1] & 0b00111000) >> 3) != 0b001) // mode
 				instrScc();
 			else
-				assert(0); /* instruction with non-001 mode bits goes here */
+				instrDbcc();
 		}
-		/* another special case for addq, which has data in the second nibble */
-		else if ((instr[0] & 0b00000001) == 0b00000000 &&
-			(instr[1] & 0b11000000) != 0b11000000)
-			instrAddq();
+		else if ((instr[0] & 0b00000001) == 0b00000000)
+		{
+			if ((instr[1] & 0b11000000) != 0b11000000)
+				instrAddq();
+			else
+				assert(0);
+		}
 		else
 			assert(0);
 		break;

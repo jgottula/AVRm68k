@@ -240,6 +240,34 @@ void instrClr(void)
 	cpu.ureg.pc.l += eaLen;
 }
 
+void instrDbcc(void)
+{
+	uartWritePSTR("dbcc %dn,<ea>\n");
+	
+	bool cond = condTest(instr[0] & 0b00001111);
+	
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint16_t displacement = decodeBigEndian16(instr + 2);
+	
+	/* only decrement/branch if the condition is false */
+	if (!cond)
+	{
+		/* decrement; then branch if not equal to -1 */
+		if ((int16_t)--cpu.ureg.d[reg].w[0] != -1)
+		{
+			cpu.ureg.pc.l += signExtend16to32(displacement);
+			
+			/* return early to avoid pc advancement */
+			return;
+		}
+	}
+	
+	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += 2;
+}
+
 void instrEorOrAnd(bool or, bool exclusive, bool dataRegDest)
 {
 	/* exclusive and not data dest should not happen */
