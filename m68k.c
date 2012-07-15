@@ -73,7 +73,7 @@ static void m68kDecode(void)
 				if ((instr[1] & 0b11000000) != 0b11000000) // size
 				{
 					if ((instr[1] & 0b00111000) != 0b00001000) // mode
-						instrEoriOriAndi(true, false); // ori
+						instrAndiEoriOri(true, false); // ori
 					else
 						assert(0);
 				}
@@ -84,7 +84,7 @@ static void m68kDecode(void)
 				if ((instr[1] & 0b11000000) != 0b11000000) // size
 				{
 					if ((instr[1] & 0b00111000) != 0b00001000) // mode
-						instrEoriOriAndi(true, true); // eori
+						instrAndiEoriOri(true, true); // eori
 					else
 						assert(0);
 				}
@@ -95,7 +95,7 @@ static void m68kDecode(void)
 				if ((instr[1] & 0b11000000) != 0b11000000) // size
 				{
 					if ((instr[1] & 0b00111000) != 0b00001000) // mode
-						instrEoriOriAndi(false, false); // andi
+						instrAndiEoriOri(false, false); // andi
 					else
 						assert(0);
 				}
@@ -370,9 +370,9 @@ static void m68kDecode(void)
 			if ((instr[1] & 0b11000000) != 0b11000000) // size
 			{
 				if ((instr[0] & 0b00000001) == 0b00000000) // data reg dest
-					instrEorOrAnd(true, false, true); // or
+					instrAndEorOr(true, false, true); // or
 				else
-					instrEorOrAnd(true, false, false); // or
+					instrAndEorOr(true, false, false); // or
 			}
 			else
 				assert(0); /* instruction without size bits goes here */
@@ -396,7 +396,7 @@ static void m68kDecode(void)
 		if (((instr[1] & 0b00111000) >> 3) != 0b001) // mode
 		{
 			if ((instr[1] & 0b11000000) != 0b11000000) // size
-				instrEorOrAnd(true, true, false); // eor
+				instrAndEorOr(true, true, false); // eor
 			else
 				assert(0); /* instruction without size bits goes here */
 		}
@@ -432,9 +432,9 @@ static void m68kDecode(void)
 			if ((instr[1] & 0b11000000) != 0b11000000) // size
 			{
 				if ((instr[0] & 0b00000001) == 0b00000000) // data reg dest
-					instrEorOrAnd(false, false, true); // and
+					instrAndEorOr(false, false, true); // and
 				else
-					instrEorOrAnd(false, false, false); // and
+					instrAndEorOr(false, false, false); // and
 			}
 			else
 				assert(0); /* instruction without size bits goes here */
