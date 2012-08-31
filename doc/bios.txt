@@ -1,0 +1,11 @@
+Configurable BIOS
+
+- Implement entirely in firmware
+- Use serial UART text interface for POST and user configuration
+- Save to AVR EEPROM, or perhaps the SPI EEPROM
+- Expose user-configurable options
+  - Set DRAM size
+  - Enable/disable individual emulated devices
+  - Enable/disable icache (if implemented)
+  - View/set AVR fuses (non-useful or dangerous ones will be read-only)
+  - Change DMA/DRAM controller settings (via special IO mode probably)

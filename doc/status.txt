@@ -23,7 +23,7 @@ andi -> sr	PRIV
 asl/asr		
 bcc			done
 bchg		
-bclr		
+bclr		NEXT
 bfchg		
 bfclr		
 bfexts		

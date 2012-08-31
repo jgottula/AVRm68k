@@ -1,4 +1,4 @@
-DRAM specs
+Old DRAM specs
 
 Century SIMM from old 286 computer
 Has 9 x Toshiba TC511000AJ-80 DRAM chips

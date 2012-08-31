@@ -1,0 +1,25 @@
+Overclocking Possibilities
+
+For testing clock speeds at increased voltage, it may be useful to hook up a
+	bare AVR running checked math so that each voltage and clock combo can be
+	checked for feasibility
+
+Overvolting
+- Get power as 12V (or 7.4V) and use another LM317 to get >5V
+  - Or, use boost converter (more expensive/difficult)
+  - This needs to be VERY precise
+- Check that all TTL components (i.e. those not buffered with 4050) can
+  withstand the overvolt
+  - ATmega324A: abs max 6V, 5.5V reasonable
+  - SMART DRAM: abs max 5.5V (pins can input abs max 7V though)
+  - MAX232: abs max 6V, 5.5V reasonable
+  - FT232R: abs max 6V, 5.25V reasonable
+  - 74HC595 (TI): abs max 7V, 6V reasonable
+  - 4050 inputs: should be fine (good up to 20V)
+- Keep 3.3V devices at regular voltage
+- Check that 3.3V outputs from SPI devices will actually register above the Vih
+  threshold of the AVR (5.5-6V WILL be a problem)
+  - Check if 4050 with Vcc 5V will actually pull 3.3V up to 5V
+    - Alt: use bipolar discretes?
+- Will need to buffer the UART tx line to 5V using 4050 (if using FTDI chip)
+- It may be possible to use the ADC to track Vcc

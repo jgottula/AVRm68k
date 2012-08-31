@@ -1,0 +1,22 @@
+Emulated Hardware
+
+Ranked by approximate implementation priority
+
+Device			Emulated As		Interface	Ease	Usefulness
+SD card			HDD/SSD			SPI			Easy	Necessary to boot
+UART interfaces	Serial tty		RS-232		Easy	Necessary to use tty
+3-wire RTC DIP	/dev/rtc		SPI			Easy	Auto-set time every boot
+Char LCD +MCU	Serial tty?		SPI			Medium	Instantly viewable IO
+	NOTE: if done as a tty, then it's possible to redirect the terminal to it
+EEPROM DIP		FDD/HDD/SSD		SPI			Easy	Small extra storage (raw)
+8Mb SPI PCM		FDD/HDD/SSD		SPI			Medium	Extra storage (FS possible)
+SRAM DIP		FDD/HDD/SSD?	SPI			Easy	Questionable
+ACPI			ACPI			Firmware	Hard	Not much
+Gfx MCU	->LCD	GPU				SPI			Hard	Graphics! X server?
+USB				USB port(s)		?			Hard	Keyboard/mouse, wifi, etc.
+	NOTE: could do passthru to a computer, or use host chip
+Ethernet		?				?			Hard	Network functionality
+	NOTE: might be able to hack a tunnel together just within Linux
+
+Some devices are potentially doable in software on Linux, or on top of other
+	emulated hardware (e.g. wifi using usb adapter)

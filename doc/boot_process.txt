@@ -1,0 +1,15 @@
+Boot Process
+
+- AVR and emulator initialization
+- BIOS/POST
+  - Enter configuration mode (if appropriate) via UART
+  - Save any changes to EEPROM
+  - Load BIOS settings from EEPROM (if not already loaded)
+  - Start and verify devices based on BIOS settings
+    - Most important: SD card, DRAM, UART
+  - Jump to bootloader
+- Bootloader (if implemented in firmware)
+  - Set CPU settings
+  - Load kernel image and initrd
+  - Jump in
+  - [See /arch/m68k/kernel/head.S for some info on this]

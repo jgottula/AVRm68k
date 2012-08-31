@@ -1,0 +1,8 @@
+Bootloader
+
+- Firmware approach: do it directly from the AVR
+  - Load kernel image, initrd; then jump in
+  - Will need to implement basic FS support or store kernel raw somewhere
+- Software approach: jump to the HDD MBR just like a real computer
+  - Needs to expose the hard drive device to the bootloader
+  - We can try syslinux, grub, grub2 (no no no), lilo?

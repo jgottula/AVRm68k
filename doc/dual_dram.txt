@@ -1,0 +1,26 @@
+Dual DRAM Support
+
+- Adding another SIMM may not be so bad, and it provides some nice gains
+- Non-shared pins (need for each SIMM):
+  - /RAS
+  - /CAS
+- Shared pins (not duplicated between SIMMs):
+  - /WE
+  - Addr bus
+  - Data bus (make sure this is hi-z when not in use by each SIMM)
+- Advantages:
+  - Greatly increased RAM capacity
+  - Simultaneous refresh is possible!
+  - Very few additional IO pins are needed
+  - Additional time used for second DIMM might fill what would have been NOPs
+- Disadvantages:
+  - Probably means that a DRAM controller MCU is necessary
+  - Won't make memory access any faster (already limited by AVR freq)
+  - Needs more board space
+    - When breadboarding, it won't be so bad: use two breadboards, and on one,
+      place the SIMMs on each side and mostly bridge connections between them;
+      the other breadboard can hold most of the other logic
+    - Shouldn't be too bad on perfboard
+- Having more than 16 MiB total RAM will require an extra address bit
+  - This means modifying the DRAM access code, as well as making sure that all
+    parts of the firmware won't explode if using 25 bits

@@ -1,0 +1,15 @@
+Board assembly considerations
+
+- Breadboard:
+  - 
+- Perfboard:
+  - Try to actually use decoupling capacitors
+  - Use female pin headers as SIMM sockets
+  - Use IC sockets for ALL chips so they will be replaceable
+  - Plan for as many status LEDs as possible
+  - Leave room and plan ahead for future additions
+    - LCD
+    - Battery
+    - Other chips
+    - Add-on boards
+    - Second SIMM (see dual_dram.txt)
