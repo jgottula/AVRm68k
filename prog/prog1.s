@@ -11,6 +11,17 @@
 		.long 0x00000000
 		.word 0x0400
 	
+	move %usp,%a0
+	.word EMU_DUMPREG
+	move %a0,%usp
+	.word EMU_DUMPREG
+	
+	/* whaaaat? */
+	move %usp,%a7
+	.word EMU_DUMPREG
+	move %a7,%usp
+	.word EMU_DUMPREG
+	
 	move.l #0x10000000,%d0
 	move.l #0x00001000,%d1
 	move.l #0x00000010,%d2
