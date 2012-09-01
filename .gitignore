@@ -1,8 +1,6 @@
-out/
-*.out
-*.hex
-*.bin
-*.lst
-*.dump
-*.olp
-*.sch
+out/*/*.bin
+out/*/*.dump
+out/*/*.hex
+out/*/*.lst
+out/*/*.o
+out/*/*.out
