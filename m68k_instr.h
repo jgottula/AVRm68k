@@ -26,6 +26,7 @@ void instrMovem(bool regToMem);
 void instrMoveq(void);
 void instrMoveToCcr(void);
 void instrMoveToSr(void);
+void instrMoveUsp(bool toUSP);
 void instrNeg(bool extend);
 void instrNop(void);
 void instrNot(void);

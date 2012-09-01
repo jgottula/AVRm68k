@@ -910,6 +910,27 @@ void instrMoveToSr(void)
 	cpu.ureg.pc.l += eaLen;
 }
 
+void instrMoveUsp(bool toUSP)
+{
+	if (toUSP)
+		uartWritePSTR("move %an,%usp\n");
+	else
+		uartWritePSTR("move %usp,%an\n");
+	
+	/* privileged instruction */
+	assert(cpu.sreg.sr.w & SR_USERSTATE);
+	
+	uint8_t reg = instr[1] & 0b111;
+	
+	/* move the user stack pointer to/from the address reg */
+	if (toUSP)
+		cpu.ureg.a[7] = cpu.ureg.a[reg];
+	else
+		cpu.ureg.a[reg] = cpu.ureg.a[7];
+	
+	/* does not affect condition codes */
+}
+
 void instrNeg(bool extend)
 {
 	if (extend)
