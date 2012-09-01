@@ -246,8 +246,17 @@ static void m68kDecode(void)
 						assert(0);
 					}
 				}
-				else
-					assert(0); /* instruction with 00 size bits goes here */
+				else // size
+				{
+					switch ((instr[1] & 0b00111000) >> 3) // mode
+					{
+					case 0b001:
+						instrLink(SIZE_LONG);
+						break;
+					default:
+						assert(0);
+					}
+				}
 				break;
 			}
 			case 0b1010:
@@ -308,6 +317,9 @@ static void m68kDecode(void)
 					{
 						switch ((instr[1] & 0b00111000) >> 3) // mode
 						{
+						case 0b010:
+							instrLink(SIZE_WORD);
+							break;
 						case 0b100:
 							instrMoveUsp(true); // an to usp
 							break;
