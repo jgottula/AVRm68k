@@ -489,7 +489,19 @@ static void m68kDecode(void)
 	}
 	case 0b1110: // shift, rotate, bitfield
 	{
-		assert(0);
+		switch ((instr[1] & 0b00111000) >> 3) // mode
+		{
+		case 0b000:
+			instrAslAsrReg(false,
+				((instr[1] & 0b00100000) != 0b00100000)); // right shift
+			break;
+		case 0b100:
+			instrAslAsrReg(true,
+				((instr[1] & 0b00100000) != 0b00100000)); // left shift
+			break;
+		default:
+			assert(0);
+		}
 		break;
 	}
 	case 0b1111: // coprocessor interface, CPU32 extensions
