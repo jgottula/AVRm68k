@@ -622,6 +622,43 @@ void instrLea(void)
 	cpu.ureg.pc.l += eaLen;
 }
 
+void instrLink(uint8_t size)
+{
+	uartWritePSTR("link %an,#<displacement>\n");
+	
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint32_t displacement;
+	uint8_t dispLen;
+	
+	switch (size)
+	{
+	case SIZE_WORD:
+		displacement = signExtend16to32(decodeBigEndian16(instr + 2));
+		dispLen = 2;
+		break;
+	case SIZE_LONG:
+		displacement = decodeBigEndian32(instr + 2);
+		dispLen = 4;
+		break;
+	default:
+		assert(0);
+	}
+	
+	/* push the specified address register onto the stack */
+	pushLong(cpu.ureg.a[reg].l);
+	
+	/* load the updated stack pointer into the address register */
+	cpu.ureg.a[reg].l = cpu.ureg.a[7].l;
+	
+	/* add the displacement value to the stack pointer */
+	cpu.ureg.a[7].l += displacement;
+	
+	/* does not affect condition codes */
+	
+	cpu.ureg.pc.l += dispLen;
+}
+
 void instrMove(void)
 {
 	uartWritePSTR("move <ea>,<ea>\n");

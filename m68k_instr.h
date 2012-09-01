@@ -19,6 +19,7 @@ void instrExt(void);
 void instrJmp(void);
 void instrJsr(void);
 void instrLea(void);
+void instrLink(uint8_t size);
 void instrMove(void);
 void instrMoveFromCcr(void);
 void instrMoveFromSr(void);
