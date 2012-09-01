@@ -7,7 +7,7 @@
  * - uint8_t   shifts  [r20]
  *             (must be >0)
  * - uint8_t  *flags   [r19:r18]
- *             (bit 0 is last bit shifted out)
+ *             (bits 1 and 5 are last bit shifted out)
  * returns:
  * - uint32_t result  [r25:r22]
  */
@@ -24,9 +24,10 @@ shiftRightArithLong_Loop:
 	dec r20
 	brne shiftRightArithLong_Loop
 	
-	/* set flags bit 0 if last bit shifted was a one */
+	/* set flags bits 1 and 5 if last bit shifted was a one */
 	brcc shiftRightArithLong_NoCarry
-	sbr r21,0x01
+	sbr r21,0b10
+	sbr r21,0b100000
 	
 shiftRightArithLong_NoCarry:
 	/* load the flags pointer into Z and store the flags value */
@@ -43,8 +44,8 @@ shiftRightArithLong_NoCarry:
  * - uint8_t   shifts  [r20]
  *             (must be >0)
  * - uint8_t  *flags   [r19:r18]
- *             (bit 0 is last bit shifted out,
- *              bit 1 indicates if msb changed at any time)
+ *             (bits 1 and 5 are last bit shifted out,
+ *              bit 2 indicates if msb changed at any time)
  * returns:
  * - uint32_t result  [r25:r22]
  */
@@ -58,17 +59,18 @@ shiftLeftArithLong_Loop:
 	rol r24
 	rol r25
 	
-	/* set flags bit 1 if msb changed during this shift */
+	/* set flags bit 2 if msb changed during this shift */
 	brvc shiftLeftArithLong_NoMSB
-	sbr r21,0x02
+	sbr r21,0b100
 	
 shiftLeftArithLong_NoMSB:
 	dec r20
 	brne shiftLeftArithLong_Loop
 	
-	/* set flags bit 0 if last bit shifted was a one */
+	/* set flags bits 1 and 5 if last bit shifted was a one */
 	brcc shiftLeftArithLong_NoCarry
-	sbr r21,0x01
+	sbr r21,0b10
+	sbr r21,0b100000
 	
 shiftLeftArithLong_NoCarry:
 	/* load the flags pointer into Z and store the flags value */
