@@ -36,5 +36,6 @@ void instrRts(void);
 void instrScc(void);
 void instrSwap(void);
 void instrTst(void);
+void instrUnlk(void);
 
 #endif
