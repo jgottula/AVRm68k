@@ -1209,3 +1209,18 @@ void instrTst(void)
 	
 	cpu.ureg.pc.l += eaLen;
 }
+
+void instrUnlk(void)
+{
+	uartWritePSTR("unlk %an\n");
+	
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	/* load the stack pointer from the specified address register */
+	cpu.ureg.a[7].l = cpu.ureg.a[reg].l;
+	
+	/* pop the value on the top of the stack into the address register */
+	cpu.ureg.a[reg].l = popLong();
+	
+	/* does not affect condition codes */
+}
