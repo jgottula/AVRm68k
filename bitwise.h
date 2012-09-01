@@ -14,5 +14,6 @@ uint32_t signExtend16to32(uint16_t word);
 
 /* assembly */
 uint32_t shiftRightArithLong(uint32_t operand, uint8_t shifts, uint8_t *flags);
+uint32_t shiftLeftArithLong(uint32_t operand, uint8_t shifts, uint8_t *flags);
 
 #endif
