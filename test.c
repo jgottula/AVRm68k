@@ -9,21 +9,21 @@
 #include "intr.h"
 #include "m68k.h"
 #include "m68k_mem.h"
-#include "shift.h"
+#include "sreg.h"
 #include "sram.h"
 #include "uart.h"
 
 uint8_t global;
 
-static void benchmarkShift(void)
+static void benchmarkShiftReg(void)
 {
-	uint8_t shiftBefore = shift;
+	uint8_t sregBefore = sregState;
 	uint16_t before = msec;
 	for (uint16_t i = 0; i < 1024; ++i)
-		shiftSet(shift ^ SHIFT_ADDRH_ALL);
+		sregSet(sregState ^ SREG_ADDRH_ALL);
 	uint16_t after = msec;
-	shift = shiftBefore;
-	uartWritePSTR("shift duration: (x1024) ");
+	sregState = sregBefore;
+	uartWritePSTR("shift reg duration: (x1024) ");
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 }
@@ -355,7 +355,7 @@ void testAll(void)
 	
 	testSRAM();
 	testDRAM();
-	benchmarkShift();
+	benchmarkShiftReg();
 	benchmarkEEPROM();
 	benchmarkSRAM();
 	benchmarkDRAM();

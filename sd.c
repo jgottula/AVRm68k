@@ -4,7 +4,7 @@
 #include "debug.h"
 #include "intr.h"
 #include "io.h"
-#include "shift.h"
+#include "sreg.h"
 #include "spi.h"
 
 static struct {
@@ -49,7 +49,7 @@ static bool sdCmd4(uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2,
 {
 	uint8_t cmdByte = 0b01000000 | (cmd & 0b00111111), r1Byte;
 	
-	spiBegin(SHIFT_SS_SD, SPIMODE_SD, SPIENDIAN_SD, sdCtx.spiDiv);
+	spiBegin(SREG_SS_SD, SPIMODE_SD, SPIENDIAN_SD, sdCtx.spiDiv);
 	
 	/* command byte */
 	spiByte(cmdByte);

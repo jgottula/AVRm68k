@@ -1,6 +1,6 @@
 #include "sram.h"
 #include "io.h"
-#include "shift.h"
+#include "sreg.h"
 #include "spi.h"
 
 static uint8_t currentSR = SRAM_SR_MODE_BYTE;
@@ -20,7 +20,7 @@ static void setMode(uint8_t mode)
 		
 		/* start another instruction sequence */
 		spiEnd();
-		spiBeginQuick(SHIFT_SS_SRAM);
+		spiBeginQuick(SREG_SS_SRAM);
 	}
 }
 
@@ -29,7 +29,7 @@ uint8_t sramReadByte(uint16_t addr)
 	uint8_t byte;
 	
 	/* start an instruction sequence */
-	spiBegin(SHIFT_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
+	spiBegin(SREG_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
 	
 	/* set to byte mode (if necessary) */
 	setMode(SRAM_SR_MODE_BYTE);
@@ -52,7 +52,7 @@ uint8_t sramReadByte(uint16_t addr)
 void sramWriteByte(uint16_t addr, uint8_t byte)
 {
 	/* start an instruction sequence */
-	spiBegin(SHIFT_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
+	spiBegin(SREG_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
 	
 	/* set to byte mode (if necessary) */
 	setMode(SRAM_SR_MODE_BYTE);
@@ -73,7 +73,7 @@ void sramWriteByte(uint16_t addr, uint8_t byte)
 void sramReadSeq(uint16_t addr, uint16_t len, uint8_t *dest)
 {
 	/* start an instruction sequence */
-	spiBegin(SHIFT_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
+	spiBegin(SREG_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
 	
 	/* set to sequential mode (if necessary) */
 	setMode(SRAM_SR_MODE_SEQ);
@@ -96,7 +96,7 @@ void sramReadSeq(uint16_t addr, uint16_t len, uint8_t *dest)
 void sramWriteSeq(uint16_t addr, uint16_t len, const uint8_t *src)
 {
 	/* start an instruction sequence */
-	spiBegin(SHIFT_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
+	spiBegin(SREG_SS_SRAM, SPIMODE_SRAM, SPIENDIAN_SRAM, SPIDIV_SRAM);
 	
 	/* set to sequential mode (if necessary) */
 	setMode(SRAM_SR_MODE_SEQ);

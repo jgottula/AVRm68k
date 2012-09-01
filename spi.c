@@ -3,21 +3,21 @@
 #include <util/delay.h>
 #include "debug.h"
 #include "io.h"
-#include "shift.h"
+#include "sreg.h"
 
 static void spiSelect(uint8_t slave)
 {
 	/* ensure valid input */
-	assert((slave & ~SHIFT_SS_ALL) == 0);
+	assert((slave & ~SREG_SS_ALL) == 0);
 	
 	/* set only the given slave select pin low */
-	shiftSet((shift | SHIFT_SS_ALL) & ~slave);
+	sregSet((sregState | SREG_SS_ALL) & ~slave);
 }
 
 static void spiUnselect(void)
 {
 	/* set all slave select pins high */
-	shiftSet(shift | SHIFT_SS_ALL);
+	sregSet(sregState | SREG_SS_ALL);
 }
 
 static void spiSetMode(uint8_t mode, uint8_t endian, uint8_t divider)
