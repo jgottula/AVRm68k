@@ -40,8 +40,7 @@ clean:
 
 
 asm: $(SOURCES) $(HEADERS) Makefile
-	cd out/asm; for i in $(SOURCES); do avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -O0 -c -g -w -Wa,-adhln ../../$$i >`basename -s .c $$i`_0.lst; \
-		avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -c -g -w -Wa,-adhln ../../$$i >`basename -s .c $$i`.lst; done
+	cd out/asm; for i in $(SOURCES); do avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -O0 -c -g -w -Wa,-adhln ../../$$i >`basename -s .c $$i`_0.lst; avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -c -g -w -Wa,-adhln ../../$$i >`basename -s .c $$i`.lst; done
 
 
 $(OUT): $(SOURCES) $(HEADERS) Makefile
