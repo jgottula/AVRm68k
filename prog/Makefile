@@ -1,11 +1,14 @@
 PROJNAME:=prog
+
 CFLAGS:=-O0 -Wa,-mcpu=68030,-mno-68851,-mno-68881,-mno-68882,-mno-float
 ASFLAGS:=-mcpu=68030 -mno-68851 -mno-68881 -mno-68882 -mno-float
 OBJCOPYFLAGS:=-R .flash
 AVRDUDEFLAGS:=-c usbasp -p m1284p -B 460800
+
 C_SOURCES:=$(wildcard *.c)
 C_HEADERS:=$(wildcard *.h)
 AS_SOURCES:=$(wildcard *.s)
+
 GLOBAL_OUT:=../out/$(PROJNAME)
 PROG1_OUT:=$(GLOBAL_OUT)/prog1.out
 PROG1_HEX:=$(GLOBAL_OUT)/prog1.hex
