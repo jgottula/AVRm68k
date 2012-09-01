@@ -304,6 +304,20 @@ static void m68kDecode(void)
 							assert(0);
 						}
 					}
+					else if ((instr[1] & 0b11000000) == 0b01000000) // size
+					{
+						switch ((instr[1] & 0b00111000) >> 3) // mode
+						{
+						case 0b100:
+							instrMoveUsp(true); // an to usp
+							break;
+						case 0b101:
+							instrMoveUsp(false); // usp to an
+							break;
+						default:
+							assert(0);
+						}
+					}
 					else if ((instr[1] & 0b11000000) == 0b10000000) // size
 					{
 						switch ((instr[1] & 0b00111000) >> 3) // mode
@@ -319,7 +333,7 @@ static void m68kDecode(void)
 						}
 					}
 					else
-						assert(0); /* instr with 00/01 size bits goes here */
+						assert(0); /* instr with 00 size bits goes here */
 				}
 				break;
 			}
