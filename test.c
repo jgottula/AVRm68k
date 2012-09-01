@@ -3,6 +3,7 @@
 #include <avr/eeprom.h>
 #include <util/atomic.h>
 #include <util/delay.h>
+#include "bitwise.h"
 #include "debug.h"
 #include "dram.h"
 #include "io.h"
@@ -349,10 +350,65 @@ static void benchmarkRefresh(void)
 	enableDRAMRefresh = true;
 }
 
+static void testASL(uint32_t operand, uint8_t shifts)
+{
+	uint32_t result;
+	uint8_t flags;
+	
+	result = shiftLeftArithLong(operand, shifts, &flags);
+	
+	uartWritePSTR("left (0x");
+	uartWriteHex8(shifts, false);
+	uartWritePSTR("): ");
+	uartWriteHex32(operand, false);
+	uartWriteChr(' ');
+	uartWriteHex32(result, false);
+	uartWriteChr(' ');
+	if (flags & 0x01) uartWriteChr('C');
+	if (flags & 0x02) uartWriteChr('V');
+	uartWriteChr('\n');
+}
+
+static void testASR(uint32_t operand, uint8_t shifts)
+{
+	uint32_t result;
+	uint8_t flags;
+	
+	result = shiftRightArithLong(operand, shifts, &flags);
+	
+	uartWritePSTR("right(0x");
+	uartWriteHex8(shifts, false);
+	uartWritePSTR("): ");
+	uartWriteHex32(operand, false);
+	uartWriteChr(' ');
+	uartWriteHex32(result, false);
+	uartWriteChr(' ');
+	if (flags & 0x01) uartWriteChr('C');
+	if (flags & 0x02) uartWriteChr('V');
+	uartWriteChr('\n');
+}
+
+static void testArithShifts(void)
+{
+	uartWrite("arithmetic shift routines:\n");
+	
+	testASL(0x89abcdef, 16);
+	testASL(0xaaaaaaaa, 1);
+	testASL(0xaaaaaaaa, 2);
+	testASL(0x55555555, 1);
+	testASL(0x55555555, 2);
+	testASR(0x89abcdef, 16);
+	testASR(0xaaaaaaaa, 1);
+	testASR(0xaaaaaaaa, 2);
+	testASR(0x55555555, 1);
+	testASR(0x55555555, 2);
+}
+
 void testAll(void)
 {
 	uartWritePSTR("-------- Unit Tests --------\n");
 	
+	testArithShifts();
 	testSRAM();
 	testDRAM();
 	benchmarkShiftReg();
@@ -362,4 +418,6 @@ void testAll(void)
 	benchmarkRefresh();
 	
 	uartWritePSTR("------ Tests Complete ------\n");
+	
+	die();
 }
