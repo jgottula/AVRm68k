@@ -2,9 +2,10 @@ Priorities:
 - Implement dram read-modify-write (for incrementing memory locations, etc)
 - Emulator: MMU!
 - Emulator: memory system
-  - Use fpm for words and longs
-  - Use rmw for increments, etc. (requires not doing the initial read in the
-    instruction)
+  - Add function for long reads/writes
+  - Implement read/modify/write cycle
+    - Probably implement int8_t addition for the modify step
+    - Will need FPM + RMW for word/long incr/decr
 - Emulator: instructions
 - Emulator: emu instructions
   - dumpstack
@@ -14,6 +15,7 @@ Priorities:
 - Bootloader
 - HDD driver
 - RTC chip for date/time
+- Interactive debugging mode (for fixing emulator bugs)
 - Colored output (use 033, followed by "[<attr>;<attr>;<attr...>m")
 - Replace assert(0)'s with actual errors
   - Use illegal instruction traps for unimplemented instruction opcodes
