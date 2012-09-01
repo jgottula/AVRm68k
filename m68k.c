@@ -320,6 +320,9 @@ static void m68kDecode(void)
 						case 0b010:
 							instrLink(SIZE_WORD);
 							break;
+						case 0b011:
+							instrUnlk();
+							break;
 						case 0b100:
 							instrMoveUsp(true); // an to usp
 							break;
