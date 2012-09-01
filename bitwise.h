@@ -21,19 +21,28 @@ uint32_t signExtend16to32(uint16_t word);
 _Static_assert(((int8_t)0x80 >> 1) == (int8_t)0xc0,
 	"compiler discards MSB on signed right shifts!");
 
-inline uint8_t shiftRightArithByte(uint8_t operand, uint8_t shifts)
+inline uint8_t shiftRightArithByte(uint8_t *operand, uint8_t shifts)
 {
-	return (uint8_t)((int8_t)operand >> shifts);
+	int8_t signedOp = (int8_t)(*operand);
+	uint8_t shifted = (uint8_t)(signedOp >> shifts);
+	
+	return (*operand = shifted);
 }
 
-inline uint16_t shiftRightArithWord(uint16_t operand, uint8_t shifts)
+inline uint16_t shiftRightArithWord(uint16_t *operand, uint8_t shifts)
 {
-	return (uint16_t)((int16_t)operand >> shifts);
+	int16_t signedOp = (int16_t)(*operand);
+	uint16_t shifted = (uint16_t)(signedOp >> shifts);
+	
+	return (*operand = shifted);
 }
 
-inline uint32_t shiftRightArithLong(uint32_t operand, uint8_t shifts)
+inline uint32_t shiftRightArithLong(uint32_t *operand, uint8_t shifts)
 {
-	return (uint32_t)((int32_t)operand >> shifts);
+	int32_t signedOp = (int32_t)(*operand);
+	uint32_t shifted = (uint32_t)(signedOp >> shifts);
+	
+	return (*operand = shifted);
 }
 
 inline uint8_t getStatusReg(void)
