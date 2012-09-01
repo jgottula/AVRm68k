@@ -39,8 +39,12 @@ clean:
 
 
 asm: $(SOURCES) $(HEADERS) Makefile
-	cd out/asm && find ../.. -maxdepth 1 -type f -iname '*.c' -print0 | \
-		xargs -0 avr-gcc $(CFLAGS) $(INCLUDE) $(LINK) -S
+	cd out/asm; for i in $(SOURCES); do \
+		avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -O0 -c -g -Wno-cpp \
+			-Wa,-adhln ../../$$i >`basename -s .c $$i`_0.lst; \
+		avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -c -g \
+			-Wa,-adhln ../../$$i >`basename -s .c $$i`.lst; \
+	done
 
 
 $(OUT): $(SOURCES) $(HEADERS) Makefile
