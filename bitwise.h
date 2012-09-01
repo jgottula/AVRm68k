@@ -12,6 +12,20 @@ uint16_t signExtend8to16(uint8_t byte);
 uint32_t signExtend8to32(uint8_t byte);
 uint32_t signExtend16to32(uint16_t word);
 
+inline uint32_t shiftRightArithLong(uint32_t operand, uint8_t shifts)
+{
+	/* hack: the C spec says that the compiler gets to decide whether right
+	 * shifts on signed integers are arithmetic or logical shifts; we rely on
+	 * the former behavior here, so we check for it
+	 * 
+	 * potential alternate approaches include writing the routine in assembly,
+	 * or doing it horrendously slowly in software */
+	_Static_assert(((int8_t)0x80 >> 1) == (int8_t)0xc0,
+		"compiler discards MSB on signed right shifts!");
+	
+	return (uint32_t)((int32_t)operand >> shifts);
+}
+
 inline uint8_t getStatusReg(void)
 {
 #warning "getStatusReg is horrible and needs to die"
