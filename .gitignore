@@ -1,3 +1,4 @@
+linux/*.dump
 out/*/*.bin
 out/*/*.dump
 out/*/*.hex
