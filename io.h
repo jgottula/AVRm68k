@@ -41,7 +41,8 @@ enum PortB {
 	DRAM_RAS    = _BV(PB2),
 	DRAM_ALL    = DRAM_CAS | DRAM_WE | DRAM_RAS,
 	
-	/* PB3 is open */
+	RTC_IO      = _BV(PB3),
+	RTC_ALL     = _BV(PB3),
 	
 	SPI_SS_NULL = _BV(PB4),
 	SPI_MOSI    = _BV(PB5),
