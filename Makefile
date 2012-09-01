@@ -7,10 +7,13 @@ AVRDUDE_BAUD:=460800
 CFLAGS:=-mmcu=$(MCU) -std=gnu11 -Wall -Wextra -Wno-unused-function -O2 -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG -DF_CPU=$(CPU_KHZ)000UL
 OBJCOPYFLAGS:=-R .eeprom
 AVRDUDEFLAGS:=-c usbasp -p $(AVRDUDE_MCU) -B $(AVRDUDE_BAUD)
-SOURCES:=$(wildcard *.c)
-HEADERS:=$(wildcard *.h)
+
 INCLUDE:=
 LINK:=
+
+SOURCES:=$(wildcard *.c)
+HEADERS:=$(wildcard *.h)
+
 GLOBAL_OUT:=out/$(PROJNAME)
 OUT:=$(GLOBAL_OUT)/$(PROJNAME).out
 HEX:=$(GLOBAL_OUT)/$(PROJNAME).hex
