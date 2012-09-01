@@ -4,9 +4,7 @@ CPU_KHZ:=20000
 AVRDUDE_MCU:=m1284p
 AVRDUDE_BAUD:=460800
 
-CFLAGS:=-mmcu=$(MCU) -std=gnu11 -Wall -Wextra -Wno-unused-function -O2 -flto \
-	-ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG \
-	-DF_CPU=$(CPU_KHZ)000UL
+CFLAGS:=-mmcu=$(MCU) -std=gnu11 -Wall -Wextra -Wno-unused-function -O2 -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG -DF_CPU=$(CPU_KHZ)000UL
 OBJCOPYFLAGS:=-R .eeprom
 AVRDUDEFLAGS:=-c usbasp -p $(AVRDUDE_MCU) -B $(AVRDUDE_BAUD)
 SOURCES:=$(wildcard *.c)
@@ -39,12 +37,8 @@ clean:
 
 
 asm: $(SOURCES) $(HEADERS) Makefile
-	cd out/asm; for i in $(SOURCES); do \
-		avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -O0 -c -g -w \
-			-Wa,-adhln ../../$$i >`basename -s .c $$i`_0.lst; \
-		avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -c -g -w \
-			-Wa,-adhln ../../$$i >`basename -s .c $$i`.lst; \
-	done
+	cd out/asm; for i in $(SOURCES); do avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -O0 -c -g -w -Wa,-adhln ../../$$i >`basename -s .c $$i`_0.lst; \
+		avr-gcc $(CFLAGS) $(INCLUDE) -o /dev/null -c -g -w -Wa,-adhln ../../$$i >`basename -s .c $$i`.lst; done
 
 
 $(OUT): $(SOURCES) $(HEADERS) Makefile
