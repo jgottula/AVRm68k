@@ -364,8 +364,8 @@ static void testASL(uint32_t operand, uint8_t shifts)
 	uartWriteChr(' ');
 	uartWriteHex32(result, false);
 	uartWriteChr(' ');
-	if (flags & 0x01) uartWriteChr('C');
-	if (flags & 0x02) uartWriteChr('V');
+	if (flags & SR_CARRY) uartWriteChr('C');
+	if (flags & SR_OVERFLOW) uartWriteChr('V');
 	uartWriteChr('\n');
 }
 
@@ -383,14 +383,14 @@ static void testASR(uint32_t operand, uint8_t shifts)
 	uartWriteChr(' ');
 	uartWriteHex32(result, false);
 	uartWriteChr(' ');
-	if (flags & 0x01) uartWriteChr('C');
-	if (flags & 0x02) uartWriteChr('V');
+	if (flags & SR_CARRY) uartWriteChr('C');
+	if (flags & SR_OVERFLOW) uartWriteChr('V');
 	uartWriteChr('\n');
 }
 
 static void testArithShifts(void)
 {
-	uartWrite("arithmetic shift routines:\n");
+	uartWritePSTR("arithmetic shift routines:\n");
 	
 	testASL(0x89abcdef, 16);
 	testASL(0xaaaaaaaa, 1);
