@@ -15,6 +15,8 @@ Priorities:
 - HDD driver
 - RTC chip for date/time
 - Colored output (use 033, followed by "[<attr>;<attr>;<attr...>m")
+- Replace assert(0)'s with actual errors
+  - Use illegal instruction traps for unimplemented instruction opcodes
 
 Tests:
 - Address modes:
