@@ -315,6 +315,103 @@ void instrAndiEoriOri(bool or, bool exclusive)
 	cpu.ureg.pc.l += eaLen + (eaOffset - 2);
 }
 
+void instrAslAsrMem(bool left)
+{
+	assert(0);
+}
+
+void instrAslAsrReg(bool left, bool immediate)
+{
+	if (left)
+		uartWritePSTR("asl ");
+	else
+		uartWritePSTR("asr ");
+	if (immediate)
+		uartWritePSTR("#<data>,%dy\n");
+	else
+		uartWritePSTR("%dx,%dy\n");
+	
+	uint8_t count = (instr[0] & 0b00001110) >> 1;
+	uint8_t size = instr[1] >> 6;
+	uint8_t reg = instr[1] & 0b00000111;
+	
+	uint8_t shifts;
+	
+	/* the number of shifts to perform may be immediate or from a register */
+	if (immediate)
+		shifts = count;
+	else
+		shifts = cpu.ureg.d[count].b[0] % 64;
+	
+	uint32_t operand, result, msbMask;
+	
+	/* load the data register to be shifted; also note which bit is the msb */
+	switch (size)
+	{
+	case SIZE_BYTE:
+		operand = signExtend8to32(cpu.ureg.d[reg].b[0]);
+		msbMask = 0x80;
+		break;
+	case SIZE_WORD:
+		operand = signExtend16to32(cpu.ureg.d[reg].w[0]);
+		msbMask = 0x8000;
+		break;
+	case SIZE_LONG:
+		operand = cpu.ureg.d[reg].l;
+		msbMask = 0x80000000;
+		break;
+	default:
+		assert(0);
+	}
+	
+	if (shifts == 0)
+	{
+		/* update condition codes for no-shift operation */
+		cpu.sreg.sr.b[0] &= ~(SR_OVERFLOW | SR_CARRY);
+		
+		result = operand;
+	}
+	else
+	{
+		uint8_t flags;
+		
+		if (left)
+			result = shiftLeftArithLong(operand, shifts, &flags);
+		else
+			result = shiftRightArithLong(operand, shifts, &flags);
+		
+		/* store the result back to the data register */
+		switch (size)
+		{
+		case SIZE_BYTE:
+			cpu.ureg.d[reg].b[0] = result;
+			break;
+		case SIZE_WORD:
+			cpu.ureg.d[reg].w[0] = result;
+			break;
+		case SIZE_LONG:
+			cpu.ureg.d[reg].l = result;
+			break;
+		default:
+			assert(0);
+		}
+		
+		/* update condition codes for operation with shifts > 0 */
+		cpu.sreg.sr.b[0] &= ~(SR_CARRY | SR_OVERFLOW | SR_EXTEND);
+		cpu.sreg.sr.b[0] |= flags;
+	}
+	
+	/* update condition codes for all operations */
+	if (result == 0)
+		cpu.sreg.sr.b[0] |= SR_ZERO;
+	else
+		cpu.sreg.sr.b[0] &= ~SR_ZERO;
+	if ((result & msbMask) == msbMask)
+		cpu.sreg.sr.b[0] |= SR_NEGATIVE;
+	else
+		cpu.sreg.sr.b[0] &= ~SR_NEGATIVE;
+}
+
 void instrBcc(void)
 {
 	uartWritePSTR("bcc <ea>\n");

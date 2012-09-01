@@ -8,6 +8,8 @@ void instrEmu(void);
 void instrAddq(void);
 void instrAndEorOr(bool or, bool exclusive, bool dataRegDest);
 void instrAndiEoriOri(bool or, bool exclusive);
+void instrAslAsrMem(bool left);
+void instrAslAsrReg(bool left, bool immediate);
 void instrBcc(void);
 void instrBra(void);
 void instrBsetBtst(bool set, bool immediate);
