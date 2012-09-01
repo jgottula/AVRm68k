@@ -120,7 +120,11 @@ void instrAddq(void)
 	
 	/* perform the add operation and immediately save the flags */
 	operand += data;
-	uint8_t sr = getStatusReg();
+	//uint8_t sr = getStatusReg();
+	uartWritePSTR("this used to use getStatusReg! "
+		"the emulator will now crash instead.\n");
+	assert(0);
+#if 0
 	
 	/* write back the sum */
 	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
@@ -142,6 +146,7 @@ void instrAddq(void)
 	}
 	
 	cpu.ureg.pc.l += eaLen;
+#endif
 }
 
 void instrAndEorOr(bool or, bool exclusive, bool dataRegDest)
@@ -1005,7 +1010,11 @@ void instrNeg(bool extend)
 		++operand;
 	
 	operand = -operand;
-	uint8_t sr = getStatusReg();
+	//uint8_t sr = getStatusReg();
+	uartWritePSTR("this used to use getStatusReg! "
+		"the emulator will now crash instead.\n");
+	assert(0);
+#if 0
 	
 	/* write the operand back */
 	accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
@@ -1050,6 +1059,7 @@ void instrNeg(bool extend)
 	}
 	
 	cpu.ureg.pc.l += eaLen;
+#endif
 }
 
 void instrNop(void)
