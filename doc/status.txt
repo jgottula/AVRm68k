@@ -7,6 +7,9 @@ features (see MC68030UM.pdf)
 - fpu (only if necessary)
 
 
+NOTE! for instructions labeled 'skip', add an illegal instruction exception,
+	instead of crashing the emulator
+
 instructions
 
 instr		status
@@ -20,7 +23,7 @@ and			done
 andi		done
 andi -> ccr	
 andi -> sr	PRIV
-asl/asr		
+asl/asr		PART,TEST
 bcc			done
 bchg		
 bclr		NEXT
@@ -32,7 +35,7 @@ bfffo
 bfins		
 bfset		
 bstst		
-bkpt		SKIP
+bkpt		
 bra			done
 bset		done
 bsr			done
@@ -56,11 +59,11 @@ eori -> ccr
 eori -> sr	PRIV
 exg			done
 ext			done
-illegal		SOON
+illegal		
 jmp			done
 jsr			done
 lea			done
-link		
+link		TEST
 lsl/lsr		
 move		done
 movea		done
@@ -68,7 +71,7 @@ move <- ccr	done
 move -> ccr	done
 move <- sr	done
 move -> sr	done
-move usp	PRIV
+move usp	TEST
 movec		PRIV
 movem		done
 movep		SKIP
@@ -108,7 +111,7 @@ trap
 trapcc		
 trapv		
 tst			done
-unlk		
+unlk		TEST
 unpk		
 
 
