@@ -1,7 +1,7 @@
-linux/*.dump
-out/*/*.bin
-out/*/*.dump
-out/*/*.hex
-out/*/*.lst
-out/*/*.o
-out/*/*.out
+*.o
+*.lst
+*.out
+*.bin
+*.hex
+*.map
+*.dump
