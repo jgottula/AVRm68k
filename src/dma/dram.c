@@ -6,8 +6,6 @@
 #include "debug.h"
 #include "intr.h"
 #include "io.h"
-#include "sreg.h"
-#include "uart.h"
 
 #if DRAM_SAFE_MODE
 #define delay() _NOP(); _NOP()
@@ -20,6 +18,7 @@
 /* WARNING: because the refresh routine is called from an ISR and could
  * interrupt at any time, these functions MUST use ATOMIC_BLOCKs */
 
+#if 0
 static void dramLoadAddrBus(uint16_t addr12)
 {
 	uint8_t addrl = (uint8_t)addr12;
@@ -299,3 +298,4 @@ void dramInit(void)
 	
 	uartWritePSTR("DRAM initialized.\n");
 }
+#endif

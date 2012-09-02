@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_MCU_DRAM_H
-#define JGOTTULA_MCU_DRAM_H
+#ifndef JGOTTULA_DMA_DRAM_H
+#define JGOTTULA_DMA_DRAM_H
 
 #include <stdbool.h>
 #include <stdint.h>
