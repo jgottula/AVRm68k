@@ -3,17 +3,14 @@
 
 #include "../common/io.h"
 
-#if 0
-#define DDR_  DDRA
-#define PORT_ PORTA
-#define PIN_  PINA
+#define DDR_DATA  DDRA
+#define PORT_DATA PORTA
+#define PIN_DATA  PINA
 
 enum PortA {
-	/* PA0-PA7 free */
+	/* PA0-PA7: data bus 0:7 */
 };
-#endif
 
-#if 0
 #define DDR_  DDRB
 #define PORT_ PORTB
 #define PIN_  PINB
@@ -21,19 +18,16 @@ enum PortA {
 enum PortB {
 	/* PB0-PB7 free */
 };
-#endif
 
-#if 0
-#define DDR_  DDRC
-#define PORT_ PORTC
-#define PIN_  PINC
+#define DDR_ADDR  DDRC
+#define PORT_ADDR PORTC
+#define PIN_ADDR  PINC
 
 enum PortC {
-	/* PC0-PC7 free */
+	/* PC0-PC7: addr bus 0:7 */
+	/* PC0-PC3: addr bus 8:11 (latched) */
 };
-#endif
 
-#if 0
 #define DDR_  DDRD
 #define PORT_ PORTD
 #define PIN_  PIND
@@ -41,6 +35,5 @@ enum PortC {
 enum PortD {
 	/* PD0-PD7 free */
 };
-#endif
 
 #endif
