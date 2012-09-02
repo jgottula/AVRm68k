@@ -3,7 +3,6 @@
 
 #include "../common/io.h"
 
-
 #if 0
 #define DDR_  DDRA
 #define PORT_ PORTA
@@ -13,7 +12,6 @@ enum PortA {
 	/* PA0-PA7 free */
 };
 #endif
-
 
 #define DDR_SPI   DDRB
 #define PORT_SPI  PORTB
@@ -33,7 +31,6 @@ enum PortB {
 	SPI_ALL     = SPI_SS_NULL | SPI_MOSI | SPI_MISO | SPI_SCK
 };
 
-
 #if 0
 #define DDR_  DDRC
 #define PORT_ PORTC
@@ -43,7 +40,6 @@ enum PortC {
 	/* PC0-PC7 free */
 };
 #endif
-
 
 #define DDR_UART  DDRD
 #define PORT_UART PORTD

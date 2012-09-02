@@ -8,7 +8,6 @@
 typedef volatile uint8_t *reg_t;
 typedef volatile uint16_t *reg16_t;
 
-
 /* WARNING: these write functions may need to be wrapped in ATOMIC_BLOCK()
  * because of their read/modify/write nature and the possibility that an ISR
  * could be RMW'ing the same register */
