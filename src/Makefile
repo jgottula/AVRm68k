@@ -61,7 +61,7 @@ lst: $(patsubst %.c,%.lst,$(wildcard $(MCU_SRCDIR)/*.c)) $(patsubst %.c,%.lst,$(
 
 map: $(MCU_MAP) $(DMA_MAP)
 
-dump: $(MCU_DUMP) $(DMA_MAP)
+dump: $(MCU_DUMP) $(DMA_DUMP)
 
 loadmcu: $(MCU_HEX)
 	-sudo avrdude $(MCU_AVRDUDEFLAGS) -U flash:w:$^
