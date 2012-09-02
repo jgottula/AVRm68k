@@ -100,21 +100,29 @@ $(MCU_DUMP): $(MCU_EXE)
 	avr-objdump -s -d $^ >$@
 
 
-# TODO: DMA targets
+$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.c $(wildcard $(DMA_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
+
+$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.s $(wildcard $(DMA_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
+
+$(DMA_SRCDIR)/%.lst: $(DMA_SRCDIR)/%.c $(wildcard $(DMA_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -O0 -g -w -Wa,-adhln -o /dev/null $< >$@
+
 $(DMA_EXE): $(patsubst %.c,%.o,$(wildcard $(DMA_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(DMA_SRCDIR)/*.s))
-	#avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -o $@ $^
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -o $@ $^
 
 $(DMA_BIN): $(DMA_EXE)
-	#avr-objcopy -O binary $(COMMON_OBJCOPYFLAGS) $^ $@
+	avr-objcopy -O binary $(COMMON_OBJCOPYFLAGS) $^ $@
 
 $(DMA_HEX): $(DMA_EXE)
-	#avr-objcopy -O ihex $(COMMON_OBJCOPYFLAGS) $^ $@
+	avr-objcopy -O ihex $(COMMON_OBJCOPYFLAGS) $^ $@
 
 $(DMA_MAP): $(DMA_EXE)
-	#avr-nm -ns $^ >$@
+	avr-nm -ns $^ >$@
 
 $(DMA_DUMP): $(DMA_EXE)
-	#avr-objdump -s -d $^ >$@
+	avr-objdump -s -d $^ >$@
 
 
 # TODO: PROG targets
