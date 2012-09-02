@@ -5,3 +5,4 @@
 *.hex
 *.map
 *.dump
+schematic/*.*#*
