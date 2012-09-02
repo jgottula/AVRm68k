@@ -75,16 +75,35 @@ clean:
 	-rm -rfv $(DMA_SRCDIR)/{*.o,*.lst,$(DMA_BASENAME).{out,bin,hex,map,dump}}
 
 
-$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.c $(wildcard $(MCU_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
+# evaluated when used
+COMMON_HEADERS=$(wildcard $(COMMON_SRCDIR)/*.h)
+MCU_HEADERS=$(wildcard $(MCU_SRCDIR)/*.h)
+MCU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(MCU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MCU_SRCDIR)/*.s))
+DMA_HEADERS=$(wildcard $(DMA_SRCDIR)/*.h)
+DMA_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(DMA_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(DMA_SRCDIR)/*.s))
+
+
+$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.c $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -o $@ $<
 
-$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.s $(wildcard $(MCU_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
+$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.s $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -o $@ $<
 
-$(MCU_SRCDIR)/%.lst: $(MCU_SRCDIR)/%.c $(wildcard $(MCU_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
+$(MCU_SRCDIR)/%.lst: $(MCU_SRCDIR)/%.c $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -O0 -g -w -Wa,-adhln -o /dev/null $< >$@
 
-$(MCU_EXE): $(patsubst %.c,%.o,$(wildcard $(MCU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MCU_SRCDIR)/*.s))
+
+$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.c $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
+
+$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.s $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
+
+$(DMA_SRCDIR)/%.lst: $(DMA_SRCDIR)/%.c $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -O0 -g -w -Wa,-adhln -o /dev/null $< >$@
+
+
+$(MCU_EXE): $(MCU_OBJECTS)
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -o $@ $^
 
 $(MCU_BIN): $(MCU_EXE)
@@ -100,16 +119,7 @@ $(MCU_DUMP): $(MCU_EXE)
 	avr-objdump -s -d $^ >$@
 
 
-$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.c $(wildcard $(DMA_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
-
-$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.s $(wildcard $(DMA_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
-
-$(DMA_SRCDIR)/%.lst: $(DMA_SRCDIR)/%.c $(wildcard $(DMA_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -O0 -g -w -Wa,-adhln -o /dev/null $< >$@
-
-$(DMA_EXE): $(patsubst %.c,%.o,$(wildcard $(DMA_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(DMA_SRCDIR)/*.s))
+$(DMA_EXE): $(DMA_OBJECTS)
 	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -o $@ $^
 
 $(DMA_BIN): $(DMA_EXE)
