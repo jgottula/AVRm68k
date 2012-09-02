@@ -5,7 +5,6 @@
 #include <util/delay.h>
 #include "bitwise.h"
 #include "debug.h"
-#include "dram.h"
 #include "io.h"
 #include "intr.h"
 #include "m68k.h"
@@ -118,6 +117,7 @@ static void benchmarkSRAM(void)
 	uartWritePSTR(" ms\n");
 }
 
+#if 0
 static void testDRAM(void)
 {
 #if 0
@@ -349,6 +349,7 @@ static void benchmarkRefresh(void)
 	
 	enableDRAMRefresh = true;
 }
+#endif
 
 static void testASL(uint32_t operand, uint8_t shifts)
 {
@@ -408,14 +409,20 @@ void testAll(void)
 {
 	uartWritePSTR("-------- Unit Tests --------\n");
 	
+	#warning dram tests are temporarily disabled
+	
 	testArithShifts();
 	testSRAM();
+#if 0
 	testDRAM();
+#endif
 	benchmarkShiftReg();
 	benchmarkEEPROM();
 	benchmarkSRAM();
+#if 0
 	benchmarkDRAM();
 	benchmarkRefresh();
+#endif
 	
 	uartWritePSTR("------ Tests Complete ------\n");
 	

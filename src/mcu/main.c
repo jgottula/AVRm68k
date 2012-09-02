@@ -4,7 +4,6 @@
 #include <util/atomic.h>
 #include <util/delay.h>
 #include "debug.h"
-#include "dram.h"
 #include "intr.h"
 #include "io.h"
 #include "m68k.h"
@@ -25,7 +24,8 @@ noreturn void main(void)
 	uartWritePSTR("\nStarted.\n");
 	
 	sregInit();
-	dramInit();
+	//dramInit();
+	#warning dramInit is now in dma
 	intrInit();
 	spiInit();
 	//sdInit();

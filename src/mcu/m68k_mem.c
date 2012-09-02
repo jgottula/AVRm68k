@@ -1,11 +1,13 @@
 #include "m68k_mem.h"
 #include "debug.h"
-#include "dram.h"
 #include "m68k.h"
 #include "uart.h"
 
+#warning all m68k_mem functions are temporarily disabled
+
 uint32_t memRead(uint32_t addr, uint8_t size)
 {
+#if 0
 	uint8_t bytes[4];
 	
 	bytes[0] = dramRead(addr);
@@ -26,10 +28,12 @@ uint32_t memRead(uint32_t addr, uint8_t size)
 			((uint32_t)bytes[2] << 8) | bytes[3];
 	
 	assert(0);
+#endif
 }
 
 void memWrite(uint32_t addr, uint8_t size, uint32_t data)
 {
+#if 0
 	switch (size)
 	{
 	case SIZE_BYTE:
@@ -48,10 +52,12 @@ void memWrite(uint32_t addr, uint8_t size, uint32_t data)
 	default:
 		assert(0);
 	}
+#endif
 }
 
 void memDump(uint32_t addr, uint16_t len)
 {
+#if 0
 	uint32_t addrBegin = addr & 0xfffffff0;
 	uint32_t addrEnd = addr + len;
 	
@@ -85,4 +91,5 @@ void memDump(uint32_t addr, uint16_t len)
 	
 	/* TODO: add textual display on the right (like hexdump -C does); replace
 	 * characters not from the usual ASCII page with periods */
+#endif
 }

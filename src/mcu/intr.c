@@ -1,14 +1,19 @@
 #include "intr.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "dram.h"
 #include "io.h"
 
+#warning dram refresh code is temporarily disabled
+
+#if 0
 static volatile uint8_t dramCounter = 0;
+#endif
 static volatile uint16_t counter = 0;
 volatile uint16_t msec = 0, sec = 0;
 volatile bool badISR = false;
+#if 0
 volatile bool enableDRAMRefresh = true;
+#endif
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -22,6 +27,7 @@ ISR(TIMER1_COMPA_vect)
 		counter = 0;
 	}
 	
+#if 0
 	/* refresh the dram at intervals */
 	if (++dramCounter == DRAM_REFRESH_FREQ)
 	{
@@ -30,6 +36,7 @@ ISR(TIMER1_COMPA_vect)
 		
 		dramCounter = 0;
 	}
+#endif
 }
 
 ISR(BADISR_vect)
