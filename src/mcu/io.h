@@ -45,22 +45,12 @@ enum PortC {
 #define PORT_UART PORTD
 #define PIN_UART  PIND
 
-#define DDR_SREG  DDRD
-#define PORT_SREG PORTD
-#define PIN_SREG  PIND
-
 enum PortD {
 	UART_RX    = _BV(PD0),
 	UART_TX    = _BV(PD1),
 	UART_ALL   = UART_RX | UART_TX,
 	
-	/* PD2-PD3 free */
-	
-	SREG_CLEAR = _BV(PD4),
-	SREG_DATA  = _BV(PD5),
-	SREG_CLK   = _BV(PD6),
-	SREG_LATCH = _BV(PD7),
-	SREG_ALL   = SREG_CLEAR | SREG_DATA | SREG_CLK | SREG_LATCH
+	/* PD2-PD7 free */
 };
 
 #endif
