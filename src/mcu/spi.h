@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_SPI_H
-#define JGOTTULA_SPI_H
+#ifndef JGOTTULA_MCU_SPI_H
+#define JGOTTULA_MCU_SPI_H
 
 #include <stdint.h>
 

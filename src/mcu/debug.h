@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_DEBUG_H
-#define JGOTTULA_DEBUG_H
+#ifndef JGOTTULA_MCU_DEBUG_H
+#define JGOTTULA_MCU_DEBUG_H
 
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>

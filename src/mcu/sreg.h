@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_SREG_H
-#define JGOTTULA_SREG_H
+#ifndef JGOTTULA_MCU_SREG_H
+#define JGOTTULA_MCU_SREG_H
 
 #include <stdbool.h>
 #include <stdint.h>

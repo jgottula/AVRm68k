@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_PCM_H
-#define JGOTTULA_PCM_H
+#ifndef JGOTTULA_MCU_PCM_H
+#define JGOTTULA_MCU_PCM_H
 
 #include <stdbool.h>
 #include <stdint.h>

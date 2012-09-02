@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_BITWISE_H
-#define JGOTTULA_BITWISE_H
+#ifndef JGOTTULA_MCU_BITWISE_H
+#define JGOTTULA_MCU_BITWISE_H
 
 #include <stdbool.h>
 #include <stdint.h>

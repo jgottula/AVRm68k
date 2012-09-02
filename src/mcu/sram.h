@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_SRAM_H
-#define JGOTTULA_SRAM_H
+#ifndef JGOTTULA_MCU_SRAM_H
+#define JGOTTULA_MCU_SRAM_H
 
 #include <stdbool.h>
 #include <stdint.h>

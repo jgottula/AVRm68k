@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_HEX_H
-#define JGOTTULA_HEX_H
+#ifndef JGOTTULA_MCU_HEX_H
+#define JGOTTULA_MCU_HEX_H
 
 #include <stdint.h>
 #include <stdbool.h>
