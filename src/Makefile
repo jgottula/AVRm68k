@@ -23,9 +23,6 @@ COMMON_OBJCOPYFLAGS:=-R .eeprom
 INCLUDE:=
 LINK:=
 
-SOURCES:=$(wildcard *.c *.s)
-HEADERS:=$(wildcard *.h)
-
 MCU_SRCDIR:=mcu
 DMA_SRCDIR:=dma
 
