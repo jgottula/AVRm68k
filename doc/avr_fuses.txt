@@ -1,0 +1,41 @@
+AVR Fuse Bits
+
+
+Main MCU: ATmega1284P
+
+- lfuse: 0x8e
+  - clock source:      external crystal at 8+ MHz
+  - startup time:      258ck + 4.1ms
+  - clock output:      yes
+  - divide clock:      no
+- hfuse: 0xd7
+  - boot reset vector: no
+  - boot size:         512 words
+  - preserve eeprom:   yes
+  - wdt always on:     no
+  - spi programming:   yes [DANGER! DO NOT CHANGE!]
+  - jtag enabled:      no
+  - on-chip debug:     no
+- efuse: 0xfc
+  - brownout level:    4.3 volts
+- lock:  0x3f
+
+
+DMA Controller MCU: ATmega324A
+
+- lfuse: 0xc0
+  - clock source:      external clock
+  - startup time:      6ck + 0ms
+  - clock output:      no
+  - divide clock:      no
+- hfuse: 0xd7
+  - boot reset vector: no
+  - boot size:         256 words
+  - preserve eeprom:   yes
+  - wdt always on:     no
+  - spi programming:   yes [DANGER! DO NOT CHANGE!]
+  - jtag enabled:      no
+  - on-chip debug:     no
+- efuse: 0xfc
+  - brownout level:    4.3 volts
+- lock:  0x3f
