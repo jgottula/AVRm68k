@@ -19,6 +19,7 @@ Priorities:
 - Colored output (use 033, followed by "[<attr>;<attr>;<attr...>m")
 - Replace assert(0)'s with actual errors
   - Use illegal instruction traps for unimplemented instruction opcodes
+- Write a bootloader that can do serial self-programming at around 1.25 Mbaud
 
 Bugs:
 - Handling of stack pointers is wrong: if in user mode, %sp means %a7; however,
