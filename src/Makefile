@@ -23,6 +23,7 @@ COMMON_OBJCOPYFLAGS:=-R .eeprom
 INCLUDE:=
 LINK:=
 
+COMMON_SRCDIR:=common
 MCU_SRCDIR:=mcu
 DMA_SRCDIR:=dma
 
@@ -74,13 +75,13 @@ clean:
 	-rm -rfv $(DMA_SRCDIR)/{*.o,*.lst,$(DMA_BASENAME).{out,bin,hex,map,dump}}
 
 
-$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.c $(wildcard $(MCU_SRCDIR)/*.h) Makefile
+$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.c $(wildcard $(MCU_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -o $@ $<
 
-$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.s $(wildcard $(MCU_SRCDIR)/*.h) Makefile
+$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.s $(wildcard $(MCU_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -o $@ $<
 
-$(MCU_SRCDIR)/%.lst: $(MCU_SRCDIR)/%.c $(wildcard $(MCU_SRCDIR)/*.h) Makefile
+$(MCU_SRCDIR)/%.lst: $(MCU_SRCDIR)/%.c $(wildcard $(MCU_SRCDIR)/*.h) $(wildcard $(COMMON_SRCDIR)/*.h) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -O0 -g -w -Wa,-adhln -o /dev/null $< >$@
 
 $(MCU_EXE): $(patsubst %.c,%.o,$(wildcard $(MCU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MCU_SRCDIR)/*.s))
