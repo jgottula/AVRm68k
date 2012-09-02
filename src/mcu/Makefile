@@ -11,7 +11,7 @@ AVRDUDEFLAGS:=-c usbasp -p $(AVRDUDE_MCU) -B $(AVRDUDE_BAUD)
 INCLUDE:=
 LINK:=
 
-SOURCES:=$(wildcard *.c)
+SOURCES:=$(wildcard *.c *.s)
 HEADERS:=$(wildcard *.h)
 
 GLOBAL_OUT:=out/$(PROJNAME)
