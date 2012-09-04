@@ -6,7 +6,7 @@
 
 #define DRAM_SAFE_MODE 0
 
-#define DRAM_SIZE         0x1000000 // 16 x 8 Mbit
+#define DRAM_SIZE         0x2000000 // 2 x (16 x 8 Mbit)
 #define DRAM_ROWS         4096      // 4k
 #define DRAM_COLS         4096		// 4k
 #define DRAM_REFRESH_FREQ 64        // milliseconds
