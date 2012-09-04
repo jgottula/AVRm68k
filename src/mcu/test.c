@@ -59,7 +59,6 @@ static void benchmarkEEPROM(void)
 static void testSRAM(void)
 {
 	bool fail = false;
-	uartWritePSTR("sram byte mode: ");
 	sramWriteByte(0x100, 0x55);
 	if ((global = sramReadByte(0x100)) != 0x55)
 	{
@@ -77,17 +76,18 @@ static void testSRAM(void)
 		uartWritePSTR(".\n");
 	}
 	
+	uartWritePSTR("sram byte mode: ");
 	if (fail)
-		uartWritePSTR("failed.");
+		uartWritePSTR("failed.\n");
 	else
 		uartWritePSTR("passed.\n");
 	
-	uartWritePSTR("sram seq mode: ");
 	const uint8_t src[] = "hello world";
 	uint8_t dest[0x10];
 	sramWriteSeq(0x100, 12, src);
 	sramReadSeq(0x100, 12, dest);
 	
+	uartWritePSTR("sram seq mode: ");
 	if (memcmp(src, dest, 12) != 0)
 		uartWritePSTR("failed.\n");
 	else
