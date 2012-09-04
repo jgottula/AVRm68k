@@ -3,28 +3,25 @@
 
 #include "../common/io.h"
 
-#define DDR_DRAM_ADDR   DDRA
-#define PORT_DRAM_ADDR  PORTA
-#define PIN_DRAM_ADDR   PINA
+#define DDR_DRAM_ADDR     DDRA
+#define PORT_DRAM_ADDR    PORTA
+#define PIN_DRAM_ADDR     PINA
 
-#define DDR_DRAM_STROBE  DDRA
-#define PORT_DRAM_STROBE PORTA
-#define PIN_DRAM_STROBE  PINA
+#define DDR_DRAM_STROBE   DDRA
+#define PORT_DRAM_STROBE  PORTA
+#define PIN_DRAM_STROBE   PINA
 
 enum PortA {
-	/* PA[0:7] => addr[4:11] (latched) */
-	DRAM_ADDR_HIGH_LATCHED = 0xff,
+	/* PA[0:3] => addr[3:0] => addr[7:4] => addr[11:8] (2-stage latched) */
+	DRAM_ADDR        = 0x0f,
 	
-	/* PA[0:3] => addr[0:3] (direct) */
-	DRAM_ADDR_LOW          = 0x0f,
-	
-	/* PA[4:7] => {ras0 cas0 ras1 cas1} (direct) */
-	DRAM_STROBE_RAS0       = _BV(PA4),
-	DRAM_STROBE_CAS0       = _BV(PA5),
-	DRAM_STROBE_RAS1       = _BV(PA6),
-	DRAM_STROBE_CAS1       = _BV(PA7),
-	DRAM_STROBE_ALL        = DRAM_STROBE_RAS0 | DRAM_STROBE_CAS0 |
-	                         DRAM_STROBE_RAS1 | DRAM_STROBE_CAS1
+	/* PA[4:7] => {ras0, cas0, ras1, cas1} (direct) */
+	DRAM_STROBE_RAS0 = _BV(PA4),
+	DRAM_STROBE_CAS0 = _BV(PA5),
+	DRAM_STROBE_RAS1 = _BV(PA6),
+	DRAM_STROBE_CAS1 = _BV(PA7),
+	DRAM_STROBE_ALL  = DRAM_STROBE_RAS0 | DRAM_STROBE_CAS0 |
+	                   DRAM_STROBE_RAS1 | DRAM_STROBE_CAS1
 };
 
 #define DDR_SPI   DDRB
@@ -69,9 +66,9 @@ enum PortD {
 	
 	/* PD2-PD5 free */
 	
-	DRAM_CTRL_LATCH = _BV(PD6),
+	DRAM_CTRL_FFCLK = _BV(PD6),
 	DRAM_CTRL_WRITE = _BV(PD7),
-	DRAM_CTRL_ALL   = DRAM_CTRL_LATCH | DRAM_CTRL_WRITE
+	DRAM_CTRL_ALL   = DRAM_CTRL_FFCLK | DRAM_CTRL_WRITE
 };
 
 #endif
