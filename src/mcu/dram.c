@@ -6,7 +6,6 @@
 #include "debug.h"
 #include "intr.h"
 #include "io.h"
-#include "sreg.h"
 #include "uart.h"
 
 #if DRAM_SAFE_MODE
@@ -17,43 +16,71 @@
 
 #define delayAlways() _NOP(); _NOP()
 
-/* WARNING: because the refresh routine is called from an ISR and could
- * interrupt at any time, these functions MUST use ATOMIC_BLOCKs */
+uint16_t lastAddr;
 
-static void dramLoadAddrBus(uint16_t addr12)
+static void dramLoadAddrBus(uint16_t newAddr)
 {
-	uint8_t addrl = (uint8_t)addr12;
-	uint8_t addrh = (uint8_t)((addr12 >> 8) & 0x0f);
+	/* if only the low 4 bits have changed, we don't need to send all 12 bits
+	 * through the flip-flop stages; because of the shared clock (octal
+	 * flip-flop rather than dual quad), changes in the middle 4 bits require
+	 * that the high 4 bits be updated as well */
+	if ((lastAddr & 0x0ff0) == (newAddr & 0x0ff0))
+		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, newAddr);
+	else
+	{
+		/* load the high 4 bits first, for 2 flip-flop stages */
+		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, (newAddr >> 8));
+		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
+		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
+		
+		/* load the middle 4 bits next, for a single flip-flop stage */
+		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, (newAddr >> 4));
+		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
+		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
+		
+		/* load the low 4 bits last; no flip-flop activity required */
+		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, newAddr);
+	}
 	
-	PORT_ADDRL = addrl;
-	
-	_Static_assert(SREG_ADDRH_ALL == 0b11110000,
-		"high addr shift indexes changed!");
-	
-	sregSet((sregState & ~SREG_ADDRH_ALL) | (addrh << 4));
+	lastAddr = newAddr;
 }
+
+/* WARNING: because the DRAM refresh procedure is done within an ISR and could
+ * happen at any time, these functions MUST use ATOMIC_BLOCKs */
 
 uint8_t dramRead(uint32_t addr)
 {
+	bool simm0;
 	uint8_t byte;
 	
 	/* this function uses the basic read technique (not fast page mode) */
 	
+	/* determine which SIMM to use based on the extra address bit */
+	simm0 = ((addr & (1UL << 24)) == 0);
+	
+	/* set the data bus to input mode without pull-ups */
+	DDR_DRAM_DATA = 0;
+	PORT_DRAM_DATA = 0;
+	
+	delay();
+	
+	/* put the row number on the address bus */
+	dramLoadAddrBus(addr >> 12);
+	
+	delay();
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		/* set the data bus to input with pull-ups */
-		DDR_DATA = 0;
-		PORT_DATA = DATA_ALL;
-		
-		delay();
-		
-		/* put the row number on the address bus */
-		dramLoadAddrBus(addr >> 12);
-		
-		delay();
-		
 		/* bring RAS low to load the row */
-		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		if (simm0)
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS0;
+		else
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS1;
+		
+		delay();
+		
+		/* clear the write enable bit */
+		PORT_DRAM_CTRL |= DRAM_CTRL_WRITE;
 		
 		delay();
 		
@@ -63,17 +90,20 @@ uint8_t dramRead(uint32_t addr)
 		delay();
 		
 		/* bring CAS low to load the column (15 ns) */
-		writeIO(&PORT_DRAM, DRAM_CAS, 0);
+		if (simm0)
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS0;
+		else
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS1;
 		
 		delayAlways();
 		
 		/* read from the data bus */
-		byte = PIN_DATA;
+		byte = PIN_DRAM_DATA;
 		
 		delay();
 		
-		/* reset all control lines */
-		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+		/* reset all strobe lines */
+		writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
 	}
 	
 	return byte;
@@ -81,28 +111,41 @@ uint8_t dramRead(uint32_t addr)
 
 void dramWrite(uint32_t addr, uint8_t byte)
 {
+	bool simm0;
+	
 	/* this function uses the basic write technique (not fast page mode) */
+	
+	/* determine which SIMM to use based on the extra address bit */
+	simm0 = ((addr & (1UL << 24)) == 0);
+	
+	/* set the data bus to output mode */
+	DDR_DRAM_DATA = DRAM_DATA;
+	
+	delay();
+	
+	/* put the row number on the address bus */
+	dramLoadAddrBus(addr >> 12);
+	
+	delay();
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		/* set the data bus to output */
-		DDR_DATA = DATA_ALL;
-		
-		delay();
-		
-		/* put the row number on the address bus */
-		dramLoadAddrBus(addr >> 12);
-		
-		delay();
-		
 		/* bring RAS low to load the row */
-		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		if (simm0)
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS0;
+		else
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS1;
+		
+		delay();
+		
+		/* assert the write enable bit */
+		PORT_DRAM_CTRL &= ~DRAM_CTRL_WRITE;
 		
 		delay();
 		
 		/* put the byte on the data bus and assert WE */
-		PORT_DATA = byte;
-		writeIO(&PORT_DRAM, DRAM_WE, 0);
+		PORT_DRAM_DATA = byte;
+		PORT_DRAM_CTRL &= ~DRAM_CTRL_WRITE;
 		
 		delay();
 		
@@ -112,37 +155,53 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		delay();
 		
 		/* bring CAS low to load the column (15 ns) */
-		writeIO(&PORT_DRAM, DRAM_CAS, 0);
+		if (simm0)
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS0;
+		else
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS1;
 		
 		delayAlways();
 		
-		/* reset all control lines */
-		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+		/* reset all strobe lines */
+		writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
 	}
 }
 
 void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 {
+	bool simm0;
+	
 	/* this function uses fast page mode */
+	
+	/* determine which SIMM to use based on the extra address bit */
+	simm0 = ((addr & (1UL << 24)) == 0);
 	
 	/* rolling over within the page is unexpected behavior */
 	assert(addr + len <= (((addr / DRAM_COLS) + 1) * DRAM_COLS));
 	
+	/* set the data bus to input without pull-ups */
+	DDR_DRAM_DATA = 0;
+	PORT_DRAM_DATA = 0;
+	
+	delay();
+	
+	/* put the row number on the address bus */
+	dramLoadAddrBus(addr >> 12);
+	
+	delay();
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		/* set the data bus to input with pull-ups */
-		DDR_DATA = 0;
-		PORT_DATA = DATA_ALL;
-		
-		delay();
-		
-		/* put the row number on the address bus */
-		dramLoadAddrBus(addr >> 12);
-		
-		delay();
-		
 		/* bring RAS low to load the row */
-		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		if (simm0)
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS0;
+		else
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS1;
+		
+		delay();
+		
+		/* clear the write enable bit */
+		PORT_DRAM_CTRL |= DRAM_CTRL_WRITE;
 		
 		delay();
 		
@@ -154,58 +213,68 @@ void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 		do
 		{
 			/* bring CAS low to load the column (15 ns) */
-			writeIO(&PORT_DRAM, DRAM_CAS, 0);
+			if (simm0)
+				PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS0;
+			else
+				PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS1;
 			
 			delayAlways();
 			
 			/* read from the data bus */
-			*(dest++) = PIN_DATA;
+			*(dest++) = PIN_DRAM_DATA;
 			
 			delay();
 			
-			/* bring CAS high again */
-			writeIO(&PORT_DRAM, DRAM_CAS, DRAM_CAS);
+			/* bring CAS high again (no need to discriminate between SIMMs) */
+			PORT_DRAM_STROBE |= (DRAM_STROBE_CAS0 | DRAM_STROBE_CAS1);
 			
 			delay();
 			
 			/* increment the column number */
-			PORT_ADDRL = ++addr;
+			dramLoadAddrBus(addr + 1);
 			
 			delay();
 		}
 		while (--len != 0);
 		
-		/* reset all control lines */
-		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+		/* reset all strobe lines */
+		writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
 	}
 }
 
 void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src)
 {
+	bool simm0;
+	
 	/* this function uses fast page mode */
+	
+	simm0 = ((addr & (1UL << 24)) == 0);
 	
 	/* rolling over within the page is unexpected behavior */
 	assert(addr + len <= (((addr / DRAM_COLS) + 1) * DRAM_COLS));
 	
+	/* set the data bus to output */
+	DDR_DRAM_DATA = DRAM_DATA;
+	
+	delay();
+	
+	/* put the row number on the address bus */
+	dramLoadAddrBus(addr >> 12);
+	
+	delay();
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		/* set the data bus to output */
-		DDR_DATA = DATA_ALL;
-		
-		delay();
-		
-		/* put the row number on the address bus */
-		dramLoadAddrBus(addr >> 12);
-		
-		delay();
-		
 		/* bring RAS low to load the row */
-		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		if (simm0)
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS0;
+		else
+			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS1;
 		
 		delay();
 		
 		/* assert the write enable bit */
-		writeIO(&PORT_DRAM, DRAM_WE, 0);
+		PORT_DRAM_CTRL &= ~DRAM_CTRL_WRITE;
 		
 		delay();
 		
@@ -217,70 +286,79 @@ void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src)
 		do
 		{
 			/* put the data on the data bus */
-			PORT_DATA = *(src++);
+			PORT_DRAM_DATA = *(src++);
 			
 			delay();
 			
 			/* bring CAS low to load the column (15 ns) */
-			writeIO(&PORT_DRAM, DRAM_CAS, 0);
+			if (simm0)
+				PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS0;
+			else
+				PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS1;
 			
 			delayAlways();
 			
-			/* bring CAS high again */
-			writeIO(&PORT_DRAM, DRAM_CAS, DRAM_CAS);
+			/* bring CAS high again (no need to discriminate between SIMMs) */
+			PORT_DRAM_STROBE |= (DRAM_STROBE_CAS0 | DRAM_STROBE_CAS1);
 			
 			delay();
 			
 			/* increment the column number */
-			PORT_ADDRL = ++addr;
+			dramLoadAddrBus(addr + 1);
 			
 			delay();
 		}
 		while (--len != 0);
 		
-		/* reset all control lines */
-		writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+		/* reset all strobe lines */
+		writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
 	}
 }
 
 void dramRefresh(void)
 {
 	/* this function doesn't need to save/restore state because the non-ISR dram
-	 * functions are wrapped in ATOMIC_BLOCKs */
+	 * functions are wrapped in ATOMIC_BLOCKs; DO NOT modify DDR_DRAM_DATA or
+	 * PORT_DRAM_DATA within this function */
 	
 	/* this function uses the cas-before-ras refresh method */
 	
-	/* bring CAS low to start the refresh sequence */
-	writeIO(&PORT_DRAM, DRAM_CAS, 0);
+	/* bring both CAS strobes low to start the refresh sequence */
+	PORT_DRAM_STROBE &= ~(DRAM_STROBE_CAS0 | DRAM_STROBE_CAS0);
 	
 	for (uint16_t i = 0; i < DRAM_ROWS; ++i)
 	{
 		/* wait for RAS precharge (40 ns = 1 cycle @ 20 MHz) */
 		delay();
 		
-		/* bring RAS low to refresh the next row */
-		writeIO(&PORT_DRAM, DRAM_RAS, 0);
+		/* bring both RAS strobes low to refresh the next row */
+		PORT_DRAM_STROBE &= ~(DRAM_STROBE_RAS0 | DRAM_STROBE_RAS1);
 		
 		/* wait for the RAS pulse time (60 ns = 2 cycles @ 20 MHz) */
 		delayAlways();
 		delay();
 		
 		/* bring RAS high again */
-		writeIO(&PORT_DRAM, DRAM_RAS, DRAM_RAS);
+		PORT_DRAM_STROBE |= (DRAM_STROBE_RAS0 | DRAM_STROBE_RAS1);
 	}
 	
-	/* reset all control lines */
-	writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+	/* reset all strobe lines */
+	writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
 }
 
 void dramInit(void)
 {
-	/* set the address bus and control lines to output mode */
-	writeIO(&DDR_ADDRL, ADDRL_ALL, ADDRL_ALL);
-	writeIO(&DDR_DRAM, DRAM_ALL, DRAM_ALL);
+	/* set the address bus, strobe and control lines to output mode */
+	_Static_assert(&DDR_DRAM_ADDR == &DDR_DRAM_STROBE,
+		"this function assumes that the address lines and "
+		"strobes are on the same port!");
+	writeIO(&DDR_DRAM_ADDR, DRAM_ADDR | DRAM_STROBE_ALL,
+		DRAM_ADDR | DRAM_STROBE_ALL);
+	writeIO(&DDR_DRAM_CTRL, DRAM_CTRL_ALL, DRAM_CTRL_ALL);
 	
-	/* deactivate all control lines */
-	writeIO(&PORT_DRAM, DRAM_ALL, DRAM_ALL);
+	/* set both /ras, both /cas, and /we high to begin with */
+	writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
+	writeIO(&PORT_DRAM_CTRL, DRAM_CTRL_ALL, DRAM_CTRL_WRITE);
 	
 	/* delay on init as required by the spec */
 	_delay_us(200);
@@ -291,9 +369,9 @@ void dramInit(void)
 		/* run 8 ras cycles as per spec */
 		for (uint8_t i = 8; i != 0; --i)
 		{
-			writeIO(&PORT_DRAM, DRAM_RAS, 0);
+			PORT_DRAM_STROBE &= ~(DRAM_STROBE_RAS0 | DRAM_STROBE_RAS1);
 			_NOP();
-			writeIO(&PORT_DRAM, DRAM_RAS, DRAM_RAS);
+			PORT_DRAM_STROBE |= (DRAM_STROBE_RAS0 | DRAM_STROBE_RAS1);
 		}
 	}
 	
