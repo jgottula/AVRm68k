@@ -10,7 +10,6 @@
 #include "m68k.h"
 #include "m68k_mem.h"
 #include "sd.h"
-#include "sreg.h"
 #include "spi.h"
 #include "test.h"
 #include "uart.h"
@@ -24,7 +23,7 @@ noreturn void main(void)
 	uartInit();
 	uartWritePSTR("\nStarted.\n");
 	
-	sregInit();
+	//sregInit();
 	dramInit();
 	intrInit();
 	spiInit();

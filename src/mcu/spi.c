@@ -3,21 +3,26 @@
 #include <util/delay.h>
 #include "debug.h"
 #include "io.h"
-#include "sreg.h"
 
 static void spiSelect(uint8_t slave)
 {
+#warning spi stuff is currently disabled
+#if 0
 	/* ensure valid input */
 	assert((slave & ~SREG_SS_ALL) == 0);
 	
 	/* set only the given slave select pin low */
 	sregSet((sregState | SREG_SS_ALL) & ~slave);
+#endif
 }
 
 static void spiUnselect(void)
 {
+#warning spi stuff is currently disabled
+#if 0
 	/* set all slave select pins high */
 	sregSet(sregState | SREG_SS_ALL);
+#endif
 }
 
 static void spiSetMode(uint8_t mode, uint8_t endian, uint8_t divider)
@@ -76,6 +81,8 @@ void spiEnd(void)
 
 void spiInit(void)
 {
+#warning spi stuff is currently disabled
+#if 0
 	/* set SS, SCLK and MOSI to output mode, and MISO to input mode */
 	writeIO(&DDR_SPI, SPI_ALL, SPI_ALL ^ SPI_MISO);
 	writeIO(&PORT_SPI, SPI_SS_NULL, SPI_SS_NULL);
@@ -91,4 +98,5 @@ void spiInit(void)
 	/* read the status and data registers to clear the state */
 	readIO(&SPSR, 0xff);
 	readIO(&SPDR, 0xff);
+#endif
 }

@@ -10,12 +10,13 @@
 #include "intr.h"
 #include "m68k.h"
 #include "m68k_mem.h"
-#include "sreg.h"
 #include "sram.h"
 #include "uart.h"
 
 uint8_t global;
 
+#warning shift reg benchmarks are disabled
+#if 0
 static void benchmarkShiftReg(void)
 {
 	uint8_t sregBefore = sregState;
@@ -28,6 +29,7 @@ static void benchmarkShiftReg(void)
 	uartWriteDec16(after - before);
 	uartWritePSTR(" ms\n");
 }
+#endif
 
 static void benchmarkEEPROM(void)
 {
@@ -408,10 +410,12 @@ void testAll(void)
 {
 	uartWritePSTR("-------- Unit Tests --------\n");
 	
+#warning shift reg benchmarks are disabled
+	
 	testArithShifts();
 	testSRAM();
 	testDRAM();
-	benchmarkShiftReg();
+	//benchmarkShiftReg();
 	benchmarkEEPROM();
 	benchmarkSRAM();
 	benchmarkDRAM();
