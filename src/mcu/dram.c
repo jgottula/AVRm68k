@@ -375,5 +375,9 @@ void dramInit(void)
 		}
 	}
 	
+	/* set the address to avoid only updating the low 4 bits on the assumption
+	 * that what lastAddr initially contains is what is on the bus */
+	dramLoadAddrBus(0);
+	
 	uartWritePSTR("DRAM initialized.\n");
 }
