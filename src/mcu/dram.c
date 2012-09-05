@@ -227,7 +227,7 @@ void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 			delay();
 			
 			/* increment the column number */
-			dramLoadAddrBus(addr + 1);
+			dramLoadAddrBus(++addr);
 			
 			delay();
 		}
@@ -244,6 +244,7 @@ void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src)
 	
 	/* this function uses fast page mode */
 	
+	/* determine which SIMM to use based on the extra address bit */
 	simm0 = ((addr & (1UL << 24)) == 0);
 	
 	/* rolling over within the page is unexpected behavior */
