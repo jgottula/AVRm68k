@@ -79,9 +79,6 @@ uint8_t dramRead(uint32_t addr)
 		
 		delay();
 		
-		/* clear the write enable bit */
-		PORT_DRAM_CTRL |= DRAM_CTRL_WRITE;
-		
 		delay();
 		
 		/* put the column number on the address bus */
@@ -143,9 +140,8 @@ void dramWrite(uint32_t addr, uint8_t byte)
 		
 		delay();
 		
-		/* put the byte on the data bus and assert WE */
+		/* put the byte on the data bus */
 		PORT_DRAM_DATA = byte;
-		PORT_DRAM_CTRL &= ~DRAM_CTRL_WRITE;
 		
 		delay();
 		
@@ -161,6 +157,9 @@ void dramWrite(uint32_t addr, uint8_t byte)
 			PORT_DRAM_STROBE &= ~DRAM_STROBE_CAS1;
 		
 		delayAlways();
+		
+		/* clear the write enable bit */
+		PORT_DRAM_CTRL |= DRAM_CTRL_WRITE;
 		
 		/* reset all strobe lines */
 		writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
@@ -199,9 +198,6 @@ void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 			PORT_DRAM_STROBE &= ~DRAM_STROBE_RAS1;
 		
 		delay();
-		
-		/* clear the write enable bit */
-		PORT_DRAM_CTRL |= DRAM_CTRL_WRITE;
 		
 		delay();
 		
@@ -304,11 +300,14 @@ void dramWriteFPM(uint32_t addr, uint16_t len, const uint8_t *src)
 			delay();
 			
 			/* increment the column number */
-			dramLoadAddrBus(addr + 1);
+			dramLoadAddrBus(++addr);
 			
 			delay();
 		}
 		while (--len != 0);
+		
+		/* clear the write enable bit */
+		PORT_DRAM_CTRL |= DRAM_CTRL_WRITE;
 		
 		/* reset all strobe lines */
 		writeIO(&PORT_DRAM_STROBE, DRAM_STROBE_ALL, DRAM_STROBE_ALL);
@@ -322,6 +321,8 @@ void dramRefresh(void)
 	 * PORT_DRAM_DATA within this function */
 	
 	/* this function uses the cas-before-ras refresh method */
+	
+	/* we assume that the write-enable line will be clear */
 	
 	/* bring both CAS strobes low to start the refresh sequence */
 	PORT_DRAM_STROBE &= ~(DRAM_STROBE_CAS0 | DRAM_STROBE_CAS0);
