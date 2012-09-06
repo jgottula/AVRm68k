@@ -58,9 +58,9 @@ uint8_t dramRead(uint32_t addr)
 	/* determine which SIMM to use based on the extra address bit */
 	simm0 = ((addr & (1UL << 24)) == 0);
 	
-	/* set the data bus to input mode without pull-ups */
+	/* set the data bus to input mode with pull-ups */
 	DDR_DRAM_DATA = 0;
-	PORT_DRAM_DATA = 0;
+	PORT_DRAM_DATA = DRAM_DATA;
 	
 	delay();
 	
@@ -178,9 +178,9 @@ void dramReadFPM(uint32_t addr, uint16_t len, uint8_t *dest)
 	/* rolling over within the page is unexpected behavior */
 	assert(addr + len <= (((addr / DRAM_COLS) + 1) * DRAM_COLS));
 	
-	/* set the data bus to input without pull-ups */
+	/* set the data bus to input with pull-ups */
 	DDR_DRAM_DATA = 0;
-	PORT_DRAM_DATA = 0;
+	PORT_DRAM_DATA = DRAM_DATA;
 	
 	delay();
 	
