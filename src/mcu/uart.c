@@ -63,6 +63,22 @@ void uartWriteHex16(uint16_t word, bool upper)
 	uartWriteHex8(word, upper);
 }
 
+void uartWriteHexTop12(uint32_t wordAndAHalf, bool upper)
+{
+	/* this function takes a 24-bit value and prints the high 12 bits */
+	uartWriteHex4(wordAndAHalf >> 20, upper);
+	uartWriteHex4(wordAndAHalf >> 16, upper);
+	uartWriteHex4(wordAndAHalf >> 12, upper);
+}
+
+void uartWriteHexBottom12(uint32_t wordAndAHalf, bool upper)
+{
+	/* this function takes a 24-bit value and prints the low 12 bits */
+	uartWriteHex4(wordAndAHalf >> 8, upper);
+	uartWriteHex4(wordAndAHalf >> 4, upper);
+	uartWriteHex4(wordAndAHalf, upper);
+}
+
 void uartWriteHex24(uint32_t wordAndAHalf, bool upper)
 {
 	uartWriteHex8(wordAndAHalf >> 16, upper);
