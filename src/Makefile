@@ -18,6 +18,7 @@ PROG2_BASENAME:=prog2
 PROG2_CFLAGS:=
 
 COMMON_CFLAGS=-std=gnu11 -Wall -Wextra -Wno-unused-function -O2 -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG
+COMMON_LST_CFLAGS=-c -O0 -g -w -Wa,-adhln -o /dev/null
 COMMON_OBJCOPYFLAGS:=-R .eeprom
 
 INCLUDE:=
@@ -90,7 +91,7 @@ $(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.s $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -o $@ $<
 
 $(MCU_SRCDIR)/%.lst: $(MCU_SRCDIR)/%.c $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -O0 -g -w -Wa,-adhln -o /dev/null $< >$@
+	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
 
 
 $(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.c $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
@@ -100,7 +101,7 @@ $(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.s $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
 
 $(DMA_SRCDIR)/%.lst: $(DMA_SRCDIR)/%.c $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -O0 -g -w -Wa,-adhln -o /dev/null $< >$@
+	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
 
 
 $(MCU_EXE): $(MCU_OBJECTS)
