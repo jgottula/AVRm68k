@@ -49,8 +49,8 @@ MCU_HEADERS=$(wildcard $(MCU_SRCDIR)/*.h)
 MCU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(MCU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MCU_SRCDIR)/*.s))
 DMA_HEADERS=$(wildcard $(DMA_SRCDIR)/*.h)
 DMA_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(DMA_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(DMA_SRCDIR)/*.s))
-MCU_CLEAN=$(MCU_EXE) $(MCU_BIN) $(MCU_HEX) $(MCU_MAP) $(MCU_DUMP) $(MCU_OBJECTS)
-DMA_CLEAN=$(DMA_EXE) $(DMA_BIN) $(DMA_HEX) $(DMA_MAP) $(DMA_DUMP) $(DMA_OBJECTS)
+MCU_CLEAN=$(MCU_EXE) $(MCU_BIN) $(MCU_HEX) $(MCU_MAP) $(MCU_DUMP) $(wildcard $(MCU_SRCDIR)/*.o)
+DMA_CLEAN=$(DMA_EXE) $(DMA_BIN) $(DMA_HEX) $(DMA_MAP) $(DMA_DUMP) $(wildcard $(DMA_SRCDIR)/*.o)
 
 
 .PHONY: all mcu dma prog1 prog2 lst map dump loadmcu loaddma loadprog1 clean
