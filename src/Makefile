@@ -1,14 +1,14 @@
-MCU_BASENAME:=mcu
-MCU_MCU:=atmega1284p
-MCU_FREQ_KHZ:=20000
-MCU_CFLAGS:=-mmcu=$(MCU_MCU) -DF_CPU=$(MCU_FREQ_KHZ)000UL
-MCU_AVRDUDEFLAGS:=-c usbasp -p m1284p -B 460800
+EMU_BASENAME:=emulator
+EMU_MCU:=atmega1284p
+EMU_FREQ_KHZ:=20000
+EMU_CFLAGS:=-mmcu=$(EMU_MCU) -DF_CPU=$(EMU_FREQ_KHZ)000UL
+EMU_AVRDUDEFLAGS:=-c usbasp -p m1284p -B 460800
 
-DMA_BASENAME:=dma
-DMA_MCU:=atmega324a
-DMA_FREQ_KHZ:=20000
-DMA_CFLAGS:=-mmcu=$(DMA_MCU) -DF_CPU=$(DMA_FREQ_KHZ)000UL
-DMA_AVRDUDEFLAGS:=-c usbasp -p m324a -B 460800
+MMU_BASENAME:=mmu
+MMU_MCU:=atmega324a
+MMU_FREQ_KHZ:=20000
+MMU_CFLAGS:=-mmcu=$(MMU_MCU) -DF_CPU=$(MMU_FREQ_KHZ)000UL
+MMU_AVRDUDEFLAGS:=-c usbasp -p m324a -B 460800
 
 PROG1_BASENAME:=prog1
 PROG1_ASFLAGS:=
@@ -25,116 +25,116 @@ INCLUDE:=
 LINK:=
 
 COMMON_SRCDIR:=common
-MCU_SRCDIR:=mcu
-DMA_SRCDIR:=dma
+EMU_SRCDIR:=emulator
+MMU_SRCDIR:=mmu
 
-MCU_EXE:=$(MCU_SRCDIR)/$(MCU_BASENAME).out
-MCU_BIN:=$(MCU_SRCDIR)/$(MCU_BASENAME).bin
-MCU_HEX=$(MCU_SRCDIR)/$(MCU_BASENAME).hex
-MCU_MAP:=$(MCU_SRCDIR)/$(MCU_BASENAME).map
-MCU_DUMP:=$(MCU_SRCDIR)/$(MCU_BASENAME).dump
+EMU_EXE:=$(EMU_SRCDIR)/$(EMU_BASENAME).out
+EMU_BIN:=$(EMU_SRCDIR)/$(EMU_BASENAME).bin
+EMU_HEX=$(EMU_SRCDIR)/$(EMU_BASENAME).hex
+EMU_MAP:=$(EMU_SRCDIR)/$(EMU_BASENAME).map
+EMU_DUMP:=$(EMU_SRCDIR)/$(EMU_BASENAME).dump
 
-DMA_EXE:=$(DMA_SRCDIR)/$(DMA_BASENAME).out
-DMA_BIN:=$(DMA_SRCDIR)/$(DMA_BASENAME).bin
-DMA_HEX=$(DMA_SRCDIR)/$(DMA_BASENAME).hex
-DMA_MAP:=$(DMA_SRCDIR)/$(DMA_BASENAME).map
-DMA_DUMP:=$(DMA_SRCDIR)/$(DMA_BASENAME).dump
+MMU_EXE:=$(MMU_SRCDIR)/$(MMU_BASENAME).out
+MMU_BIN:=$(MMU_SRCDIR)/$(MMU_BASENAME).bin
+MMU_HEX=$(MMU_SRCDIR)/$(MMU_BASENAME).hex
+MMU_MAP:=$(MMU_SRCDIR)/$(MMU_BASENAME).map
+MMU_DUMP:=$(MMU_SRCDIR)/$(MMU_BASENAME).dump
 
 # TODO: PROG dirs
 
 
 # evaluated when used
 COMMON_HEADERS=$(wildcard $(COMMON_SRCDIR)/*.h)
-MCU_HEADERS=$(wildcard $(MCU_SRCDIR)/*.h)
-MCU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(MCU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MCU_SRCDIR)/*.s))
-DMA_HEADERS=$(wildcard $(DMA_SRCDIR)/*.h)
-DMA_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(DMA_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(DMA_SRCDIR)/*.s))
-MCU_CLEAN=$(MCU_EXE) $(MCU_BIN) $(MCU_HEX) $(MCU_MAP) $(MCU_DUMP) $(wildcard $(MCU_SRCDIR)/*.o)
-DMA_CLEAN=$(DMA_EXE) $(DMA_BIN) $(DMA_HEX) $(DMA_MAP) $(DMA_DUMP) $(wildcard $(DMA_SRCDIR)/*.o)
+EMU_HEADERS=$(wildcard $(EMU_SRCDIR)/*.h)
+EMU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(EMU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(EMU_SRCDIR)/*.s))
+MMU_HEADERS=$(wildcard $(MMU_SRCDIR)/*.h)
+MMU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(MMU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MMU_SRCDIR)/*.s))
+EMU_CLEAN=$(EMU_EXE) $(EMU_BIN) $(EMU_HEX) $(EMU_MAP) $(EMU_DUMP) $(wildcard $(EMU_SRCDIR)/*.o)
+MMU_CLEAN=$(MMU_EXE) $(MMU_BIN) $(MMU_HEX) $(MMU_MAP) $(MMU_DUMP) $(wildcard $(MMU_SRCDIR)/*.o)
 
 
-.PHONY: all mcu dma prog1 prog2 lst map dump loadmcu loaddma loadprog1 clean
+.PHONY: all emulator mmu prog1 prog2 lst map dump loademu loadmmu loadprog1 clean
 
 # default rule
-all: mcu dma prog1 prog2 lst map dump
+all: emulator mmu prog1 prog2 lst map dump
 
-mcu: $(MCU_EXE) $(MCU_BIN) $(MCU_HEX)
+emulator: $(EMU_EXE) $(EMU_BIN) $(EMU_HEX)
 
-dma: $(DMA_EXE) $(DMA_BIN) $(DMA_HEX)
+mmu: $(MMU_EXE) $(MMU_BIN) $(MMU_HEX)
 
 prog1: $(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX)
 
 prog2: $(PROG2_EXE) $(PROG2_BIN) $(PROG2_HEX)
 
-lst: $(patsubst %.c,%.lst,$(wildcard $(MCU_SRCDIR)/*.c)) $(patsubst %.c,%.lst,$(wildcard $(DMA_SRCDIR)/*.c))
+lst: $(patsubst %.c,%.lst,$(wildcard $(EMU_SRCDIR)/*.c)) $(patsubst %.c,%.lst,$(wildcard $(MMU_SRCDIR)/*.c))
 
-map: $(MCU_MAP) $(DMA_MAP)
+map: $(EMU_MAP) $(MMU_MAP)
 
-dump: $(MCU_DUMP) $(DMA_DUMP)
+dump: $(EMU_DUMP) $(MMU_DUMP)
 
-loadmcu: $(MCU_HEX)
-	-sudo avrdude $(MCU_AVRDUDEFLAGS) -U flash:w:$^
+loademu: $(EMU_HEX)
+	-sudo avrdude $(EMU_AVRDUDEFLAGS) -U flash:w:$^
 
-loaddma: $(DMA_HEX)
+loadmmu: $(MMU_HEX)
 	# ...
 
 loadprog1: $(PROG1_HEX)
 	# ...
 
 clean:
-	rm -f $(MCU_CLEAN)
-	rm -f $(DMA_CLEAN)
+	rm -f $(EMU_CLEAN)
+	rm -f $(MMU_CLEAN)
 
 
-$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.c $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -o $@ $<
+$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.c $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
-$(MCU_SRCDIR)/%.o: $(MCU_SRCDIR)/%.s $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -c -o $@ $<
+$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
-$(MCU_SRCDIR)/%.lst: $(MCU_SRCDIR)/%.c $(MCU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
-
-
-$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.c $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
-
-$(DMA_SRCDIR)/%.o: $(DMA_SRCDIR)/%.s $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -c -o $@ $<
-
-$(DMA_SRCDIR)/%.lst: $(DMA_SRCDIR)/%.c $(DMA_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
+$(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
 
 
-$(MCU_EXE): $(MCU_OBJECTS)
-	avr-gcc $(COMMON_CFLAGS) $(MCU_CFLAGS) -o $@ $^
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
 
-$(MCU_BIN): $(MCU_EXE)
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
+
+$(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
+
+
+$(EMU_EXE): $(EMU_OBJECTS)
+	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -o $@ $^
+
+$(EMU_BIN): $(EMU_EXE)
 	avr-objcopy -O binary $(COMMON_OBJCOPYFLAGS) $^ $@
 
-$(MCU_HEX): $(MCU_EXE)
+$(EMU_HEX): $(EMU_EXE)
 	avr-objcopy -O ihex $(COMMON_OBJCOPYFLAGS) $^ $@
 
-$(MCU_MAP): $(MCU_EXE)
+$(EMU_MAP): $(EMU_EXE)
 	avr-nm -ns $^ >$@
 
-$(MCU_DUMP): $(MCU_EXE)
+$(EMU_DUMP): $(EMU_EXE)
 	avr-objdump -s -d $^ >$@
 
 
-$(DMA_EXE): $(DMA_OBJECTS)
-	avr-gcc $(COMMON_CFLAGS) $(DMA_CFLAGS) -o $@ $^
+$(MMU_EXE): $(MMU_OBJECTS)
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -o $@ $^
 
-$(DMA_BIN): $(DMA_EXE)
+$(MMU_BIN): $(MMU_EXE)
 	avr-objcopy -O binary $(COMMON_OBJCOPYFLAGS) $^ $@
 
-$(DMA_HEX): $(DMA_EXE)
+$(MMU_HEX): $(MMU_EXE)
 	avr-objcopy -O ihex $(COMMON_OBJCOPYFLAGS) $^ $@
 
-$(DMA_MAP): $(DMA_EXE)
+$(MMU_MAP): $(MMU_EXE)
 	avr-nm -ns $^ >$@
 
-$(DMA_DUMP): $(DMA_EXE)
+$(MMU_DUMP): $(MMU_EXE)
 	avr-objdump -s -d $^ >$@
 
 
