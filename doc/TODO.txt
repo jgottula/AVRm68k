@@ -21,6 +21,12 @@ Priorities:
   - Use illegal instruction traps for unimplemented instruction opcodes
 - Write a bootloader that can do serial self-programming at around 1.25 Mbaud
   - Enable chain-programming: program the dma mcu from the main mcu
+- Put the FF clk on PORTA to save two cycles
+  - Instead of loading the new address, setting clk, and then clearing clk,
+    clear clk as the address is loaded, and then set it as a second step
+  - Order matters: don't give the flip-flop a positive edge as its inputs change
+- Stack trace on assertion failures (use map file to manually symbolify)
+- Implement RTS/CTS for the UART so the FT232R doesn't overflow its buffer
 
 Bugs:
 - Handling of stack pointers is wrong: if in user mode, %sp means %a7; however,
