@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_DMA_IO_H
-#define JGOTTULA_DMA_IO_H
+#ifndef JGOTTULA_MMU_IO_H
+#define JGOTTULA_MMU_IO_H
 
 #include "../common/io.h"
 
