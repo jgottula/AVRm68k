@@ -7,6 +7,7 @@ Boot Process
   - Load BIOS settings from EEPROM (if not already loaded)
   - Start and verify devices based on BIOS settings
     - Most important: SD card, DRAM, UART
+    - Move DRAM test code here
   - Jump to bootloader
 - Bootloader (if implemented in firmware)
   - Set CPU settings
