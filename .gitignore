@@ -6,3 +6,4 @@
 *.map
 *.dump
 schematic/*.*#*
+schematic/*.epf
