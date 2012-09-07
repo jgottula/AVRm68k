@@ -20,3 +20,13 @@ Ethernet		?				?			Hard	Network functionality
 
 Some devices are potentially doable in software on Linux, or on top of other
 	emulated hardware (e.g. wifi using usb adapter)
+
+Mass storage possibilities:
+- Network file system access in software (possibly involving usb net adapter)
+- USB hard drive connection
+- Implement IDE spec (could be simple; connector has nice, easy pin spacing)
+  - PIO looks easiest; DMA is also possible!
+  - Large IO requirement (alleviate with flipflops or shift registers)
+- Implement SCSI spec
+  - Looks superficially similar in difficulty to IDE
+  - The older the drive, the better
