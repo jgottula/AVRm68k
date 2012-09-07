@@ -10,3 +10,4 @@ Configurable BIOS
   - View/set AVR fuses (non-useful or dangerous ones will be read-only)
   - Change DMA/DRAM controller settings (via special IO mode probably)
   - Enable/disable hardware debugger
+  - Choose fast or thorough POST
