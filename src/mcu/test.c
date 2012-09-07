@@ -139,7 +139,7 @@ static void testDRAM(void)
 		chunkErrors = 0;
 		
 		uartWritePSTR("chunk 0x");
-		uartWriteHex24(chunk, false);
+		uartWriteHex32(chunk, false);
 		
 		uartWritePSTR(": waiting");
 		_delay_ms(delayTime);
@@ -174,13 +174,13 @@ static void testDRAM(void)
 					max = addr;
 				++chunkErrors;
 				
-				/*uartWritePSTR("\nerror @ 0x");
-				uartWriteHex24(addr, false);
+				uartWritePSTR("\nerror @ 0x");
+				uartWriteHex32(addr, false);
 				uartWritePSTR(": exp 0x");
 				uartWriteHex8(0x55, true);
 				uartWritePSTR(" act 0x");
 				uartWriteHex8(byte, true);
-				uartWriteChr(' ');*/
+				uartWriteChr(' ');
 			}
 			_delay_us(1);
 			
@@ -192,13 +192,13 @@ static void testDRAM(void)
 					max = addr;
 				++chunkErrors;
 				
-				/*uartWritePSTR("\nerror @ 0x");
-				uartWriteHex24(addr + 1, false);
+				uartWritePSTR("\nerror @ 0x");
+				uartWriteHex32(addr + 1, false);
 				uartWritePSTR(": exp 0x");
 				uartWriteHex8(0xaa, true);
 				uartWritePSTR(" act 0x");
 				uartWriteHex8(byte, true);
-				uartWriteChr(' ');*/
+				uartWriteChr(' ');
 			}
 			_delay_us(1);
 		}
@@ -209,8 +209,8 @@ static void testDRAM(void)
 		uartWriteDec16(chunkErrors);
 		uartWritePSTR(" errors).\n");
 		
-		if (chunkErrors > 0)
-			goto redo;
+		/*if (chunkErrors > 0)
+			goto redo;*/
 	}
 	
 	for (uint32_t i = 0xffffff; (int32_t)i >= 0; --i)
@@ -223,14 +223,14 @@ static void testDRAM(void)
 		if (byte != 0xff)
 		{
 			uartWritePSTR("failed @ 0x");
-			uartWriteHex24(i, false);
+			uartWriteHex32(i, false);
 			uartWritePSTR(" (expected: 0x");
 			uartWriteHex8(0xff, false);
 			uartWritePSTR(" actual: 0x");
 			uartWriteHex8(byte, false);
 			uartWritePSTR(")\n");
 			
-			/*uartWriteHex24(i, false);
+			/*uartWriteHex32(i, false);
 			uartWriteChr('\n');*/
 			
 			if (i < min)
@@ -244,11 +244,158 @@ static void testDRAM(void)
 	
 	uartWriteDec16(errors);
 	uartWritePSTR(" total errors (min: 0x");
-	uartWriteHex24(min, false);
+	uartWriteHex32(min, false);
 	uartWritePSTR(", max: 0x");
-	uartWriteHex24(max, false);
+	uartWriteHex32(max, false);
 	uartWritePSTR(")\n");
 #endif
+	
+	uint8_t write[0x40];
+	//memset(write, 0xff, sizeof(write));
+	for (uint16_t i = 0; i < sizeof(write); ++i)
+		write[i] = i;
+	uint8_t read[sizeof(write)];
+	
+	for (uint32_t addr = 0x01000000; addr < 0x01100000; addr += sizeof(write))
+	{
+		//dramWriteFPM(addr, sizeof(write), write);
+		for (uint16_t i = 0; i < sizeof(write); ++i)
+			dramWrite(addr + i, write[i]);
+	}
+	
+	for ( ; ; )
+	{
+		for (uint32_t addr = 0x01000000; addr < 0x01100000; addr += sizeof(write))
+		{
+			/*for (uint8_t i = 0; i < 2; ++i)
+			{*/
+				//dramReadFPM(addr, sizeof(write), read);
+				for (uint16_t j = 0; j < sizeof(write); ++j)
+					read[j] = dramRead(addr + j);
+				
+				uartWritePSTR("0x");
+				uartWriteHex8(addr >> 24, false);
+				uartWriteChr(':');
+				uartWriteHexTop12(addr, false);
+				uartWriteChr(':');
+				uartWriteHexBottom12(addr, false);
+				uartWritePSTR("  ");
+				
+				for (uint16_t j = 0; j < sizeof(write); ++j)
+				{
+					if (read[j] == write[j])
+						uartWriteChr(' ');
+					else
+						uartWriteChr('X');
+				}
+				uartWriteChr('\n');
+				
+				_delay_ms(1);
+			/*}*/
+		}
+		
+		_delay_ms(10000);
+	}
+	
+	uartWritePSTR("another dram test.\n");
+	for (uint32_t i = 0; i < 2; ++i)
+	{
+		uint32_t addr = (0x01000000 * i);
+		
+		uint8_t data[0x800];
+		
+		srandom(2);
+		
+		/*for (int32_t j = 0; j < sizeof(data); ++j)
+		{
+			data[j] = random();
+			//data[j] = j;
+			//dramWrite(addr + j, data[j]);
+		}
+		dramWriteFPM(addr, sizeof(data), data);*/
+		
+		/*for (int16_t j = 0; j < sizeof(data); j += 2)
+			dramWrite(addr + j, data[j]);
+		for (int16_t j = 1; j < sizeof(data); j += 2)
+			dramWrite(addr + j, data[j]);*/
+		
+		//_delay_ms(10000);
+		
+		/*uint8_t check[sizeof(data)];
+		dramReadFPM(addr, sizeof(check), check);
+		for (int32_t j = 0; j < sizeof(check); ++j)
+		{
+			uartWritePSTR("0x");
+			uartWriteHex8((addr + j) >> 24, false);
+			uartWriteChr(':');
+			uartWriteHexTop12(addr + j, false);
+			uartWriteChr(':');
+			uartWriteHexBottom12(addr + j, false);
+			uartWritePSTR("   0x");
+			uartWriteHex8(data[j], false);
+			uartWritePSTR("  0x");
+			uartWriteHex8(check[j], false);
+			if (data[j] != check[j])
+			{
+				uartWritePSTR("   0x");
+				uartWriteHex8(data[j] ^ check[j], false);
+				uartWritePSTR("  |");
+				for (int8_t k = 0; k < 8; ++k)
+				{
+					if (((data[j] ^ check[j]) & (1 << (7 - k))) != 0)
+					{
+						if ((check[j] & (1 << (7 - k))) != 0)
+							uartWriteChr('+');
+						else
+							uartWriteChr('-');
+					}
+					else
+						uartWriteChr(' ');
+				}
+				uartWriteChr('|');
+			}
+			uartWriteChr('\n');
+			_delay_ms(1);
+		}*/
+		/*for (int32_t j = 0; j < sizeof(data); ++j)
+		{
+			uint8_t check = dramRead(addr + j);
+			
+			uartWritePSTR("0x");
+			uartWriteHex8((addr + j) >> 24, false);
+			uartWriteChr(':');
+			uartWriteHexTop12(addr + j, false);
+			uartWriteChr(':');
+			uartWriteHexBottom12(addr + j, false);
+			uartWritePSTR("   0x");
+			uartWriteHex8(data[j], false);
+			uartWritePSTR("  0x");
+			uartWriteHex8(check, false);
+			if (data[j] != check)
+			{
+				uartWritePSTR("   0x");
+				uartWriteHex8(data[j] ^ check, false);
+				uartWritePSTR("  |");
+				for (int8_t k = 0; k < 8; ++k)
+				{
+					if (((data[j] ^ check) & (1 << (7 - k))) != 0)
+					{
+						if ((check & (1 << (7 - k))) != 0)
+							uartWriteChr('+');
+						else
+							uartWriteChr('-');
+					}
+					else
+						uartWriteChr(' ');
+				}
+				uartWriteChr('|');
+			}
+			uartWriteChr('\n');
+			_delay_ms(1);
+		}*/
+	}
+	
+	for (;;);
 	
 	uartWritePSTR("dram test: writing.\n");
 	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 4096)
@@ -267,6 +414,7 @@ static void testDRAM(void)
 	_delay_ms(60000);
 	uartWritePSTR("1 minute left.\n");
 	_delay_ms(60000);*/
+	
 	uartWritePSTR("dram test: reading.\n");
 	for (uint32_t i = 0x000000; i < DRAM_SIZE / 16; i += 4096)
 	{
@@ -279,17 +427,16 @@ static void testDRAM(void)
 			if (arr[j] != (j & 0xff))
 			{
 				uartWritePSTR("err: 0x");
-				uartWriteHex24(i + j, false);
+				uartWriteHex32(i + j, false);
 				uartWritePSTR(" exp: 0x");
 				uartWriteHex8(j, false);
 				uartWritePSTR(" act: 0x");
 				uartWriteHex8(arr[j], false);
 				uartWriteChr('\n');
 				
-				break;
+				//break;
 			}
 		}
-
 	}
 	uartWritePSTR("dram test: done.\n");
 }
