@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_MCU_IO_H
-#define JGOTTULA_MCU_IO_H
+#ifndef JGOTTULA_EMULATOR_IO_H
+#define JGOTTULA_EMULATOR_IO_H
 
 #include "../common/io.h"
 

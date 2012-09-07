@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_MCU_UART_H
-#define JGOTTULA_MCU_UART_H
+#ifndef JGOTTULA_EMULATOR_UART_H
+#define JGOTTULA_EMULATOR_UART_H
 
 #include <stdint.h>
 #include <stdbool.h>

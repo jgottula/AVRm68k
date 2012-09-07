@@ -1,5 +1,5 @@
-#ifndef JGOTTULA_MCU_M68K_MEM_H
-#define JGOTTULA_MCU_M68K_MEM_H
+#ifndef JGOTTULA_EMULATOR_M68K_MEM_H
+#define JGOTTULA_EMULATOR_M68K_MEM_H
 
 #include <stdbool.h>
 #include <stdint.h>
