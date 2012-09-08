@@ -34,3 +34,31 @@ uint32_t signExtend16to32(uint16_t word)
 	else
 		return word;
 }
+
+uint8_t bcdPack(uint8_t msd, uint8_t lsd)
+{
+	return ((msd << 4) | (lsd & 0x0f));
+}
+
+uint16_t bcdUnpack(uint8_t packed)
+{
+	return (((packed & 0xf0) << 4) | (packed & 0x0f));
+}
+
+uint8_t bcdAdd(uint8_t lhs, uint8_t rhs)
+{
+	/* this function assumes valid bcd digits */
+	
+	/* probably this doesn't work quite right */
+	
+	uint8_t lsdSum = ((lhs & 0x0f) + (rhs & 0x0f));
+	bool carry = (lsdSum >= 10);
+	uint8_t msdSum = ((lhs & 0xf0) + (rhs & 0xf0) + (carry ? 0 : 0x10));
+	
+	return ((msdSum % 160) | (lsdSum % 10));
+}
+
+uint8_t bcdNegate(uint8_t packed)
+{
+	
+}
