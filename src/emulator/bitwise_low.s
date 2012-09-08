@@ -5,17 +5,18 @@
 
 	.section .text
 	
+	
+	/* parameters:
+	 * - uint32_t  operand [r25:r22]
+	 * - uint8_t   shifts  [r20]
+	 *             (must be >0)
+	 * - uint8_t  *flags   [r19:r18]
+	 *             (bits 1 and 5 are last bit shifted out)
+	 * returns:
+	 * - uint32_t result  [r25:r22]
+	 */
 	.global shiftRightArithLong
 	.type shiftRightArithLong,@function
-/* parameters:
- * - uint32_t  operand [r25:r22]
- * - uint8_t   shifts  [r20]
- *             (must be >0)
- * - uint8_t  *flags   [r19:r18]
- *             (bits 1 and 5 are last bit shifted out)
- * returns:
- * - uint32_t result  [r25:r22]
- */
 shiftRightArithLong:
 	clr r21
 	
@@ -43,18 +44,18 @@ shiftRightArithLong_NoCarry:
 	ret
 	
 	
+	/* parameters:
+	 * - uint32_t  operand [r25:r22]
+	 * - uint8_t   shifts  [r20]
+	 *             (must be >0)
+	 * - uint8_t  *flags   [r19:r18]
+	 *             (bits 1 and 5 are last bit shifted out,
+	 *              bit 2 indicates if msb changed at any time)
+	 * returns:
+	 * - uint32_t result  [r25:r22]
+	 */
 	.global shiftLeftArithLong
 	.type shiftLeftArithLong,@function
-/* parameters:
- * - uint32_t  operand [r25:r22]
- * - uint8_t   shifts  [r20]
- *             (must be >0)
- * - uint8_t  *flags   [r19:r18]
- *             (bits 1 and 5 are last bit shifted out,
- *              bit 2 indicates if msb changed at any time)
- * returns:
- * - uint32_t result  [r25:r22]
- */
 shiftLeftArithLong:
 	clr r21
 	
