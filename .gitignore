@@ -6,5 +6,6 @@
 *.hex
 *.map
 *.dump
+linux/vmlinux.dump*
 schematic/*.*#*
 schematic/*.epf
