@@ -190,7 +190,7 @@ void uartInit(void)
 {
 	/* set the baud rate to 230400 baud
 	 * the formula is: (F_CPU / (8 * BAUD_RATE)) - 1 [with U2X0 on]
-	 * see table 20-11 in the ATmega328p manual for details */
+	 * see table 19-12 in the ATmega1284P manual for details */
 	UBRR0 = 10;
 	
 	/* enable the double speed bit */
