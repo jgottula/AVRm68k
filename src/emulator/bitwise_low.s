@@ -5,8 +5,8 @@
 
 	.section .text
 	
-	
 	.global shiftRightArithLong
+	.type shiftRightArithLong,@function
 /* parameters:
  * - uint32_t  operand [r25:r22]
  * - uint8_t   shifts  [r20]
@@ -44,6 +44,7 @@ shiftRightArithLong_NoCarry:
 	
 	
 	.global shiftLeftArithLong
+	.type shiftLeftArithLong,@function
 /* parameters:
  * - uint32_t  operand [r25:r22]
  * - uint8_t   shifts  [r20]
