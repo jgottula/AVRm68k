@@ -1,8 +1,4 @@
-#include "spi.h"
-#include <avr/io.h>
-#include <util/delay.h>
-#include "debug.h"
-#include "io.h"
+#include "all.h"
 
 static void spiSelect(uint8_t slave)
 {

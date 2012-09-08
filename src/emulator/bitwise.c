@@ -1,4 +1,4 @@
-#include "bitwise.h"
+#include "all.h"
 
 uint16_t decodeBigEndian16(const uint8_t *bytes)
 {

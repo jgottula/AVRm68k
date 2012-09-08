@@ -1,10 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_M68K_H
 #define JGOTTULA_EMULATOR_M68K_H
 
-#include <avr/io.h>
-#include <stdbool.h>
-#include <stdint.h>
-
 #define SR_CARRY    _BV(1)
 #define SR_OVERFLOW _BV(2)
 #define SR_ZERO     _BV(3)

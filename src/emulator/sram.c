@@ -1,6 +1,4 @@
-#include "sram.h"
-#include "io.h"
-#include "spi.h"
+#include "all.h"
 
 static uint8_t currentSR = SRAM_SR_MODE_BYTE;
 

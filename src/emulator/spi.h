@@ -1,8 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_SPI_H
 #define JGOTTULA_EMULATOR_SPI_H
 
-#include <stdint.h>
-
 enum {
 	SPIMODE_CPOL = 0b10,
 	SPIMODE_CPHA = 0b01,

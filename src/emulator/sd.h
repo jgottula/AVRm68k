@@ -1,10 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_SD_H
 #define JGOTTULA_EMULATOR_SD_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <avr/io.h>
-
 enum {
 	SDCMD0 = 0,
 	SDCMD_GO_IDLE_STATE = 0,

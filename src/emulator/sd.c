@@ -1,10 +1,4 @@
-#include "sd.h"
-#include <string.h>
-#include <util/delay.h>
-#include "debug.h"
-#include "intr.h"
-#include "io.h"
-#include "spi.h"
+#include "all.h"
 
 static struct {
 	bool init;

@@ -1,18 +1,4 @@
-#include <stdint.h>
-#include <stdnoreturn.h>
-#include <string.h>
-#include <util/atomic.h>
-#include <util/delay.h>
-#include "debug.h"
-#include "dram.h"
-#include "intr.h"
-#include "io.h"
-#include "m68k.h"
-#include "m68k_mem.h"
-#include "sd.h"
-#include "spi.h"
-#include "test.h"
-#include "uart.h"
+#include "all.h"
 
 noreturn void main(void)
 {

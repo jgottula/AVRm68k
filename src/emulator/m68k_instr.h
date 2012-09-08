@@ -1,9 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_M68K_INSTR_H
 #define JGOTTULA_EMULATOR_M68K_INSTR_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
 void instrEmu(void);
 void instrAddq(void);
 void instrAndEorOr(bool or, bool exclusive, bool dataRegDest);

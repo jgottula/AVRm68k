@@ -1,10 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_UART_H
 #define JGOTTULA_EMULATOR_UART_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <avr/pgmspace.h>
-
 /* convert \n to \r\n for serial terminals */
 #define ADD_CARRIAGE_RETURN
 

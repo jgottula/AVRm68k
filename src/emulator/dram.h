@@ -1,9 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_DRAM_H
 #define JGOTTULA_EMULATOR_DRAM_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #define DRAM_SAFE_MODE 0
 
 #define DRAM_SIZE         0x2000000 // 2 x (16 x 8 Mbit)

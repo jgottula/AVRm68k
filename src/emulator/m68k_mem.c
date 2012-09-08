@@ -1,8 +1,4 @@
-#include "m68k_mem.h"
-#include "debug.h"
-#include "dram.h"
-#include "m68k.h"
-#include "uart.h"
+#include "all.h"
 
 uint32_t memRead(uint32_t addr, uint8_t size)
 {

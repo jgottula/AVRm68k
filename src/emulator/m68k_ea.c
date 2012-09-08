@@ -1,9 +1,4 @@
-#include "m68k_ea.h"
-#include "bitwise.h"
-#include "debug.h"
-#include "m68k.h"
-#include "m68k_instr.h"
-#include "m68k_mem.h"
+#include "all.h"
 
 static bool extWordType(const uint8_t *ptr)
 {

@@ -1,9 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_INTR_H
 #define JGOTTULA_EMULATOR_INTR_H
 
-#include <stdint.h>
-#include <stdbool.h>
-
 /* msec counts centiseconds
  * sec counts seconds */
 extern volatile uint16_t msec, sec;

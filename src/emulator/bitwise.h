@@ -1,11 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_BITWISE_H
 #define JGOTTULA_EMULATOR_BITWISE_H
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <avr/cpufunc.h>
-#include <avr/io.h>
-
 uint16_t decodeBigEndian16(const uint8_t *bytes);
 uint32_t decodeBigEndian32(const uint8_t *bytes);
 uint16_t signExtend8to16(uint8_t byte);

@@ -1,8 +1,4 @@
-#include "intr.h"
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include "dram.h"
-#include "io.h"
+#include "all.h"
 
 static volatile uint8_t dramCounter = 0;
 static volatile uint16_t counter = 0;

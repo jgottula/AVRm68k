@@ -1,17 +1,4 @@
-#include "test.h"
-#include <string.h>
-#include <avr/eeprom.h>
-#include <util/atomic.h>
-#include <util/delay.h>
-#include "bitwise.h"
-#include "debug.h"
-#include "dram.h"
-#include "io.h"
-#include "intr.h"
-#include "m68k.h"
-#include "m68k_mem.h"
-#include "sram.h"
-#include "uart.h"
+#include "all.h"
 
 uint8_t global;
 

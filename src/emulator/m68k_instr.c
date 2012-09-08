@@ -1,10 +1,4 @@
-#include "m68k_instr.h"
-#include "bitwise.h"
-#include "debug.h"
-#include "m68k.h"
-#include "m68k_ea.h"
-#include "m68k_mem.h"
-#include "uart.h"
+#include "all.h"
 
 extern const uint8_t *instr;
 

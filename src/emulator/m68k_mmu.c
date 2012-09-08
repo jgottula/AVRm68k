@@ -1,3 +1,3 @@
-#include "m68k_mmu.h"
+#include "all.h"
 
 

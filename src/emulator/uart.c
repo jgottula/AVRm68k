@@ -1,6 +1,4 @@
-#include "uart.h"
-#include "debug.h"
-#include "io.h"
+#include "all.h"
 
 bool uartAvail(void)
 {

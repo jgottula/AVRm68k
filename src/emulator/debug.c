@@ -1,6 +1,4 @@
-#include "debug.h"
-#include <util/delay.h>
-#include "io.h"
+#include "all.h"
 
 void assertFail(const char *file, uint16_t line)
 {

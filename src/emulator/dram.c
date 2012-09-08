@@ -1,12 +1,4 @@
-#include "dram.h"
-#include <avr/cpufunc.h>
-#include <util/atomic.h>
-#include <util/delay.h>
-#include <util/delay_basic.h>
-#include "debug.h"
-#include "intr.h"
-#include "io.h"
-#include "uart.h"
+#include "all.h"
 
 #if DRAM_SAFE_MODE
 #define delay() _NOP(); _NOP()

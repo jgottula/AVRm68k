@@ -1,10 +1,4 @@
-#include "m68k.h"
-#include <avr/eeprom.h>
-#include "debug.h"
-#include "intr.h"
-#include "m68k_instr.h"
-#include "m68k_mem.h"
-#include "uart.h"
+#include "all.h"
 
 static uint8_t fetchBuffer[22]; // must have even size
 const uint8_t *instr;

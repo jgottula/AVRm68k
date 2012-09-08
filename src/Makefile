@@ -35,12 +35,16 @@ EMU_BIN:=$(EMU_SRCDIR)/$(EMU_BASENAME).bin
 EMU_HEX=$(EMU_SRCDIR)/$(EMU_BASENAME).hex
 EMU_MAP:=$(EMU_SRCDIR)/$(EMU_BASENAME).map
 EMU_DUMP:=$(EMU_SRCDIR)/$(EMU_BASENAME).dump
+EMU_PCH:=$(EMU_SRCDIR)/all.h
+EMU_PCH_EXT:=$(EMU_PCH).gch
 
 MMU_EXE:=$(MMU_SRCDIR)/$(MMU_BASENAME).out
 MMU_BIN:=$(MMU_SRCDIR)/$(MMU_BASENAME).bin
 MMU_HEX=$(MMU_SRCDIR)/$(MMU_BASENAME).hex
 MMU_MAP:=$(MMU_SRCDIR)/$(MMU_BASENAME).map
 MMU_DUMP:=$(MMU_SRCDIR)/$(MMU_BASENAME).dump
+MMU_PCH:=$(MMU_SRCDIR)/all.h
+MMU_PCH_EXT:=$(MMU_PCH).gch
 
 PROG1_EXE=$(PROG_SRCDIR)/$(PROG1_BASENAME).out
 PROG1_BIN=$(PROG_SRCDIR)/$(PROG1_BASENAME).bin
@@ -63,12 +67,12 @@ PROG1_SOURCE=$(wildcard $(PROG_SRCDIR)/*.s)
 PROG2_SOURCE=$(wildcard $(PROG_SRCDIR)/*.c)
 EMU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(EMU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(EMU_SRCDIR)/*.s))
 MMU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(MMU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MMU_SRCDIR)/*.s))
-EMU_CLEAN=$(EMU_EXE) $(EMU_BIN) $(EMU_HEX) $(EMU_MAP) $(EMU_DUMP) $(wildcard $(EMU_SRCDIR)/*.o) $(wildcard $(EMU_SRCDIR)/*.lst)
-MMU_CLEAN=$(MMU_EXE) $(MMU_BIN) $(MMU_HEX) $(MMU_MAP) $(MMU_DUMP) $(wildcard $(MMU_SRCDIR)/*.o) $(wildcard $(EMU_SRCDIR)/*.lst)
+EMU_CLEAN=$(EMU_EXE) $(EMU_BIN) $(EMU_HEX) $(EMU_MAP) $(EMU_DUMP) $(wildcard $(EMU_SRCDIR)/*.o) $(wildcard $(EMU_SRCDIR)/*.lst) $(wildcard $(EMU_SRCDIR)/*.gch)
+MMU_CLEAN=$(MMU_EXE) $(MMU_BIN) $(MMU_HEX) $(MMU_MAP) $(MMU_DUMP) $(wildcard $(MMU_SRCDIR)/*.o) $(wildcard $(EMU_SRCDIR)/*.lst) $(wildcard $(EMU_SRCDIR)/*.gch)
 PROG_CLEAN=$(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX) $(PROG1_MAP) $(PROG1_DUMP) $(PROG2_EXE) $(PROG2_BIN) $(PROG2_HEX) $(PROG2_MAP) $(PROG2_DUMP)
 
 
-.PHONY: all emulator mmu prog prog1 prog2 lst map dump loademu loadmmu loadprog1 loadprog2 clean
+.PHONY: all emulator mmu prog prog1 prog2 pch lst map dump loademu loadmmu loadprog1 loadprog2 clean
 
 # default rule
 all: emulator mmu prog lst map dump
@@ -82,6 +86,8 @@ prog: prog1 prog2
 prog1: $(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX)
 
 prog2: $(PROG2_EXE) $(PROG2_BIN) $(PROG2_HEX)
+
+pch: $(EMU_PCH_EXT) $(MMU_PCH_EXT)
 
 lst: $(patsubst %.c,%.lst,$(wildcard $(EMU_SRCDIR)/*.c)) $(patsubst %.c,%.lst,$(wildcard $(MMU_SRCDIR)/*.c))
 
@@ -107,25 +113,28 @@ clean:
 	rm -f $(PROG_CLEAN)
 
 
-$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.c $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
-$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
-$(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
 
 
-$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
 
-$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
 
-$(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
 
+
+$(EMU_PCH_EXT): $(EMU_PCH) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(EMU_PCH)
 
 $(EMU_EXE): $(EMU_OBJECTS)
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -o $@ $^
@@ -142,6 +151,9 @@ $(EMU_MAP): $(EMU_EXE)
 $(EMU_DUMP): $(EMU_EXE)
 	avr-objdump $(COMMON_OBJDUMPFLAGS) $^ >$@
 
+
+$(MMU_PCH_EXT): $(MMU_PCH) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(MMU_PCH)
 
 $(MMU_EXE): $(MMU_OBJECTS)
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -o $@ $^

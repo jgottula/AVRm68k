@@ -1,9 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_SRAM_H
 #define JGOTTULA_EMULATOR_SRAM_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
 /* 32 KiB */
 #define SRAM_SIZE 0x8000
 

@@ -1,13 +1,6 @@
 #ifndef JGOTTULA_EMULATOR_DEBUG_H
 #define JGOTTULA_EMULATOR_DEBUG_H
 
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
-#include <avr/wdt.h>
-#include <stdint.h>
-#include <stdnoreturn.h>
-#include "uart.h"
-
 #define ASSERT_DIE
 #undef  ASSERT_RESET
 
