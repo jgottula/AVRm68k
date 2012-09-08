@@ -32,6 +32,10 @@ Bugs:
 - Handling of stack pointers is wrong: if in user mode, %sp means %a7; however,
   if we are in supervisor mode, %a7 is actually either %isp or %msp (see section
   1.3.1 of M68000PRM.pdf)
+- ALL instances of exceptions (illegal instr, hw reset, etc.) need to be handled
+  precisely as documented: no more messy emulation
+- EA modes need to be a bit more restrictive
+  - They likely need to be checked in general anyway
 
 Tests:
 - Address modes:
