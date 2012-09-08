@@ -125,16 +125,6 @@ $(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HE
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
 
 
-$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
-
-$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
-
-$(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
-
-
 $(EMU_PCH_EXT): $(EMU_PCH) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(EMU_PCH)
 
@@ -152,6 +142,16 @@ $(EMU_MAP): $(EMU_EXE)
 
 $(EMU_DUMP): $(EMU_EXE)
 	avr-objdump $(COMMON_OBJDUMPFLAGS) $^ >$@
+
+
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
+
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
+
+$(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
 
 
 $(MMU_PCH_EXT): $(MMU_PCH) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
