@@ -1,3 +1,10 @@
+/* AVRm68k [test programs]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* instruction tests in m68k assembly */
+
 	.section .text
 	
 	.equ EMU_DUMPREG, 0xa001
