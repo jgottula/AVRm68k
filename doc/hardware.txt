@@ -30,3 +30,12 @@ Mass storage possibilities:
 - Implement SCSI spec
   - Looks superficially similar in difficulty to IDE
   - The older the drive, the better
+
+Ways of implementing hardware:
+- Write driver that uses emulator instructions
+  - Fastest performance
+- Implement standard driver IO addressing
+  - Should not require writing a driver
+  - Will require BIOS cooperation to expose the device
+  - May not be too slow because IO addresses can probably be quickly intercepted
+- Emulate standard buses like SPI, I2C/SMBus, PCI, ISA
