@@ -1,3 +1,10 @@
+# AVRm68k
+# (c) 2012 Justin Gottula
+# The source code of this project is distributed under the terms of the
+# simplified BSD license. See the LICENSE file for details. */
+
+# project makefile
+
 EMU_BASENAME:=emulator
 EMU_MCU:=atmega1284p
 EMU_FREQ_KHZ:=20000
@@ -22,13 +29,12 @@ COMMON_LST_CFLAGS=-c -O0 -g -w -Wa,-adhln -o /dev/null
 COMMON_OBJCOPYFLAGS:=-R .eeprom
 COMMON_OBJDUMPFLAGS:=-s -d
 
-INCLUDE:=
-LINK:=
 
 COMMON_SRCDIR:=common
 EMU_SRCDIR:=emulator
 MMU_SRCDIR:=mmu
 PROG_SRCDIR:=prog
+
 
 EMU_EXE:=$(EMU_SRCDIR)/$(EMU_BASENAME).out
 EMU_BIN:=$(EMU_SRCDIR)/$(EMU_BASENAME).bin
@@ -78,13 +84,11 @@ PROG_CLEAN=$(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX) $(PROG1_MAP) $(PROG1_DUMP) $(P
 all: emulator mmu prog lst map dump
 
 emulator: $(EMU_EXE) $(EMU_BIN) $(EMU_HEX)
-
 mmu: $(MMU_EXE) $(MMU_BIN) $(MMU_HEX)
 
 prog: prog1 prog2
 
 prog1: $(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX)
-
 prog2: $(PROG2_EXE) $(PROG2_BIN) $(PROG2_HEX)
 
 pch: $(EMU_PCH_EXT) $(MMU_PCH_EXT)
@@ -97,13 +101,11 @@ dump: $(EMU_DUMP) $(MMU_DUMP) $(PROG1_DUMP) $(PROG2_DUMP)
 
 loademu: $(EMU_HEX)
 	-sudo avrdude $(EMU_AVRDUDEFLAGS) -U flash:w:$^
-
 loadmmu: $(MMU_HEX)
 	-sudo avrdude $(MMU_AVRDUDEFLAGS) -U flash:w:$^
 
 loadprog1: $(PROG1_HEX)
 	-sudo avrdude $(PROG_AVRDUDEFLAGS) -U eeprom:w:$^
-
 loadprog2: $(PROG2_HEX)
 	-sudo avrdude $(PROG_AVRDUDEFLAGS) -U eeprom:w:$^
 
