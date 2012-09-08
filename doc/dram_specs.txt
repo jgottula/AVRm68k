@@ -1,0 +1,49 @@
+DRAM specs
+
+
+Century SIMM from old 286 computer
+
+- An extremely brief and unreadable datasheet exists
+- Has 9 x Toshiba TC511000AJ-80 DRAM chips
+- Capacity is 8 x 1Mib = 1 MiB
+- Uses 4.5~5.5 volts
+- Max current is 70 mA; standby current is 1-2 mA
+- Logical zero voltage: < 0.8 volts
+- Logical one voltage:  > 2.4 volts
+- Support for fpm is questionable
+- Probably doesn't support cbr refresh
+- Timing requirements in nanoseconds (refer to other, better dataheets for the
+  meanings of the subscript acronyms):
+  - tRAC < 80
+  - tRCY > 150
+  - tCAD > 20
+  - tAH  > 15
+  - tP   > 60 
+  - tWCY > 150
+  - tDH  > 15
+  - tRWC > 175
+- Refreshing at 250 ms seems to retain data; 500 fails; <= 100 seems safest
+
+
+OWC 16 MiB SIMM
+
+- Has 8 x KM41C16000CK-6 (no parity)
+- Datasheet with full specs is available
+- This SIMM appears to have damage
+  - It appeared early on, so it's likely not my fault
+  - No way to return after soldering pins onto the pads
+
+
+MemoryX 16 MiB SIMM
+
+- Has 9 x KM41C6000AK-6 (has parity)
+- Datasheet with full specs is available
+- Works fantastically
+
+
+Unknown 16 MiB SIMM
+
+- Purchased from eBay
+- SIMM pictured has 9 x HYB514100BJ-60
+  - A good datasheet exists for this particular DRAM chip
+  - Actual SIMM may have a different chip (it lacks parity, for example)
