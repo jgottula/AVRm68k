@@ -1,5 +1,13 @@
-#ifndef JGOTTULA_EMULATOR_SD_H
-#define JGOTTULA_EMULATOR_SD_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* sd card storage functions */
+
+#ifndef AVRM68K_EMULATOR_SD_H
+#define AVRM68K_EMULATOR_SD_H
+
 
 enum {
 	SDCMD0 = 0,
@@ -12,6 +20,7 @@ enum {
 	SDCMD_READ_OCR = 58
 } SDSPICmd;
 
+
 enum {
 	SDR1_PARAM_ERROR = _BV(6),
 	SDR1_ADDR_ERROR  = _BV(5),
@@ -22,10 +31,12 @@ enum {
 	SDR1_IDLE        = _BV(0)
 } SDR1Bits;
 
+
 enum {
 	SDVOLT_33  = 0b0001,
 	SDVOLT_LOW = 0b0010
 } SDVoltage;
+
 
 typedef struct {
 	uint8_t resp;
@@ -48,7 +59,9 @@ typedef union {
 	SDR7 r7;
 } SDRx;
 
+
 bool sdCardDetect();
 void sdInit();
+
 
 #endif

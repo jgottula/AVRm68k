@@ -1,5 +1,13 @@
-#ifndef JGOTTULA_EMULATOR_M68K_INSTR_H
-#define JGOTTULA_EMULATOR_M68K_INSTR_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* m68k emulated instruction implementations */
+
+#ifndef AVRM68K_EMULATOR_M68K_INSTR_H
+#define AVRM68K_EMULATOR_M68K_INSTR_H
+
 
 void instrEmu(void);
 void instrAddq(void);
@@ -36,5 +44,6 @@ void instrScc(void);
 void instrSwap(void);
 void instrTst(void);
 void instrUnlk(void);
+
 
 #endif

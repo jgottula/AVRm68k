@@ -1,8 +1,13 @@
-#ifndef JGOTTULA_EMULATOR_PCM_H
-#define JGOTTULA_EMULATOR_PCM_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
 
-#include <stdbool.h>
-#include <stdint.h>
+/* phase-change memory access code */
+
+#ifndef AVRM68K_EMULATOR_PCM_H
+#define AVRM68K_EMULATOR_PCM_H
+
 
 #define PCM_INSTR_WREN        0b00000110
 #define PCM_INSTR_WRDI        0b00000110
@@ -25,6 +30,7 @@
 #define PCM_INSTR_SEC_ERASE   0b11011000   
 #define PCM_INSTR_BULK_ERASE  0b11000111
 
+
 #define PCM_SR_WIP  _BV(0)
 #define PCM_SR_WEL  _BV(1)
 #define PCM_SR_BP0  _BV(2)
@@ -34,6 +40,7 @@
 #define PCM_SR_BP3  _BV(6)
 #define PCM_SR_SRWD _BV(7)
 
+
 void pcmReadRange(uint32_t addr, uint16_t num, uint8_t *dest);
 uint8_t pcmReadByte(uint32_t addr);
 void pcmWriteRange(uint32_t addr, uint16_t num, const uint8_t *src);
@@ -41,5 +48,6 @@ void pcmWriteByte(uint32_t addr, uint8_t byte);
 void pcmSectorErase(uint32_t addr);
 void pcmBulkErase(void);
 void pcmInit(void);
+
 
 #endif

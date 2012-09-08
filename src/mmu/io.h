@@ -1,7 +1,16 @@
-#ifndef JGOTTULA_MMU_IO_H
-#define JGOTTULA_MMU_IO_H
+/* AVRm68k [mmu subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* subproject-specific IO definitions */
+
+#ifndef AVRM68K_MMU_IO_H
+#define AVRM68K_MMU_IO_H
+
 
 #include "../common/io.h"
+
 
 #if 0
 #define DDR_  DDRA
@@ -13,6 +22,7 @@ enum PortA {
 };
 #endif
 
+
 #if 0
 #define DDR_  DDRB
 #define PORT_ PORTB
@@ -22,6 +32,7 @@ enum PortB {
 	/* PB0-PB7 free */
 };
 #endif
+
 
 #if 0
 #define DDR_  DDRC
@@ -33,6 +44,7 @@ enum PortC {
 };
 #endif
 
+
 #if 0
 #define DDR_  DDRD
 #define PORT_ PORTD
@@ -42,5 +54,6 @@ enum PortD {
 	/* PD0-PD7 free */
 };
 #endif
+
 
 #endif

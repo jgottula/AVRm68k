@@ -1,5 +1,13 @@
-#ifndef JGOTTULA_EMULATOR_SPI_H
-#define JGOTTULA_EMULATOR_SPI_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* hardware spi protocol implementation */
+
+#ifndef AVRM68K_EMULATOR_SPI_H
+#define AVRM68K_EMULATOR_SPI_H
+
 
 enum {
 	SPIMODE_CPOL = 0b10,
@@ -11,10 +19,12 @@ enum {
 	SPIMODE_3    = 0b11
 } SPIMode;
 
+
 enum {
 	SPIENDIAN_BIG    = 0,
 	SPIENDIAN_LITTLE = 1
 } SPIEndian;
+
 
 /* frequency values given assume 20 MHz operation */
 enum {
@@ -32,6 +42,7 @@ enum {
 	SPIDIV_32    = 0b110  //  0.625 MHz
 } SPIDivider;
 
+
 /* SPI parameters for each slave */
 #define SPIMODE_SRAM   SPIMODE_0
 #define SPIENDIAN_SRAM SPIENDIAN_BIG
@@ -41,10 +52,12 @@ enum {
 #define SPIENDIAN_SD SPIENDIAN_BIG
 #define SPIDIV_SD    SPIDIV_2
 
+
 void spiBegin(uint8_t slave, uint8_t mode, uint8_t endian, uint8_t divider);
 void spiBeginQuick(uint8_t slave);
 uint8_t spiByte(uint8_t byte);
 void spiEnd(void);
 void spiInit(void);
+
 
 #endif

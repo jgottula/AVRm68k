@@ -1,11 +1,20 @@
-#ifndef JGOTTULA_EMULATOR_M68K_H
-#define JGOTTULA_EMULATOR_M68K_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* main m68k emulator code */
+
+#ifndef AVRM68K_EMULATOR_M68K_H
+#define AVRM68K_EMULATOR_M68K_H
+
 
 #define SR_CARRY    _BV(1)
 #define SR_OVERFLOW _BV(2)
 #define SR_ZERO     _BV(3)
 #define SR_NEGATIVE _BV(4)
 #define SR_EXTEND   _BV(5)
+
 
 #define SR_INTPRIO0  _BV(8)
 #define SR_INTPRIO1  _BV(9)
@@ -15,9 +24,11 @@
 #define SR_TRACE0    _BV(14)
 #define SR_TRACE1    _BV(15)
 
+
 #define SIZE_BYTE 0b00
 #define SIZE_WORD 0b01
 #define SIZE_LONG 0b10
+
 
 #define AMODE_DREGDIRECT   0b000
 #define AMODE_AREGDIRECT   0b001
@@ -28,27 +39,33 @@
 #define AMODE_INDEXED      0b110
 #define AMODE_EXTRA        0b111
 
+
 #define AMODE_EXTRA_ABSSHORT   0b000
 #define AMODE_EXTRA_ABSLONG    0b001
 #define AMODE_EXTRA_PCDISPLACE 0b010
 #define AMODE_EXTRA_PCINDEXED  0b011
 #define AMODE_EXTRA_IMMEDIATE  0b100
 
+
 #define SCALE_1 0b00
 #define SCALE_2 0b01
 #define SCALE_4 0b10
 #define SCALE_8 0b11
 
+
 #define BD_SIZE_NULL 0b01
 #define BD_SIZE_WORD 0b10
 #define BD_SIZE_LONG 0b11
 
+
 #define EXT_BRIEF 0
 #define EXT_FULL  1
+
 
 #define SIZE_MOVE_BYTE 0b01
 #define SIZE_MOVE_WORD 0b11
 #define SIZE_MOVE_LONG 0b10
+
 
 #define COND_T  0b0000
 #define COND_F  0b0001
@@ -67,8 +84,10 @@
 #define COND_GT 0b1110
 #define COND_LE 0b1111
 
+
 #define EMUINSTR_DUMPREG 0xa001
 #define EMUINSTR_DUMPMEM 0xa002
+
 
 typedef union {
 	uint16_t w;
@@ -87,6 +106,7 @@ typedef union {
 	uint16_t w[4];
 	uint8_t b[8];
 } Reg64;
+
 
 struct {
 	/* user registers */
@@ -121,8 +141,10 @@ struct {
 	} mreg;
 } cpu;
 
+
 void m68kDumpReg(void);
 void m68kNext(void);
 void m68kInit(void);
+
 
 #endif

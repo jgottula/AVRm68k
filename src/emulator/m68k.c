@@ -1,7 +1,13 @@
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
 #include "all.h"
 
 static uint8_t fetchBuffer[22]; // must have even size
 const uint8_t *instr;
+
 
 static void m68kFetch(void)
 {

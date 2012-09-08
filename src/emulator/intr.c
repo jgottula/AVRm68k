@@ -1,3 +1,8 @@
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
 #include "all.h"
 
 static volatile uint8_t dramCounter = 0;
@@ -5,6 +10,7 @@ static volatile uint16_t counter = 0;
 volatile uint16_t msec = 0, sec = 0;
 volatile bool badISR = false;
 volatile bool enableDRAMRefresh = true;
+
 
 ISR(TIMER1_COMPA_vect)
 {

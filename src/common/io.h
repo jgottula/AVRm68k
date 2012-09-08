@@ -1,12 +1,17 @@
-#ifndef JGOTTULA_COMMON_IO_H
-#define JGOTTULA_COMMON_IO_H
+/* AVRm68k [common headers]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <avr/io.h>
+/* shared IO types and functions */
+
+#ifndef AVRM68K_COMMON_IO_H
+#define AVRM68K_COMMON_IO_H
+
 
 typedef volatile uint8_t *reg_t;
 typedef volatile uint16_t *reg16_t;
+
 
 /* WARNING: these write functions may need to be wrapped in ATOMIC_BLOCK()
  * because of their read/modify/write nature and the possibility that an ISR
@@ -37,5 +42,6 @@ inline void writeIO16(reg16_t reg, uint16_t mask, uint16_t val)
 	else
 		*reg = readIO16(reg, ~mask) | (val & mask);
 }
+
 
 #endif

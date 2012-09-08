@@ -1,7 +1,16 @@
-#ifndef JGOTTULA_EMULATOR_IO_H
-#define JGOTTULA_EMULATOR_IO_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* subproject-specific IO definitions */
+
+#ifndef AVRM68K_EMULATOR_IO_H
+#define AVRM68K_EMULATOR_IO_H
+
 
 #include "../common/io.h"
+
 
 #define DDR_DRAM_ADDR     DDRA
 #define PORT_DRAM_ADDR    PORTA
@@ -24,6 +33,7 @@ enum PortA {
 	                   DRAM_STROBE_RAS1 | DRAM_STROBE_CAS1
 };
 
+
 #define DDR_SPI   DDRB
 #define PORT_SPI  PORTB
 #define PIN_SPI   PINB
@@ -42,6 +52,7 @@ enum PortB {
 	SPI_ALL     = SPI_SS_NULL | SPI_MOSI | SPI_MISO | SPI_SCK
 };
 
+
 #define DDR_DRAM_DATA  DDRC
 #define PORT_DRAM_DATA PORTC
 #define PIN_DRAM_DATA  PINC
@@ -50,6 +61,7 @@ enum PortC {
 	/* PC[0:7] <=> data[0:7] */
 	DRAM_DATA = 0xff
 };
+
 
 #define DDR_UART      DDRD
 #define PORT_UART     PORTD
@@ -70,5 +82,6 @@ enum PortD {
 	DRAM_CTRL_WRITE = _BV(PD7),
 	DRAM_CTRL_ALL   = DRAM_CTRL_FFCLK | DRAM_CTRL_WRITE
 };
+
 
 #endif

@@ -1,8 +1,17 @@
-#ifndef JGOTTULA_EMULATOR_UART_H
-#define JGOTTULA_EMULATOR_UART_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
+
+/* uart access and utility functions */
+
+#ifndef AVRM68K_EMULATOR_UART_H
+#define AVRM68K_EMULATOR_UART_H
+
 
 /* convert \n to \r\n for serial terminals */
 #define ADD_CARRIAGE_RETURN
+
 
 bool uartAvail(void);
 uint8_t uartRead(void);
@@ -27,6 +36,8 @@ void uartWrite(uint8_t byte);
 bool uartEnabled(void);
 void uartInit(void);
 
+
 #define uartWritePSTR(_str) (uartWritePStr(PSTR(_str)))
+
 
 #endif
