@@ -78,12 +78,12 @@ MMU_CLEAN=$(MMU_EXE) $(MMU_BIN) $(MMU_HEX) $(MMU_MAP) $(MMU_DUMP) $(wildcard $(M
 PROG_CLEAN=$(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX) $(PROG1_MAP) $(PROG1_DUMP) $(PROG2_EXE) $(PROG2_BIN) $(PROG2_HEX) $(PROG2_MAP) $(PROG2_DUMP)
 
 
-.PHONY: all emulator mmu prog prog1 prog2 pch lst map dump loademu loadmmu loadprog1 loadprog2 clean
+.PHONY: all emu mmu prog prog1 prog2 pch lst map dump loademu loadmmu loadprog1 loadprog2 clean
 
 # default rule
-all: emulator mmu prog lst map dump
+all: emu mmu prog lst map dump
 
-emulator: $(EMU_EXE) $(EMU_BIN) $(EMU_HEX)
+emu: $(EMU_EXE) $(EMU_BIN) $(EMU_HEX)
 mmu: $(MMU_EXE) $(MMU_BIN) $(MMU_HEX)
 
 prog: prog1 prog2
