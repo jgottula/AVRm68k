@@ -1,7 +1,7 @@
 AVR Fuse Bits
 
 
-Main MCU: ATmega1284P
+Emulator Microcontroller: ATmega1284P
 
 - lfuse: 0x8e
   - clock source:      external crystal at 8+ MHz
@@ -21,7 +21,7 @@ Main MCU: ATmega1284P
 - lock:  0x3f
 
 
-DMA Controller MCU: ATmega324A
+MMU Microcontroller: ATmega324A
 
 - lfuse: 0xc0
   - clock source:      external clock
