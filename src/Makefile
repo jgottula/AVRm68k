@@ -26,6 +26,7 @@ PROG_OBJDUMPFLAGS:=-s -d -M att
 
 COMMON_CFLAGS=-std=gnu11 -Wall -Wextra -Wno-unused-function -O2 -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG
 COMMON_LST_CFLAGS=-c -O0 -g -w -Wa,-adhln -o /dev/null
+COMMON_ASM_CFLAGS=-x assembler-with-cpp
 COMMON_OBJCOPYFLAGS:=-R .eeprom
 COMMON_OBJDUMPFLAGS:=-s -d
 
@@ -119,7 +120,7 @@ $(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEAD
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
 $(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
+	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_ASM_CFLAGS) -c  -o $@ $<
 
 $(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
@@ -148,7 +149,7 @@ $(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEAD
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
 
 $(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
+	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_ASM_CFLAGS) -c -o $@ $<
 
 $(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
