@@ -1,9 +1,13 @@
-#ifndef JGOTTULA_MCU_SREG_H
-#define JGOTTULA_MCU_SREG_H
+/* AVRm68k [emulator subproject]
+ * (c) 2012 Justin Gottula
+ * The source code of this project is distributed under the terms of the
+ * simplified BSD license. See the LICENSE file for details. */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <avr/io.h>
+/* shift register abstraction functions */
+
+#ifndef AVRM68K_EMULATOR_SREG_H
+#define AVRM68K_EMULATOR_SREG_H
+
 
 enum {
 	SREG_SS_FLASH = _BV(0),
@@ -19,10 +23,13 @@ enum {
 	SREG_ADDRH_ALL = SREG_ADDRH_8 | SREG_ADDRH_9 | SREG_ADDRH_10 | SREG_ADDRH_11
 } ShiftRegBits;
 
+
 extern uint8_t sregState;
+
 
 void sregClear(void);
 void sregSet(uint8_t newState);
 void sregInit(void);
+
 
 #endif
