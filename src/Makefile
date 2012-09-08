@@ -118,7 +118,7 @@ clean:
 $(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
-$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
 $(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
@@ -147,7 +147,7 @@ $(EMU_DUMP): $(EMU_EXE)
 $(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
 
-$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
 
 $(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
