@@ -74,7 +74,7 @@ PROG2_SOURCE=$(wildcard $(PROG_SRCDIR)/*.c)
 EMU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(EMU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(EMU_SRCDIR)/*.s))
 MMU_OBJECTS=$(patsubst %.c,%.o,$(wildcard $(MMU_SRCDIR)/*.c)) $(patsubst %.s,%.o,$(wildcard $(MMU_SRCDIR)/*.s))
 EMU_CLEAN=$(EMU_EXE) $(EMU_BIN) $(EMU_HEX) $(EMU_MAP) $(EMU_DUMP) $(wildcard $(EMU_SRCDIR)/*.o) $(wildcard $(EMU_SRCDIR)/*.lst) $(wildcard $(EMU_SRCDIR)/*.gch)
-MMU_CLEAN=$(MMU_EXE) $(MMU_BIN) $(MMU_HEX) $(MMU_MAP) $(MMU_DUMP) $(wildcard $(MMU_SRCDIR)/*.o) $(wildcard $(EMU_SRCDIR)/*.lst) $(wildcard $(EMU_SRCDIR)/*.gch)
+MMU_CLEAN=$(MMU_EXE) $(MMU_BIN) $(MMU_HEX) $(MMU_MAP) $(MMU_DUMP) $(wildcard $(MMU_SRCDIR)/*.o) $(wildcard $(MMU_SRCDIR)/*.lst) $(wildcard $(MMU_SRCDIR)/*.gch)
 PROG_CLEAN=$(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX) $(PROG1_MAP) $(PROG1_DUMP) $(PROG2_EXE) $(PROG2_BIN) $(PROG2_HEX) $(PROG2_MAP) $(PROG2_DUMP)
 
 
