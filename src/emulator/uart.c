@@ -39,7 +39,7 @@ void uartWriteDec16(uint16_t word)
 		if (temp == 0 && !firstDigit)
 			continue;
 		
-		uartWriteChr('0' + temp);
+		uartWrite('0' + temp);
 		firstDigit = true;
 	}
 }
@@ -49,9 +49,9 @@ void uartWriteHex4(uint8_t nibble, bool upper)
 	nibble &= 0xf;
 	
 	if (nibble < 0xa)
-		uartWriteChr('0' + nibble);
+		uartWrite('0' + nibble);
 	else
-		uartWriteChr((upper ? 'A' : 'a') + (nibble - 0xa));
+		uartWrite((upper ? 'A' : 'a') + (nibble - 0xa));
 }
 
 void uartWriteHex8(uint8_t byte, bool upper)
@@ -100,7 +100,7 @@ void uartWriteHex256(const uint32_t arr[8], bool upper)
 	for (uint8_t i = 0; i < 8; ++i)
 	{
 		if (i != 0)
-			uartWriteChr(' ');
+			uartWrite(' ');
 		uartWriteHex32(arr[i], upper);
 	}
 }
@@ -110,9 +110,9 @@ void uartWriteBin4(uint8_t nibble)
 	for (int8_t i = 3; i >= 0; --i)
 	{
 		if ((nibble >> i) & 0b1)
-			uartWriteChr('1');
+			uartWrite('1');
 		else
-			uartWriteChr('0');
+			uartWrite('0');
 	}
 }
 
@@ -121,9 +121,9 @@ void uartWriteBin8(uint8_t byte)
 	for (int8_t i = 7; i >= 0; --i)
 	{
 		if ((byte >> i) & 0b1)
-			uartWriteChr('1');
+			uartWrite('1');
 		else
-			uartWriteChr('0');
+			uartWrite('0');
 	}
 }
 
