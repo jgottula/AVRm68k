@@ -12,8 +12,17 @@ bool uartAvail(void)
 
 uint8_t uartRead(void)
 {
-	loop_until_bit_is_set(UCSR0A, RXC0);
-	return UDR0;
+	uint8_t byte;
+	
+	/* RESTORESTATE is used since this function may be used in an ISR, in which
+	 * case interrupts should remain disabled until the ISR is done */
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		loop_until_bit_is_set(UCSR0A, RXC0);
+		byte = UDR0;
+	}
+	
+	return byte;
 }
 
 void uartWriteDec16(uint16_t word)
@@ -177,8 +186,26 @@ void uartWriteChr(char chr)
 
 void uartWrite(uint8_t byte)
 {
-	loop_until_bit_is_set(UCSR0A, UDRE0);
-	UDR0 = byte;
+	/* bug report:
+	 * 
+	 * this function had issues when the ATOMIC_BLOCK was introduced, but only
+	 * when compiled with -O2 (worked with -O1, and strangely enough, -O3 as
+	 * well); the fix involved making all the functions that know they won't
+	 * need newline replacement use uartWrite instead of uartWriteChr, which
+	 * apparently caused the compiler to inline things in a better way at -O2,
+	 * thereby fixing the problem
+	 * 
+	 * I have no idea exactly what was wrong or why this particular fix worked,
+	 * so don't ask */
+	
+	/* RESTORESTATE is used since this function may be used in an ISR, in which
+	 * case interrupts should remain disabled until the ISR is done */
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		loop_until_bit_is_set(UCSR0A, UDRE0);
+		
+		UDR0 = byte;
+	}
 }
 
 bool uartEnabled(void)
