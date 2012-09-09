@@ -227,6 +227,6 @@ void uartInit(void)
 	 * character size */
 	UCSR0C = _BV(UCSZ00) | _BV(UCSZ01);
 	
-	/* enable the UART with no interrupts */
-	UCSR0B = _BV(RXEN0) | _BV(TXEN0);
+	/* enable the UART with receive and transmit complete interrupts enabled */
+	UCSR0B = _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0) | _BV(TXCIE0);
 }
