@@ -24,7 +24,7 @@ PROG2_CFLAGS:=-c -O0 -Wa,-mcpu=68030,-mno-68851,-mno-68881,-mno-68882,-mno-float
 PROG_AVRDUDEFLAGS:=-R .flash
 PROG_OBJDUMPFLAGS:=-s -d -M att
 
-COMMON_CFLAGS=-std=gnu11 -Wall -Wextra -Wno-unused-function -O2 -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG
+COMMON_CFLAGS=-std=gnu11 -Wall -Wextra -Wno-unused-function -O2 -g -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG
 COMMON_LST_CFLAGS=-c -O0 -g -w -Wa,-adhln -o /dev/null
 COMMON_ASM_CFLAGS=-x assembler-with-cpp
 COMMON_OBJCOPYFLAGS:=-R .eeprom
@@ -68,6 +68,7 @@ PROG2_DUMP=$(PROG_SRCDIR)/$(PROG2_BASENAME).dump
 
 # evaluated when used
 COMMON_HEADERS=$(wildcard $(COMMON_SRCDIR)/*.h)
+COMMON_ASM_HEADERS=$(wildcard $(COMMON_SRCDIR)/*.s)
 EMU_HEADERS=$(wildcard $(EMU_SRCDIR)/*.h)
 MMU_HEADERS=$(wildcard $(MMU_SRCDIR)/*.h)
 PROG1_SOURCE=$(wildcard $(PROG_SRCDIR)/*.s)
@@ -120,7 +121,7 @@ clean:
 $(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) -c -o $@ $<
 
-$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_HEADERS) $(COMMON_HEADERS) $(COMMON_ASM_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_ASM_CFLAGS) -c  -o $@ $<
 
 $(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
@@ -149,7 +150,7 @@ $(EMU_DUMP): $(EMU_EXE)
 $(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) -c -o $@ $<
 
-$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
+$(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_HEADERS) $(COMMON_HEADERS) $(COMMON_ASM_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_ASM_CFLAGS) -c -o $@ $<
 
 $(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
