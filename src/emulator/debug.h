@@ -9,11 +9,9 @@
 #define AVRM68K_EMULATOR_DEBUG_H
 
 
+/* action to take on assertion failure: restart, or die */
 #define ASSERT_DIE
 #undef  ASSERT_RESET
-
-
-#undef HAVE_LED
 
 
 #ifdef DEBUG
@@ -28,9 +26,6 @@
 
 noreturn void assertFail(const char *file, uint16_t line);
 noreturn void reset(void);
-void flashLED(uint16_t duration);
-noreturn void blinkLEDForever(uint16_t halfPeriod);
-void dumpIO();
 
 
 noreturn inline void die(void)
