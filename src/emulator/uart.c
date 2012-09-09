@@ -181,7 +181,7 @@ void uartWriteChr(char chr)
 		uartWrite('\r');
 #endif
 	
-	uartWrite((uint8_t)chr);
+	uartWrite(chr);
 }
 
 void uartWrite(uint8_t byte)
