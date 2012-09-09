@@ -83,6 +83,7 @@ PROG_CLEAN=$(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX) $(PROG1_MAP) $(PROG1_DUMP) $(P
 
 # default rule
 all: emu mmu prog lst map dump
+	@ls -l $(EMU_BIN) $(MMU_BIN)
 
 emu: $(EMU_EXE) $(EMU_BIN) $(EMU_HEX)
 mmu: $(MMU_EXE) $(MMU_BIN) $(MMU_HEX)
