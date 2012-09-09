@@ -60,7 +60,7 @@
 	.endm
 	
 	
-	/* save all call-clobbered registers (only useful for ISRs) */
+	/* save all call-clobbered registers */
 	.macro saveclobber
 	
 	savereg 18,27
@@ -69,10 +69,30 @@
 	.endm
 	
 	
-	/* restore all call-clobbered registers (only useful for ISRs) */
+	/* restore all call-clobbered registers */
 	.macro restclobber
 	
 	restreg 31,30
 	restreg 27,18
+	
+	.endm
+	
+	
+	/* save the status register (and r0) */
+	.macro savesreg
+	
+	push r0
+	in r0,SREG
+	push r0
+	
+	.endm
+	
+	
+	/* restore the status register (and r0) */
+	.macro restsreg
+	
+	pop r0
+	out SREG,r0
+	pop r0
 	
 	.endm
