@@ -6,6 +6,34 @@
 	.altmacro
 	
 	
+	/* multiply the 16-bit register starting with lsreg by two */
+	.macro word_x2 lsreg
+	.irp reg,lsreg,%(\lsreg + 1)
+	
+	.if \reg == \lsreg
+		add r\reg,r\reg
+	.else
+		adc r\reg,r\reg
+	.endif
+	
+	.endr
+	.endm
+	
+	
+	/* divide the 16-bit register starting with lsreg by two */
+	.macro word_half lsreg
+	.irp reg,%(\lsreg + 1),lsreg
+	
+	.if \reg != \lsreg
+		lsr \reg
+	.else
+		ror \reg
+	.endif
+	
+	.endr
+	.endm
+	
+	
 	/* push the registers numbered from low to high, inclusive, onto the stack
 	 * in ascending order */
 	.macro savereg low high
