@@ -215,13 +215,13 @@ bool uartEnabled(void)
 
 void uartInit(void)
 {
-	/* set the baud rate to 230400 baud
+	/* set the baud rate to 38400 baud
 	 * the formula is: (F_CPU / (8 * BAUD_RATE)) - 1 [with U2X0 on]
 	 * see table 19-12 in the ATmega1284P manual for details */
-	UBRR0 = 10;
+	UBRR0 = 64;
 	
-	/* enable the double speed bit */
-	writeIO(&UCSR0A, _BV(MPCM0) | _BV(U2X0), _BV(U2X0));
+	/* disable the double speed bit */
+	writeIO(&UCSR0A, _BV(MPCM0) | _BV(U2X0), 0);
 	
 	/* set the UART to asynchronous mode with no parity, one stop bit, and 8-bit
 	 * character size */
