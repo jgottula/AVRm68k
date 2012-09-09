@@ -220,8 +220,8 @@ void instrAndEorOr(bool or, bool exclusive, bool dataRegDest)
 	
 	/* write the operand back */
 	if (dataRegDest)
-		accessEA(instr + 2, effAddr, AMODE_DREGDIRECT, dataRegNum, operand, size,
-			true);
+		accessEA(instr + 2, effAddr, AMODE_DREGDIRECT, dataRegNum, operand,
+			size, true);
 	else
 		accessEA(instr + 2, effAddr, mode, reg, operand, size, true);
 	
