@@ -20,27 +20,32 @@ uint16_t lastAddr;
 
 static void dramLoadAddrBus(uint16_t newAddr)
 {
+	if (newAddr == lastAddr)
+		return;
+	
+	uint8_t addr = (PORT_DRAM_ADDR & ~DRAM_ADDR);
+	
 	/* if only the low 4 bits have changed, we don't need to send all 12 bits
 	 * through the flip-flop stages; because of the shared clock (octal
 	 * flip-flop rather than dual quad), changes in the middle 4 bits require
 	 * that the high 4 bits be updated as well */
-	if ((lastAddr & 0x0ff0) == (newAddr & 0x0ff0))
-		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, newAddr);
-	else
+	if ((lastAddr & 0xff0) != (newAddr & 0xff0))
 	{
+		uint8_t ctrl = PORT_DRAM_CTRL;
+		
 		/* load the high 4 bits first, for 2 flip-flop stages */
-		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, (newAddr >> 8));
-		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
-		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
+		PORT_DRAM_ADDR = (addr | ((newAddr >> 8) & DRAM_ADDR));
+		PORT_DRAM_CTRL = ctrl ^ DRAM_CTRL_FFCLK;
+		PORT_DRAM_CTRL = ctrl;
 		
 		/* load the middle 4 bits next, for a single flip-flop stage */
-		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, (newAddr >> 4));
-		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
-		PORT_DRAM_CTRL ^= DRAM_CTRL_FFCLK;
-		
-		/* load the low 4 bits last; no flip-flop activity required */
-		writeIO(&PORT_DRAM_ADDR, DRAM_ADDR, newAddr);
+		PORT_DRAM_ADDR = (addr | ((newAddr >> 4) & DRAM_ADDR));
+		PORT_DRAM_CTRL = ctrl ^ DRAM_CTRL_FFCLK;
+		PORT_DRAM_CTRL = ctrl;
 	}
+	
+	/* load the low 4 bits; no flip-flop activity required */
+	PORT_DRAM_ADDR = (addr | (newAddr & DRAM_ADDR));
 	
 	lastAddr = newAddr;
 }
