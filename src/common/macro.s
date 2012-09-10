@@ -66,6 +66,22 @@
 	.endm
 	
 	
+	/* save all registers (excluding r0 and sreg) */
+	.macro saveall
+	
+	savereg 1,31
+	
+	.endm
+	
+	
+	/* restore all registers (excluding r0 and sreg) */
+	.macro restall
+	
+	restreg 31,1
+	
+	.endm
+	
+	
 	/* save all call-clobbered registers */
 	.macro saveclobber
 	
