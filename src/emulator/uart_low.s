@@ -196,6 +196,55 @@ uartWriteBool_True:
 	jmp uartWritePStr
 	
 	
+	/* description: writes four binary digits to the UART
+	 * parameters:
+	 * - uint8_t nibble [r24]
+	 * no return value
+	 */
+	.global uartWriteBin4
+	.type uartWriteBin4,@function
+uartWriteBin4:
+	mov r20,r24
+	ldi r18,0b1000
+	
+uartWriteBin4_Loop:
+	mov r19,r20
+	and r19,r18
+	brne uartWriteBin4_One
+	
+	ldi r24,'0'
+	call uartWrite
+	
+	lsr r18
+	brcc uartWriteBin4_Loop
+	
+	ret
+	
+uartWriteBin4_One:
+	ldi r24,'1'
+	call uartWrite
+	
+	lsr r18
+	brcc uartWriteBin4_Loop
+	
+	ret
+	
+	
+	/* description: writes eight binary digits to the UART
+	 * parameters:
+	 * - uint8_t byte [r24]
+	 * no return value
+	 */
+	.global uartWriteBin8
+	.type uartWriteBin8,@function
+uartWriteBin8:
+	mov r20,r24
+	ldi r18,0b10000000
+	
+	/* use the 4-bit loop, since all that changed was r18's starting value */
+	jmp uartWriteBin4_Loop
+	
+	
 	/* description: writes a single hex digit to the UART, optionally uppercase
 	 * parameters:
 	 * - uint8_t nibble [r24]

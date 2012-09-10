@@ -38,28 +38,6 @@ void uartWriteDec16(uint16_t word)
 	}
 }
 
-void uartWriteBin4(uint8_t nibble)
-{
-	for (int8_t i = 3; i >= 0; --i)
-	{
-		if ((nibble >> i) & 0b1)
-			uartWrite('1');
-		else
-			uartWrite('0');
-	}
-}
-
-void uartWriteBin8(uint8_t byte)
-{
-	for (int8_t i = 7; i >= 0; --i)
-	{
-		if ((byte >> i) & 0b1)
-			uartWrite('1');
-		else
-			uartWrite('0');
-	}
-}
-
 bool uartEnabled(void)
 {
 	return UCSR0B & _BV(TXEN0);
