@@ -12,7 +12,31 @@
 	.section .text
 	
 	
-	/* description: atomically writes one byte to the UART
+	/* description: atomically and synchronously reads a byte from the UART
+	 * no parameters
+	 * returns:
+	 * - uint8_t byte [r24]
+	 */
+	.global uartRead
+	.type uartRead,@function
+uartRead:
+	/* equivalent of ATOMIC_BLOCK(ATOMIC_RESTORESTATE); needed since the UART is
+	 * used by both regular and ISR code */
+	savesreg
+	cli
+	
+uartRead_WaitLoop:
+	lds r0,UCSR0A
+	sbrs r0,RXC0
+	jmp uartRead_WaitLoop
+	
+	lds r24,UDR0
+	
+	restsreg
+	ret
+	
+	
+	/* description: atomically and synchronously writes a byte to the UART
 	 * parameters:
 	 * - uint8_t byte [r24]
 	 * no return value

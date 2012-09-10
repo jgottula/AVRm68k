@@ -28,6 +28,7 @@ void uartInit(void);
 
 
 /* assembly */
+uint8_t uartRead(void);
 void uartWrite(uint8_t byte);
 void uartWriteChr(char chr);
 void uartWriteStr(const char *str);
