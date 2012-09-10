@@ -28,7 +28,8 @@ COMMON_CFLAGS=-std=gnu11 -Wall -Wextra -Wno-unused-function -Wstrict-aliasing=2 
 COMMON_LST_CFLAGS=-c -O0 -ggdb -w -Wa,-adhln -o /dev/null
 COMMON_ASM_CFLAGS=-x assembler-with-cpp
 COMMON_OBJCOPYFLAGS:=-R .eeprom
-COMMON_OBJDUMPFLAGS:=-s -d
+COMMON_OBJDUMPFLAGS:=-s -d -h -j .text -j .data -j .bss -j .eeprom
+COMMON_LST_OBJDUMPFLAGS=-s -d -t -S --file-start-context -j .text -j .data -j .bss -j .eeprom
 
 
 COMMON_SRCDIR:=common
@@ -82,8 +83,8 @@ PROG_CLEAN=$(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX) $(PROG1_MAP) $(PROG1_DUMP) $(P
 
 .PHONY: all emu mmu prog prog1 prog2 pch lst map dump loademu loadmmu loadprog1 loadprog2 clean
 
-# default rule (excludes lst)
-all: emu mmu prog map dump
+# default rule
+all: emu mmu prog lst map dump
 	@ls -l $(EMU_BIN) $(MMU_BIN)
 
 emu: $(EMU_EXE) $(EMU_BIN) $(EMU_HEX)
@@ -96,7 +97,7 @@ prog2: $(PROG2_EXE) $(PROG2_BIN) $(PROG2_HEX)
 
 pch: $(EMU_PCH_EXT) $(MMU_PCH_EXT)
 
-lst: $(patsubst %.c,%.lst,$(wildcard $(EMU_SRCDIR)/*.c)) $(patsubst %.c,%.lst,$(wildcard $(MMU_SRCDIR)/*.c))
+lst: $(patsubst %.c,%.lst,$(wildcard $(EMU_SRCDIR)/*.c)) $(patsubst %.s,%.lst,$(wildcard $(EMU_SRCDIR)/*.s)) $(patsubst %.c,%.lst,$(wildcard $(MMU_SRCDIR)/*.c)) $(patsubst %.s,%.lst,$(wildcard $(MMU_SRCDIR)/*.s))
 
 map: $(EMU_MAP) $(MMU_MAP) $(PROG1_MAP) $(PROG2_MAP)
 
@@ -124,8 +125,8 @@ $(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEAD
 $(EMU_SRCDIR)/%.o: $(EMU_SRCDIR)/%.s $(EMU_HEADERS) $(COMMON_HEADERS) $(COMMON_ASM_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_ASM_CFLAGS) -c  -o $@ $<
 
-$(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.c $(EMU_PCH_EXT) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(EMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
+$(EMU_SRCDIR)/%.lst: $(EMU_SRCDIR)/%.o
+	avr-objdump $(COMMON_LST_OBJDUMPFLAGS) $< >$@
 
 
 $(EMU_PCH_EXT): $(EMU_PCH) $(EMU_HEADERS) $(COMMON_HEADERS) Makefile
@@ -153,8 +154,8 @@ $(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEAD
 $(MMU_SRCDIR)/%.o: $(MMU_SRCDIR)/%.s $(MMU_HEADERS) $(COMMON_HEADERS) $(COMMON_ASM_HEADERS) Makefile
 	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_ASM_CFLAGS) -c -o $@ $<
 
-$(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.c $(MMU_PCH_EXT) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
-	avr-gcc $(COMMON_CFLAGS) $(MMU_CFLAGS) $(COMMON_LST_CFLAGS) $< >$@
+$(MMU_SRCDIR)/%.lst: $(MMU_SRCDIR)/%.o
+	avr-objdump $(COMMON_LST_OBJDUMPFLAGS) $< >$@
 
 
 $(MMU_PCH_EXT): $(MMU_PCH) $(MMU_HEADERS) $(COMMON_HEADERS) Makefile
