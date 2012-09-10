@@ -39,32 +39,36 @@ USART0_RX_vect_GetChar:
 	
 	/* ctrl+c */
 	cpi r25,0x03
-	brne USART0_RX_vect_CheckOthers
-	jmp USART0_RX_vect_CtrlC
+	brne USART0_RX_vect_CheckS
 	
-USART0_RX_vect_CheckOthers:
-	/* echo the character back */
-	ldi r24,'\n'
-	saveclobber
-	call uartWriteChr
-	restclobber
-	mov r24,r25
-	saveclobber
-	call uartWriteChr
-	restclobber
-	ldi r24,'\n'
-	saveclobber
-	call uartWriteChr
-	restclobber
-	
-	jmp USART0_RX_vect_Done
-	
-USART0_RX_vect_CtrlC:
 	/* do nothing if debugging is already on */
 	lds r18,dbgEnabled
-	tst r18
-	breq USART0_RX_vect_EnableDebugging
+	sbrs r18,0
+	jmp USART0_RX_vect_EnableDebugging
+	jmp USART0_RX_vect_CmdWait
+	
+USART0_RX_vect_CheckS:
+	/* single step */
+	cpi r25,'s'
+	brne USART0_RX_vect_CheckC
 	jmp USART0_RX_vect_Done
+	
+USART0_RX_vect_CheckC:
+	/* continue execution */
+	cpi r25,'c'
+	brne USART0_RX_vect_CheckOthers
+	
+	/* disable debugging, turn off TIMER2, and clear its overflow flag */
+	sts dbgEnabled,r1
+	sts TIMSK2,r1
+	ldi r18,0xff
+	sts TIFR2,r18
+	
+	jmp USART0_RX_vect_Done
+	
+USART0_RX_vect_CheckOthers:
+	/* ignore other characters */
+	jmp USART0_RX_vect_CmdWait
 	
 USART0_RX_vect_EnableDebugging:
 	/* set the debugging flag */
@@ -120,10 +124,15 @@ USART0_RX_vect_CmdWait:
 	jmp USART0_RX_vect_GetChar
 	
 USART0_RX_vect_Done:
+	ldi r24,'\n'
+	call uartWriteChr
 	
 	restclobber
 	restsreg
 	reti
+	/* PROBLEM: by reading the UART input with a spin loop inside of the rx isr,
+	 * we may be causing an rx interrupt to queue up, which might run the isr an
+	 * extra, unwanted time */
 	
 	
 	/* no parameters, no return value */
@@ -138,7 +147,20 @@ USART0_TX_vect:
 	.global TIMER2_COMPA_vect
 	.type TIMER2_COMPA_vect,@function
 TIMER2_COMPA_vect:
-	jmp dbgBreak
+	/* check if debugging is enabled, and exit if it is not */
+	push r18
+	lds r18,dbgEnabled
+	tst r18
+	brne TIMER2_COMPA_vect_Break
+	
+	pop r18
+	reti
+	
+TIMER2_COMPA_vect_Break:
+	ldi r18,1
+	sts dbgForceBreak,r18
+	pop r18
+	jmp _VECTAB(USART0_RX_vect_num)
 	
 	
 	/* no parameters, no return value */
@@ -159,6 +181,7 @@ dbgInit:
 	sts TCNT2,r1
 	
 	ret
+	
 	
 	/* no parameters, no return value */
 	.global dbgBreak
