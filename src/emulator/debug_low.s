@@ -22,12 +22,12 @@
 	.type USART0_RX_vect,@function
 USART0_RX_vect:
 	savesreg
-	saveclobber
+	saveall
 	
-	/* immediately save the stack pointer */
+	/* save the pre-ISR stack pointer */
 	lds ZH,SPH
 	lds ZL,SPL
-	adiw ZL,14
+	adiw ZL,33
 	
 	/* if we just came back from a single step, then skip to the PC dump */
 	lds r18,dbgSingleStep
@@ -50,6 +50,9 @@ USART0_RX_vect_GetChar:
 	cpi r24,0x03
 	brne USART0_RX_vect_CheckLetters
 	
+	ldi r24,'\n'
+	call uartWriteChr
+	
 	/* do nothing if debugging is already on */
 	lds r18,dbgEnabled
 	sbrs r18,0
@@ -67,12 +70,18 @@ USART0_RX_vect_CheckS:
 	cpi r24,'s'
 	brne USART0_RX_vect_CheckC
 	
+	ldi r24,'\n'
+	call uartWriteChr
+	
 	jmp USART0_RX_vect_Done
 	
 USART0_RX_vect_CheckC:
 	/* continue execution */
 	cpi r24,'c'
-	brne USART0_RX_vect_CheckOthers
+	brne USART0_RX_vect_CheckR
+	
+	ldi r24,'\n'
+	call uartWriteChr
 	
 	/* disable debugging, turn off TIMER2, and clear its overflow flag */
 	sts dbgEnabled,r1
@@ -81,6 +90,17 @@ USART0_RX_vect_CheckC:
 	sts TIFR2,r18
 	
 	jmp USART0_RX_vect_Done
+
+USART0_RX_vect_CheckR:
+	/* dump registers */
+	cpi r24,'r'
+	brne USART0_RX_vect_CheckOthers
+	
+	ldi r24,'\n'
+	call uartWriteChr
+	
+	call dbgDumpReg
+	jmp USART0_RX_vect_CmdPrompt
 	
 USART0_RX_vect_CheckOthers:
 	/* ignore other characters */
@@ -137,10 +157,7 @@ USART0_RX_vect_CmdWait:
 	jmp USART0_RX_vect_GetChar
 	
 USART0_RX_vect_Done:
-	ldi r24,'\n'
-	call uartWriteChr
-	
-	restclobber
+	restall
 	restsreg
 	reti
 	/* PROBLEM: by reading the UART input with a spin loop inside of the rx isr,
@@ -208,3 +225,78 @@ dbgBreak:
 	sts dbgForceBreak,r18
 	pop r18
 	jmp _VECTAB(USART0_RX_vect_num)
+	
+	
+	/* description: dumps registers (on the stack at Z) to the UART
+	 * parameters:
+	 * - Z (pre-ISR stack pointer)
+	 * no return value
+	 * not public
+	 */
+	.type dbgDumpReg,@function
+dbgDumpReg:
+	savez
+	push r22
+	push r24
+	
+	sbiw ZL,31
+	
+	.macro dumpreg_forreal offset
+	
+	ldd r24,Z+\offset
+	call uartWriteHex8
+	
+	.endm
+	
+	.macro dumpreg reg
+	
+	.if (\reg < 10) && ((\reg % 2) != 0)
+		ldi r24,' '
+		call uartWrite
+	.endif
+	
+	.if (\reg % 2) != 0
+		ldi r24,'r'
+		call uartWrite
+	.endif
+	
+	.if \reg >= 10
+		ldi r24,('0' + (\reg / 10))
+		call uartWrite
+	.endif
+	
+	ldi r24,('0' + (\reg % 10))
+	call uartWrite
+	
+	.if (\reg % 2) == 0
+		ldi r24,' '
+		call uartWrite
+		
+		.if \reg < 10
+			call uartWrite
+		.endif
+		
+		ldi r22,0
+		
+		dumpreg_forreal %(31 - \reg)
+		dumpreg_forreal %(30 - \reg)
+		
+		ldi r24,'\n'
+		call uartWriteChr
+	.else
+		ldi r24,':'
+		call uartWrite
+		
+		dumpreg %(\reg - 1)
+	.endif
+	
+	.endm
+	
+	.irp reg,31,29,27,25,23,21,19,17,15,13,11,9,7,5,3
+		dumpreg \reg
+	.endr
+	
+	pop r24
+	pop r22
+	restz
+	ret
