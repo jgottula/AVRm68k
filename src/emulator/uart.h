@@ -9,9 +9,9 @@
 #define AVRM68K_EMULATOR_UART_H
 
 
+void uartWriteDec8(uint8_t byte, bool pad);
+void uartWriteDec16(uint16_t word, bool pad);
 bool uartAvail(void);
-uint8_t uartRead(void);
-void uartWriteDec16(uint16_t word);
 bool uartEnabled(void);
 void uartInit(void);
 

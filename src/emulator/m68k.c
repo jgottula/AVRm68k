@@ -514,7 +514,7 @@ static void m68kDecode(void)
 	uint16_t after = msec;
 	
 	uartWritePSTR("[Done ");
-	uartWriteDec16(after - before);
+	uartWriteDec16(after - before, false);
 	uartWritePSTR("ms]\n");
 }
 

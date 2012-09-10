@@ -12,7 +12,7 @@ void assertFail(const char *file, uint16_t line)
 		uartWritePSTR("\nAssertion failed at ");
 		uartWriteStr(file);
 		uartWriteChr(':');
-		uartWriteDec16(line);
+		uartWriteDec16(line, false);
 		uartWritePSTR(".\n");
 	}
 	

@@ -5,37 +5,174 @@
 
 #include "all.h"
 
+void uartWriteDec8(uint8_t byte, bool pad)
+{
+	bool firstDigit = false;
+	char digit;
+	
+	if (byte < 100)
+	{
+		if (pad && !firstDigit)
+			uartWrite(' ');
+	}
+	else if (byte < 200)
+	{
+		uartWrite('1');
+		
+		firstDigit = true;
+		byte -= 100;
+	}
+	else
+	{
+		uartWrite('2');
+		
+		firstDigit = true;
+		byte -= 200;
+	}
+	
+	if (byte < 20) /* 0-19 */
+	{
+		if (byte < 10)
+		{
+			if (!firstDigit)
+			{
+				if (pad)
+					digit = ' ';
+				else
+					goto skip10;
+			}
+			else
+				digit = '0';
+		}
+		else
+		{
+			digit = '1';
+			byte -= 10;
+		}
+	}
+	else /* 20-99 */
+	{
+		if (byte < 60) /* 20-59 */
+		{
+			if (byte < 40) /* 20-39 */
+			{
+				if (byte < 30)
+				{
+					digit = '2';
+					byte -= 20;
+				}
+				else
+				{
+					digit = '3';
+					byte -= 30;
+				}
+			}
+			else /* 40-59 */
+			{
+				if (byte < 50)
+				{
+					digit = '4';
+					byte -= 40;
+				}
+				else
+				{
+					digit = '5';
+					byte -= 50;
+				}
+			}
+		}
+		else /* 60-99 */
+		{
+			if (byte < 80) /* 60-79 */
+			{
+				if (byte < 70)
+				{
+					digit = '6';
+					byte -= 60;
+				}
+				else
+				{
+					digit = '7';
+					byte -= 70;
+				}
+			}
+			else /* 80-99 */
+			{
+				if (byte < 90)
+				{
+					digit = '8';
+					byte -= 80;
+				}
+				else
+				{
+					digit = '9';
+					byte -= 90;
+				}
+			}
+		}
+	}
+	
+	uartWrite(digit);
+	
+skip10:
+	uartWrite('0' + byte);
+}
+
+void uartWriteDec16(uint16_t word, bool pad)
+{
+	bool firstDigit = false;
+	uint8_t quot;
+	
+	quot = word / 10000;
+	if (quot != 0)
+	{
+		uartWrite('0' + quot);
+		
+		word -= quot * 10000;
+		firstDigit = true;
+	}
+	else if (pad && !firstDigit)
+		uartWrite(' ');
+	
+	quot = word / 1000;
+	if (quot != 0)
+	{
+		uartWrite('0' + quot);
+		
+		word -= quot * 1000;
+		firstDigit = true;
+	}
+	else if (pad && !firstDigit)
+		uartWrite(' ');
+	
+	quot = word / 100;
+	if (quot != 0)
+	{
+		uartWrite('0' + quot);
+		
+		word -= quot * 100;
+		firstDigit = true;
+	}
+	else if (pad && !firstDigit)
+		uartWrite(' ');
+	
+	quot = word / 10;
+	if (quot != 0)
+	{
+		uartWrite('0' + quot);
+		
+		word -= quot * 10;
+		firstDigit = true;
+	}
+	else if (pad && !firstDigit)
+		uartWrite(' ');
+	
+	uartWrite('0' + quot);
+}
+
 bool uartAvail(void)
 {
 	return (UCSR0A & _BV(RXC0)) != 0;
-}
-
-void uartWriteDec16(uint16_t word)
-{
-	int8_t i = 4;
-	bool firstDigit = false;
-	
-	for ( ; i >= 0; --i)
-	{
-		uint16_t temp = word;
-		
-		/* hack for 0 */
-		if (i == 0)
-			firstDigit = true;
-		
-		for (int8_t j = 0; j < i; ++j)
-			temp /= 10;
-		
-		/* modulo is expensive, so do it last */
-		temp %= 10;
-		
-		/* don't print leading zeros */
-		if (temp == 0 && !firstDigit)
-			continue;
-		
-		uartWrite('0' + temp);
-		firstDigit = true;
-	}
 }
 
 bool uartEnabled(void)
