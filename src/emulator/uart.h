@@ -12,7 +12,6 @@
 bool uartAvail(void);
 uint8_t uartRead(void);
 void uartWriteDec16(uint16_t word);
-void uartWriteHex4(uint8_t nibble, bool upper);
 void uartWriteHex8(uint8_t byte, bool upper);
 void uartWriteHex16(uint16_t word, bool upper);
 void uartWriteHexTop12(uint32_t wordAndAHalf, bool upper);
@@ -35,6 +34,7 @@ void uartWriteStr(const char *str);
 void uartWritePStr(const char *pstr);
 void uartWriteArr(const uint8_t *arr, uint8_t len);
 void uartWritePArr(const uint8_t *arr, uint8_t len);
+void uartWriteHex4(uint8_t nibble, bool upper);
 
 
 #define uartWritePSTR(_str) (uartWritePStr(PSTR(_str)))

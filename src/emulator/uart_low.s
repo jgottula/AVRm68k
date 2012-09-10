@@ -173,3 +173,28 @@ uartWritePArr_Loop:
 	brne uartWritePArr_Loop
 	
 	ret
+	
+	
+	/* description: writes a single hex digit to the UART; optionally uppercase
+	 * parameters:
+	 * - uint8_t nibble [r24]
+	 * - bool    upper  [r22]
+	 * no return value
+	 */
+	.global uartWriteHex4
+	.type uartWriteHex4,@function
+uartWriteHex4:
+	andi r24,0x0f
+	cpi r24,0x0a
+	brge uartWriteHex4_Letter
+	
+	ldi r25,'0'
+	add r24,r25
+	jmp uartWrite
+	
+uartWriteHex4_Letter:
+	ldi r25,('a' - 10)
+	sbrc r22,0
+	ldi r25,('A' - 10)
+	add r24,r25
+	jmp uartWrite

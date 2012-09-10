@@ -38,16 +38,6 @@ void uartWriteDec16(uint16_t word)
 	}
 }
 
-void uartWriteHex4(uint8_t nibble, bool upper)
-{
-	nibble &= 0xf;
-	
-	if (nibble < 0xa)
-		uartWrite('0' + nibble);
-	else
-		uartWrite((upper ? 'A' : 'a') + (nibble - 0xa));
-}
-
 void uartWriteHex8(uint8_t byte, bool upper)
 {
 	uartWriteHex4(byte >> 4, upper);
