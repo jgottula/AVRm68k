@@ -38,12 +38,6 @@ void uartWriteDec16(uint16_t word)
 	}
 }
 
-void uartWriteHex8(uint8_t byte, bool upper)
-{
-	uartWriteHex4(byte >> 4, upper);
-	uartWriteHex4(byte, upper);
-}
-
 void uartWriteHex16(uint16_t word, bool upper)
 {
 	uartWriteHex8(word >> 8, upper);

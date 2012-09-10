@@ -175,7 +175,7 @@ uartWritePArr_Loop:
 	ret
 	
 	
-	/* description: writes a single hex digit to the UART; optionally uppercase
+	/* description: writes a single hex digit to the UART, optionally uppercase
 	 * parameters:
 	 * - uint8_t nibble [r24]
 	 * - bool    upper  [r22]
@@ -198,3 +198,19 @@ uartWriteHex4_Letter:
 	ldi r25,('A' - 10)
 	add r24,r25
 	jmp uartWrite
+	
+	
+	/* description: writes two hex digits to the UART, optionally uppercase
+	 * parameters:
+	 * - uint8_t byte  [r24]
+	 * - bool    upper [r22]
+	 * no return value
+	 */
+	.global uartWriteHex8
+	.type uartWriteHex8,@function
+uartWriteHex8:
+	mov r18,r24
+	swap r24
+	call uartWriteHex4
+	mov r24,r18
+	jmp uartWriteHex4
