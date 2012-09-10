@@ -37,6 +37,7 @@ noreturn inline void die(void)
 
 
 /* assembly */
+void dbgInit(void);
 void dbgBreak(void);
 
 

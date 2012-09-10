@@ -27,11 +27,11 @@ USART0_RX_vect:
 	lds ZL,SPL
 	adiw ZL,14
 	
-	/* if a break was forced, then jump immediately to the ctrl+c handler */
+	/* if a break was forced, then skip the serial character handling */
 	lds r18,dbgForceBreak
 	tst r18
 	breq USART0_RX_vect_GetChar
-	jmp USART0_RX_vect_CtrlC
+	jmp USART0_RX_vect_EnableDebugging
 	
 USART0_RX_vect_GetChar:
 	/* read the incoming character */
@@ -63,11 +63,13 @@ USART0_RX_vect_CtrlC:
 	jmp USART0_RX_vect_Done
 	
 USART0_RX_vect_EnableDebugging:
-	/* enable debugging */
+	/* set the debugging flag */
 	ldi r18,1
 	sts dbgEnabled,r18
 	
-	/* TODO: turn on timer2 */
+	/* enable interrupt upon TIMER2 overflow (TCNT2 == OCR2A) */
+	ldi r18,_BV(OCIE2A)
+	sts TIMSK2,r18
 	
 	/* display the interrupted program counter */
 	lds r18,dbgForceBreak
@@ -95,8 +97,8 @@ USART0_RX_vect_WritePC:
 	call uartWriteChr
 	restclobber
 	
-looploop:
-	jmp looploop
+/*looploop:
+	jmp looploop*/
 	
 	/*jmp USART0_RX_vect_Done*/
 	
@@ -121,16 +123,38 @@ USART0_TX_vect:
 	.global TIMER2_COMPA_vect
 	.type TIMER2_COMPA_vect,@function
 TIMER2_COMPA_vect:
+	/*saveclobber
+	savesreg
 	
-	reti
+	ldi r24,'t'
+	call uartWriteChr
+	
+	restsreg
+	restclobber
+	reti*/
+	
+	
+	jmp dbgBreak
+	/*reti*/
 	
 	
 	.global dbgInit
 	.type dbgInit,@function
 dbgInit:
+	/* in this routine, we set up TIMER2, but don't start it */
+	
+	/* set TIMER2 to run at F_CPU Hz and overflow when equal to OCR2A */
+	ldi r18,(_BV(CS20) | _BV(WGM22))
+	sts TCCR2B,r18
+	
+	/* set the overflow threshold to 1 (always overflow) */
+	ldi r18,1
+	sts OCR2A,r18
+	
+	/* zero out the counter */
+	sts TCNT2,r1
 	
 	ret
-	
 	
 	.global dbgBreak
 	.type dbgBreak,@function
