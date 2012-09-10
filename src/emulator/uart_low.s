@@ -80,3 +80,28 @@ uartWriteStr_Loop:
 	
 uartWriteStr_Done:
 	ret
+
+
+	/* description: same as uartWriteStr, but reads from program memory
+	 * parameters:
+	 * - const char *pstr [r25:r24]
+	 * no return value
+	 */
+	.global uartWritePStr
+	.type uartWritePStr,@function
+uartWritePStr:
+	mov ZH,r25
+	mov ZL,r24
+	
+	lpm r24,Z+
+	tst r24
+	breq uartWritePStr_Done
+	
+uartWritePStr_Loop:
+	call uartWriteChr
+	lpm r24,Z+
+	tst r24
+	brne uartWritePStr_Loop
+	
+uartWritePStr_Done:
+	ret

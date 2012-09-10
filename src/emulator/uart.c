@@ -162,15 +162,6 @@ void uartWritePArr(const uint8_t *arr, uint16_t len)
 	while (--len > 0);
 }
 
-void uartWritePStr(const char *str)
-{
-	char c;
-	
-	/* don't write the terminating null */
-	while ((c = pgm_read_byte(str++)) != 0)
-		uartWriteChr(c);
-}
-
 bool uartEnabled(void)
 {
 	return UCSR0B & _BV(TXEN0);
