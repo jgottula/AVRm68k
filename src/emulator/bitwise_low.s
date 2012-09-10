@@ -8,7 +8,8 @@
 	.section .text
 	
 	
-	/* parameters:
+	/* description: efficiently emulates 32-bit arithmetic right shift
+	 * parameters:
 	 * - uint32_t  operand [r25:r22]
 	 * - uint8_t   shifts  [r20]
 	 *             (must be >0)
@@ -46,7 +47,8 @@ shiftRightArithLong_NoCarry:
 	ret
 	
 	
-	/* parameters:
+	/* description: efficiently emulates 32-bit arithmetic left shift
+	 * parameters:
 	 * - uint32_t  operand [r25:r22]
 	 * - uint8_t   shifts  [r20]
 	 *             (must be >0)
