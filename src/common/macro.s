@@ -3,6 +3,11 @@
  * The source code of this project is distributed under the terms of the
  * simplified BSD license. See the LICENSE file for details. */
 
+#include <avr/io.h>
+
+#define _IO(_x) _SFR_IO_ADDR(_x)
+
+
 	.altmacro
 	
 	
@@ -82,7 +87,7 @@
 	.macro savesreg
 	
 	push r0
-	in r0,SREG
+	in r0,_IO(SREG)
 	push r0
 	
 	.endm
@@ -92,7 +97,7 @@
 	.macro restsreg
 	
 	pop r0
-	out SREG,r0
+	out _IO(SREG),r0
 	pop r0
 	
 	.endm
