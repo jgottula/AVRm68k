@@ -12,7 +12,7 @@
 	
 	
 	/* multiply the 16-bit register starting with lsreg by two */
-	.macro word_x2 lsreg
+	.macro reg16_x2 lsreg
 	.irp reg,lsreg,%(\lsreg + 1)
 	
 	.if \reg == \lsreg
@@ -26,7 +26,7 @@
 	
 	
 	/* divide the 16-bit register starting with lsreg by two */
-	.macro word_half lsreg
+	.macro reg16_half lsreg
 	.irp reg,%(\lsreg + 1),lsreg
 	
 	.if \reg != \lsreg
