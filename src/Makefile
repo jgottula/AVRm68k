@@ -24,7 +24,7 @@ PROG2_CFLAGS:=-c -O0 -Wa,-mcpu=68030,-mno-68851,-mno-68881,-mno-68882,-mno-float
 PROG_AVRDUDEFLAGS:=-R .flash
 PROG_OBJDUMPFLAGS:=-s -d -M att
 
-COMMON_CFLAGS=-std=gnu11 -Wall -Wextra -Wno-unused-function -Wstrict-aliasing=2 -O2 -ggdb -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG
+COMMON_CFLAGS=-std=gnu11 -Wall -Wextra -Wno-unused-function -Wstrict-aliasing=2 -O1 -ggdb -fno-reorder-functions -flto -ffreestanding -fwhole-program -fuse-linker-plugin -mrelax -DDEBUG
 COMMON_LST_CFLAGS=-c -O0 -ggdb -w -Wa,-adhln -o /dev/null
 COMMON_ASM_CFLAGS=-x assembler-with-cpp
 COMMON_OBJCOPYFLAGS:=-R .eeprom
