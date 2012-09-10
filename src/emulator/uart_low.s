@@ -92,17 +92,16 @@ uartWriteStr:
 	mov ZH,r25
 	mov ZL,r24
 	
-	ld r24,Z+
-	tst r24
-	breq uartWriteStr_Done
+	jmp uartWriteStr_Check
 	
 uartWriteStr_Loop:
 	call uartWriteChr
+	
+uartWriteStr_Check:
 	ld r24,Z+
 	tst r24
 	brne uartWriteStr_Loop
 	
-uartWriteStr_Done:
 	ret
 
 
@@ -117,17 +116,16 @@ uartWritePStr:
 	mov ZH,r25
 	mov ZL,r24
 	
-	lpm r24,Z+
-	tst r24
-	breq uartWritePStr_Done
+	jmp uartWritePStr_Check
 	
 uartWritePStr_Loop:
 	call uartWriteChr
+	
+uartWritePStr_Check:
 	lpm r24,Z+
 	tst r24
 	brne uartWritePStr_Loop
 	
-uartWritePStr_Done:
 	ret
 	
 	
