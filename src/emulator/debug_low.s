@@ -15,7 +15,8 @@
 	.section .text
 	
 	
-	/* no parameters, no return value */
+	/* description: handles ctrl+c as well as subsequent keypresses
+	 * no parameters, no return value */
 	.global USART0_RX_vect
 	.type USART0_RX_vect,@function
 USART0_RX_vect:
@@ -135,7 +136,8 @@ USART0_RX_vect_Done:
 	 * extra, unwanted time */
 	
 	
-	/* no parameters, no return value */
+	/* description: currently unused
+	 * no parameters, no return value */
 	.global USART0_TX_vect
 	.type USART0_TX_vect,@function
 USART0_TX_vect:
@@ -143,7 +145,8 @@ USART0_TX_vect:
 	reti
 	
 	
-	/* no parameters, no return value */
+	/* description: returns to the debug prompt after a single-step operation
+	 * no parameters, no return value */
 	.global TIMER2_COMPA_vect
 	.type TIMER2_COMPA_vect,@function
 TIMER2_COMPA_vect:
@@ -163,12 +166,11 @@ TIMER2_COMPA_vect_Break:
 	jmp _VECTAB(USART0_RX_vect_num)
 	
 	
-	/* no parameters, no return value */
+	/* description: sets up TIMER2 without starting it
+	 * no parameters, no return value */
 	.global dbgInit
 	.type dbgInit,@function
 dbgInit:
-	/* in this routine, we set up TIMER2, but don't start it */
-	
 	/* set TIMER2 to run at F_CPU Hz and overflow when equal to OCR2A */
 	ldi r18,(_BV(CS20) | _BV(WGM22))
 	sts TCCR2B,r18
@@ -183,7 +185,8 @@ dbgInit:
 	ret
 	
 	
-	/* no parameters, no return value */
+	/* description: triggers a debug break from within normal user code
+	 * no parameters, no return value */
 	.global dbgBreak
 	.type dbgBreak,@function
 dbgBreak:
