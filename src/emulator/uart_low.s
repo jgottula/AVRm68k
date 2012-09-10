@@ -89,6 +89,8 @@ uartWriteChr:
 	.global uartWriteStr
 	.type uartWriteStr,@function
 uartWriteStr:
+	savez
+	
 	mov ZH,r25
 	mov ZL,r24
 	
@@ -102,6 +104,7 @@ uartWriteStr_Check:
 	tst r24
 	brne uartWriteStr_Loop
 	
+	restz
 	ret
 	
 	
@@ -113,6 +116,8 @@ uartWriteStr_Check:
 	.global uartWritePStr
 	.type uartWritePStr,@function
 uartWritePStr:
+	savez
+	
 	mov ZH,r25
 	mov ZL,r24
 	
@@ -126,6 +131,7 @@ uartWritePStr_Check:
 	tst r24
 	brne uartWritePStr_Loop
 	
+	restz
 	ret
 	
 	
@@ -138,6 +144,8 @@ uartWritePStr_Check:
 	.global uartWriteArr
 	.type uartWriteArr,@function
 uartWriteArr:
+	savez
+	
 	mov ZH,r25
 	mov ZL,r24
 	
@@ -148,6 +156,7 @@ uartWriteArr_Loop:
 	dec r22
 	brne uartWriteArr_Loop
 	
+	restz
 	ret
 	
 	
@@ -160,6 +169,8 @@ uartWriteArr_Loop:
 	.global uartWritePArr
 	.type uartWritePArr,@function
 uartWritePArr:
+	savez
+	
 	mov ZH,r25
 	mov ZL,r24
 	
@@ -170,6 +181,7 @@ uartWritePArr_Loop:
 	dec r22
 	brne uartWritePArr_Loop
 	
+	restz
 	ret
 	
 	
@@ -181,17 +193,25 @@ uartWritePArr_Loop:
 	.global uartWriteBool
 	.type uartWriteBool,@function
 uartWriteBool:
+	push r25
+	
 	tst r24
 	brne uartWriteBool_True
 	
 	ldi r25,hi8(strUartFalse)
 	ldi r24,lo8(strUartFalse)
-	jmp uartWritePStr
+	call uartWritePStr
+	
+	pop r25
+	ret
 	
 uartWriteBool_True:
 	ldi r25,hi8(strUartTrue)
 	ldi r24,lo8(strUartTrue)
-	jmp uartWritePStr
+	call uartWritePStr
+	
+	pop r25
+	ret
 	
 	
 	/* description: writes four binary digits to the UART
@@ -202,29 +222,33 @@ uartWriteBool_True:
 	.global uartWriteBin4
 	.type uartWriteBin4,@function
 uartWriteBin4:
-	mov r20,r24
-	ldi r18,0b1000
+	savereg 15,17
+	
+	mov r15,r24
+	ldi r16,0b1000
 	
 uartWriteBin4_Loop:
-	mov r19,r20
-	and r19,r18
+	mov r17,r15
+	and r17,r16
 	brne uartWriteBin4_One
 	
 	ldi r24,'0'
 	call uartWrite
 	
-	lsr r18
+	lsr r16
 	brcc uartWriteBin4_Loop
 	
+	restreg 17,15
 	ret
 	
 uartWriteBin4_One:
 	ldi r24,'1'
 	call uartWrite
 	
-	lsr r18
+	lsr r16
 	brcc uartWriteBin4_Loop
 	
+	restreg 17,15
 	ret
 	
 	
@@ -236,8 +260,12 @@ uartWriteBin4_One:
 	.global uartWriteBin8
 	.type uartWriteBin8,@function
 uartWriteBin8:
-	mov r20,r24
-	ldi r18,0b10000000
+	/* warning, make sure these are the same as for uartWriteBin4, since it will
+	 * be doing the restoration */
+	savereg 15,17
+	
+	mov r15,r24
+	ldi r16,0b10000000
 	
 	/* use the 4-bit loop, since all that changed was r18's starting value */
 	jmp uartWriteBin4_Loop
@@ -252,20 +280,28 @@ uartWriteBin8:
 	.global uartWriteHex4
 	.type uartWriteHex4,@function
 uartWriteHex4:
+	push r17
+	
 	andi r24,0x0f
 	cpi r24,0x0a
 	brge uartWriteHex4_Letter
 	
-	ldi r25,'0'
-	add r24,r25
-	jmp uartWrite
+	ldi r17,'0'
+	add r24,r17
+	call uartWrite
+	
+	pop r17
+	ret
 	
 uartWriteHex4_Letter:
-	ldi r25,('a' - 10)
+	ldi r17,('a' - 10)
 	sbrc r22,0
-	ldi r25,('A' - 10)
-	add r24,r25
-	jmp uartWrite
+	ldi r17,('A' - 10)
+	add r24,r17
+	call uartWrite
+	
+	pop r17
+	ret
 	
 	
 	/* description: writes two hex digits to the UART, optionally uppercase
@@ -277,12 +313,17 @@ uartWriteHex4_Letter:
 	.global uartWriteHex8
 	.type uartWriteHex8,@function
 uartWriteHex8:
-	mov r18,r24
+	push r17
+	
+	mov r17,r24
 	swap r24
 	call uartWriteHex4
 	
-	mov r24,r18
-	jmp uartWriteHex4
+	mov r24,r17
+	call uartWriteHex4
+	
+	pop r17
+	ret
 	
 	
 	/* description: writes four hex digits to the UART, optionally uppercase
@@ -294,12 +335,17 @@ uartWriteHex8:
 	.global uartWriteHex16
 	.type uartWriteHex16,@function
 uartWriteHex16:
-	mov r19,r24
+	push r17
+	
+	mov r17,r24
 	mov r24,r25
 	call uartWriteHex8
 	
-	mov r24,r19
-	jmp uartWriteHex8
+	mov r24,r17
+	call uartWriteHex8
+	
+	pop r17
+	ret
 	
 	
 	/* description: writes three hex digits to the UART, optionally uppercase
@@ -311,12 +357,17 @@ uartWriteHex16:
 	.global uartWriteHex12
 	.type uartWriteHex12,@function
 uartWriteHex12:
-	mov r26,r24
+	push r17
+	
+	mov r17,r24
 	mov r24,r25
 	call uartWriteHex4
 	
-	mov r24,r26
-	jmp uartWriteHex8
+	mov r24,r17
+	call uartWriteHex8
+	
+	pop r17
+	ret
 	
 	
 	
@@ -329,13 +380,17 @@ uartWriteHex12:
 	.global uartWriteHex24
 	.type uartWriteHex24,@function
 uartWriteHex24:
-	movw r26,r22
+	savereg 16,17
+	
+	movw r16,r22
 	mov r22,r20
 	call uartWriteHex8
 	
-	movw r24,r26
-	jmp uartWriteHex16
+	movw r24,r16
+	call uartWriteHex16
 	
+	restreg 17,16
+	ret
 	
 	
 	/* description: same as uartWriteHex24, but only writes hex digits 5:3
@@ -364,9 +419,14 @@ uartWriteHex24HighHalf:
 	.global uartWriteHex32
 	.type uartWriteHex32,@function
 uartWriteHex32:
-	movw r26,r22
+	savereg 16,17
+	
+	movw r16,r22
 	mov r22,r20
 	call uartWriteHex16
 	
-	movw r24,r26
-	jmp uartWriteHex16
+	movw r24,r16
+	call uartWriteHex16
+	
+	restreg 17,16
+	ret
