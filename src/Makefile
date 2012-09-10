@@ -29,7 +29,7 @@ COMMON_LST_CFLAGS=-c -O0 -ggdb -w -Wa,-adhln -o /dev/null
 COMMON_ASM_CFLAGS=-x assembler-with-cpp
 COMMON_OBJCOPYFLAGS:=-R .eeprom
 COMMON_OBJDUMPFLAGS:=-s -d -h -j .text -j .data -j .bss -j .eeprom
-COMMON_LST_OBJDUMPFLAGS=-s -d -t -S --file-start-context -j .text -j .data -j .bss -j .eeprom
+COMMON_LST_OBJDUMPFLAGS=-s -d -t -S -j .text -j .data -j .bss -j .eeprom
 
 
 COMMON_SRCDIR:=common
