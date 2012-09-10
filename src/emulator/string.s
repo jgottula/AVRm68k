@@ -9,9 +9,13 @@
 	.section .text
 	
 	
-	.global strDbgAddr
-strDbgAddr:
-	.asciz "\nBreak! PC: 0x"
+	.global strDbgUserBreak
+strDbgUserBreak:
+	.asciz "\nUser Break (^C)\nPC = 0x"
+	
+	.global strDbgCodeBreak
+strDbgCodeBreak:
+	.asciz "\nCode Break (dbgBreak)\nPC = 0x"
 	
 	
 	/* ensure that cpu instructions are aligned to word boundaries */
