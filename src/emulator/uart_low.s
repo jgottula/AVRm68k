@@ -234,6 +234,24 @@ uartWriteHex16:
 	jmp uartWriteHex8
 	
 	
+	/* description: writes three hex digits to the UART, optionally uppercase
+	 * parameters:
+	 * - uint16_t byteAndAHalf [r25:r24]
+	 * - bool     upper        [r22]
+	 * no return value
+	 */
+	.global uartWriteHex12
+	.type uartWriteHex12,@function
+uartWriteHex12:
+	mov r26,r24
+	mov r24,r25
+	call uartWriteHex4
+	
+	mov r24,r26
+	jmp uartWriteHex8
+	
+	
+	
 	/* description: writes six hex digits to the UART, optionally uppercase
 	 * parameters:
 	 * - uint32_t wordAndAHalf [r25:r22]
@@ -249,6 +267,24 @@ uartWriteHex24:
 	
 	movw r24,r26
 	jmp uartWriteHex16
+	
+	
+	
+	/* description: same as uartWriteHex24, but only writes hex digits 5:3
+	 * parameters:
+	 * - uint32_t wordAndAHalf [r25:r22]
+	 * - bool     upper        [r20]
+	 * no return value
+	 */
+	.global uartWriteHex24HighHalf
+	.type uartWriteHex24HighHalf,@function
+uartWriteHex24HighHalf:
+	mov r22,r20
+	call uartWriteHex8
+	
+	mov r24,r23
+	swap r24
+	jmp uartWriteHex4
 	
 	
 	/* description: writes eight hex digits to the UART, optionally uppercase

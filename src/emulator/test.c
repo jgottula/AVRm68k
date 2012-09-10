@@ -269,9 +269,9 @@ static void testDRAM(void)
 				uartWritePSTR("0x");
 				uartWriteHex8(addr >> 24, false);
 				uartWriteChr(':');
-				uartWriteHexTop12(addr, false);
+				uartWriteHex24HighHalf(addr, false);
 				uartWriteChr(':');
-				uartWriteHexBottom12(addr, false);
+				uartWriteHex12(addr, false);
 				uartWritePSTR("  ");
 				
 				for (uint16_t j = 0; j < sizeof(write); ++j)
@@ -321,9 +321,9 @@ static void testDRAM(void)
 			uartWritePSTR("0x");
 			uartWriteHex8((addr + j) >> 24, false);
 			uartWriteChr(':');
-			uartWriteHexTop12(addr + j, false);
+			uartWriteHex24HighHalf(addr + j, false);
 			uartWriteChr(':');
-			uartWriteHexBottom12(addr + j, false);
+			uartWriteHex12(addr + j, false);
 			uartWritePSTR("   0x");
 			uartWriteHex8(data[j], false);
 			uartWritePSTR("  0x");
@@ -357,9 +357,9 @@ static void testDRAM(void)
 			uartWritePSTR("0x");
 			uartWriteHex8((addr + j) >> 24, false);
 			uartWriteChr(':');
-			uartWriteHexTop12(addr + j, false);
+			uartWriteHex24HighHalf(addr + j, false);
 			uartWriteChr(':');
-			uartWriteHexBottom12(addr + j, false);
+			uartWriteHex12(addr + j, false);
 			uartWritePSTR("   0x");
 			uartWriteHex8(data[j], false);
 			uartWritePSTR("  0x");
