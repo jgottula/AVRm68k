@@ -212,6 +212,7 @@ uartWriteHex8:
 	mov r18,r24
 	swap r24
 	call uartWriteHex4
+	
 	mov r24,r18
 	jmp uartWriteHex4
 	
@@ -228,5 +229,23 @@ uartWriteHex16:
 	mov r19,r24
 	mov r24,r25
 	call uartWriteHex8
+	
 	mov r24,r19
 	jmp uartWriteHex8
+	
+	
+	/* description: writes eight hex digits to the UART, optionally uppercase
+	 * parameters:
+	 * - uint32_t dword [r25:r22]
+	 * - bool     upper [r20]
+	 * no return value
+	 */
+	.global uartWriteHex32
+	.type uartWriteHex32,@function
+uartWriteHex32:
+	movw r26,r22
+	mov r22,r20
+	call uartWriteHex16
+	
+	movw r24,r26
+	jmp uartWriteHex16

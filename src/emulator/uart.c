@@ -61,12 +61,6 @@ void uartWriteHex24(uint32_t wordAndAHalf, bool upper)
 	uartWriteHex8(wordAndAHalf, upper);
 }
 
-void uartWriteHex32(uint32_t dword, bool upper)
-{
-	uartWriteHex16(dword >> 16, upper);
-	uartWriteHex16(dword, upper);
-}
-
 void uartWriteHex256(const uint32_t arr[8], bool upper)
 {
 	for (uint8_t i = 0; i < 8; ++i)
