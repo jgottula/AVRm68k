@@ -178,16 +178,6 @@ void uartWritePStr(const char *str)
 		uartWriteChr(c);
 }
 
-void uartWriteChr(char chr)
-{
-#ifdef ADD_CARRIAGE_RETURN
-	if (chr == '\n')
-		uartWrite('\r');
-#endif
-	
-	uartWrite(chr);
-}
-
 bool uartEnabled(void)
 {
 	return UCSR0B & _BV(TXEN0);

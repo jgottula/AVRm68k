@@ -9,10 +9,6 @@
 #define AVRM68K_EMULATOR_UART_H
 
 
-/* convert \n to \r\n for serial terminals */
-#define ADD_CARRIAGE_RETURN
-
-
 bool uartAvail(void);
 uint8_t uartRead(void);
 void uartWriteDec16(uint16_t word);
@@ -31,13 +27,13 @@ void uartWriteArr(const uint8_t *arr, uint16_t len);
 void uartWritePArr(const uint8_t *arr, uint16_t len);
 void uartWriteStr(const char *str);
 void uartWritePStr(const char *str);
-void uartWriteChr(char chr);
 bool uartEnabled(void);
 void uartInit(void);
 
 
 /* assembly */
 void uartWrite(uint8_t byte);
+void uartWriteChr(char chr);
 
 
 #define uartWritePSTR(_str) (uartWritePStr(PSTR(_str)))
