@@ -9,9 +9,6 @@
 #define AVRM68K_EMULATOR_IO_H
 
 
-#include "../common/io.h"
-
-
 #define DDR_DRAM_ADDR     DDRA
 #define PORT_DRAM_ADDR    PORTA
 #define PIN_DRAM_ADDR     PINA

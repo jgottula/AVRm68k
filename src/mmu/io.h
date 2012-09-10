@@ -9,9 +9,6 @@
 #define AVRM68K_MMU_IO_H
 
 
-#include "../common/io.h"
-
-
 #if 0
 #define DDR_  DDRA
 #define PORT_ PORTA
