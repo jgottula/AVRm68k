@@ -12,7 +12,6 @@
 bool uartAvail(void);
 uint8_t uartRead(void);
 void uartWriteDec16(uint16_t word);
-void uartWriteHex256(const uint32_t arr[8], bool upper);
 void uartWriteBin4(uint8_t nibble);
 void uartWriteBin8(uint8_t byte);
 void uartWriteBool(bool truth);

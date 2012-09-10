@@ -38,16 +38,6 @@ void uartWriteDec16(uint16_t word)
 	}
 }
 
-void uartWriteHex256(const uint32_t arr[8], bool upper)
-{
-	for (uint8_t i = 0; i < 8; ++i)
-	{
-		if (i != 0)
-			uartWrite(' ');
-		uartWriteHex32(arr[i], upper);
-	}
-}
-
 void uartWriteBin4(uint8_t nibble)
 {
 	for (int8_t i = 3; i >= 0; --i)
