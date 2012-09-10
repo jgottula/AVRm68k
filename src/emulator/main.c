@@ -19,11 +19,38 @@ noreturn void main(void)
 	intrInit();
 	spiInit();
 	//sdInit();
-	m68kInit();
+	//m68kInit();
+#warning m68k init is disabled until dramLoadAddrBus with O2 can be fixed
 	
 	uartWritePSTR("Init complete.\n");
 	
-	testAll();
+	uint16_t localTime = 0;
+	for ( ; ; )
+	{
+		/* why the hell does ATOMIC_BLOCK screw everything up on -O2? someone
+		 * did a terrible job writing that macro */
+		
+		sei();
+		/*if (dbgChar != 0)
+		{
+			uartWritePSTR("\ndbgChar: 0x");
+			uartWriteHex8(dbgChar, false);
+			uartWritePSTR(" '");
+			uartWriteChr(dbgChar);
+			uartWritePSTR("'\n");
+			
+			dbgChar = 0;
+		}*/
+		if (localTime != sec)
+		{
+			uartWritePSTR("\ntick!\n");
+			
+			localTime = sec;
+		}
+		cli();
+	}
+	
+	/*testAll();*/
 	
 	while (true)
 	{
