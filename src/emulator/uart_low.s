@@ -103,8 +103,8 @@ uartWriteStr_Check:
 	brne uartWriteStr_Loop
 	
 	ret
-
-
+	
+	
 	/* description: same as uartWriteStr, but reads from program memory
 	 * parameters:
 	 * - const char *pstr [r25:r24]
