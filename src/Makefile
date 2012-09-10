@@ -82,8 +82,8 @@ PROG_CLEAN=$(PROG1_EXE) $(PROG1_BIN) $(PROG1_HEX) $(PROG1_MAP) $(PROG1_DUMP) $(P
 
 .PHONY: all emu mmu prog prog1 prog2 pch lst map dump loademu loadmmu loadprog1 loadprog2 clean
 
-# default rule
-all: emu mmu prog lst map dump
+# default rule (excludes lst)
+all: emu mmu prog map dump
 	@ls -l $(EMU_BIN) $(MMU_BIN)
 
 emu: $(EMU_EXE) $(EMU_BIN) $(EMU_HEX)
