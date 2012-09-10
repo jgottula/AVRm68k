@@ -10,6 +10,7 @@
 	
 	.lcomm dbgEnabled,1
 	.lcomm dbgForceBreak,1
+	.lcomm dbgSingleStep,1
 	
 	
 	.section .text
@@ -28,18 +29,26 @@ USART0_RX_vect:
 	lds ZL,SPL
 	adiw ZL,14
 	
+	/* if we just came back from a single step, then skip to the PC dump */
+	lds r18,dbgSingleStep
+	tst r18
+	breq USART0_RX_vect_NotSingleStep
+	sts dbgSingleStep,r1
+	jmp USART0_RX_vect_WritePC
+	
+USART0_RX_vect_NotSingleStep:
 	/* if a break was forced, then skip the serial character handling */
 	lds r18,dbgForceBreak
 	tst r18
 	breq USART0_RX_vect_GetChar
 	jmp USART0_RX_vect_EnableDebugging
 	
-USART0_RX_vect_GetChar:
 	/* read the incoming character */
-	lds r25,UDR0
+	lds r24,UDR0
 	
+USART0_RX_vect_GetChar:
 	/* ctrl+c */
-	cpi r25,0x03
+	cpi r24,0x03
 	brne USART0_RX_vect_CheckS
 	
 	/* do nothing if debugging is already on */
@@ -50,13 +59,13 @@ USART0_RX_vect_GetChar:
 	
 USART0_RX_vect_CheckS:
 	/* single step */
-	cpi r25,'s'
+	cpi r24,'s'
 	brne USART0_RX_vect_CheckC
 	jmp USART0_RX_vect_Done
 	
 USART0_RX_vect_CheckC:
 	/* continue execution */
-	cpi r25,'c'
+	cpi r24,'c'
 	brne USART0_RX_vect_CheckOthers
 	
 	/* disable debugging, turn off TIMER2, and clear its overflow flag */
@@ -84,44 +93,41 @@ USART0_RX_vect_EnableDebugging:
 	lds r18,dbgForceBreak
 	tst r18
 	breq USART0_RX_vect_UserBreak
+	
 	ldi r25,hi8(strDbgCodeBreak)
 	ldi r24,lo8(strDbgCodeBreak)
-	jmp USART0_RX_vect_WritePC
+	
+	/* clear the force break flag */
+	sts dbgForceBreak,r1
+	jmp USART0_RX_vect_WriteBreak
+	
 USART0_RX_vect_UserBreak:
 	ldi r25,hi8(strDbgUserBreak)
 	ldi r24,lo8(strDbgUserBreak)
 	
-USART0_RX_vect_WritePC:
-	/* clear the force break flag */
-	sts dbgForceBreak,r1
-	
-	saveclobber
+USART0_RX_vect_WriteBreak:
 	call uartWritePStr
-	restclobber
+	
+USART0_RX_vect_WritePC:
+	ldi r25,hi8(strDbgPCDump)
+	ldi r24,lo8(strDbgPCDump)
+	call uartWritePStr
+	
 	ldd r25,Z+1
 	ldd r24,Z+2
 	reg16_x2 24
 	clr r22
-	saveclobber
 	call uartWriteHex16
-	restclobber
 	ldi r24,'\n'
-	saveclobber
 	call uartWriteChr
-	restclobber
 	
 USART0_RX_vect_CmdPrompt:
 	ldi r25,hi8(strDbgCmdPrompt)
 	ldi r24,lo8(strDbgCmdPrompt)
-	saveclobber
 	call uartWritePStr
-	restclobber
 	
 USART0_RX_vect_CmdWait:
-	lds r0,UCSR0A
-	sbrs r0,RXC0
-	jmp USART0_RX_vect_CmdWait
-	
+	call uartRead
 	jmp USART0_RX_vect_GetChar
 	
 USART0_RX_vect_Done:
@@ -161,7 +167,7 @@ TIMER2_COMPA_vect:
 	
 TIMER2_COMPA_vect_Break:
 	ldi r18,1
-	sts dbgForceBreak,r18
+	sts dbgSingleStep,r18
 	pop r18
 	jmp _VECTAB(USART0_RX_vect_num)
 	

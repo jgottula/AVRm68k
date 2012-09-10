@@ -11,11 +11,15 @@
 	
 	.global strDbgUserBreak
 strDbgUserBreak:
-	.asciz "\nUser Break (^C)\nPC = 0x"
+	.asciz "\nUser Break (^C)\n"
 	
 	.global strDbgCodeBreak
 strDbgCodeBreak:
-	.asciz "\nCode Break (dbgBreak)\nPC = 0x"
+	.asciz "\nCode Break (dbgBreak)\n"
+	
+	.global strDbgPCDump
+strDbgPCDump:
+	.asciz "PC = 0x"
 	
 	.global strDbgCmdPrompt
 strDbgCmdPrompt:
