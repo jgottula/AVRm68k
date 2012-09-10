@@ -214,3 +214,19 @@ uartWriteHex8:
 	call uartWriteHex4
 	mov r24,r18
 	jmp uartWriteHex4
+	
+	
+	/* description: writes four hex digits to the UART, optionally uppercase
+	 * parameters:
+	 * - uint16_t word  [r25:r24]
+	 * - bool     upper [r22]
+	 * no return value
+	 */
+	.global uartWriteHex16
+	.type uartWriteHex16,@function
+uartWriteHex16:
+	mov r19,r24
+	mov r24,r25
+	call uartWriteHex8
+	mov r24,r19
+	jmp uartWriteHex8

@@ -38,12 +38,6 @@ void uartWriteDec16(uint16_t word)
 	}
 }
 
-void uartWriteHex16(uint16_t word, bool upper)
-{
-	uartWriteHex8(word >> 8, upper);
-	uartWriteHex8(word, upper);
-}
-
 void uartWriteHexTop12(uint32_t wordAndAHalf, bool upper)
 {
 	/* this function takes a 24-bit value and prints the high 12 bits */
