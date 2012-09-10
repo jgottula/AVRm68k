@@ -148,20 +148,6 @@ void uartWriteBool(bool truth)
 		uartWritePSTR("false");
 }
 
-void uartWriteArr(const uint8_t *arr, uint16_t len)
-{
-	do
-		uartWrite(*(arr++));
-	while (--len > 0);
-}
-
-void uartWritePArr(const uint8_t *arr, uint16_t len)
-{
-	do
-		uartWrite(pgm_read_byte(arr++));
-	while (--len > 0);
-}
-
 bool uartEnabled(void)
 {
 	return UCSR0B & _BV(TXEN0);

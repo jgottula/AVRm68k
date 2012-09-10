@@ -105,3 +105,47 @@ uartWritePStr_Loop:
 	
 uartWritePStr_Done:
 	ret
+	
+	
+	/* description: writes an array of given length to the UART
+	 * parameters:
+	 * - const uint8_t *arr [r25:r24]
+	 * - uint8_t        len [r22]
+	 * no return value
+	 */
+	.global uartWriteArr
+	.type uartWriteArr,@function
+uartWriteArr:
+	mov ZH,r25
+	mov ZL,r24
+	
+uartWriteArr_Loop:
+	ld r24,Z+
+	call uartWrite
+	
+	dec r22
+	brne uartWriteArr_Loop
+	
+	ret
+	
+	
+	/* description: same as uartWriteArr, but reads from program memory
+	 * parameters:
+	 * - const uint8_t *parr [r25:r24]
+	 * - uint8_t        len [r22]
+	 * no return value
+	 */
+	.global uartWritePArr
+	.type uartWritePArr,@function
+uartWritePArr:
+	mov ZH,r25
+	mov ZL,r24
+	
+uartWritePArr_Loop:
+	lpm r24,Z+
+	call uartWrite
+	
+	dec r22
+	brne uartWritePArr_Loop
+	
+	ret

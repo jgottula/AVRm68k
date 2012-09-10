@@ -23,8 +23,6 @@ void uartWriteHex256(const uint32_t arr[8], bool upper);
 void uartWriteBin4(uint8_t nibble);
 void uartWriteBin8(uint8_t byte);
 void uartWriteBool(bool truth);
-void uartWriteArr(const uint8_t *arr, uint16_t len);
-void uartWritePArr(const uint8_t *arr, uint16_t len);
 bool uartEnabled(void);
 void uartInit(void);
 
@@ -34,6 +32,8 @@ void uartWrite(uint8_t byte);
 void uartWriteChr(char chr);
 void uartWriteStr(const char *str);
 void uartWritePStr(const char *pstr);
+void uartWriteArr(const uint8_t *arr, uint8_t len);
+void uartWritePArr(const uint8_t *arr, uint8_t len);
 
 
 #define uartWritePSTR(_str) (uartWritePStr(PSTR(_str)))
