@@ -37,21 +37,25 @@ USART0_RX_vect_GetChar:
 	/* read the incoming character */
 	lds r25,UDR0
 	
-#if 0
-	/* echo the character back */
-	ldi r24,'\n'
-	call uartWriteChr
-	mov r24,r25
-	ldi r22,0
-	call uartWriteHex8
-	ldi r24,'\n'
-	call uartWriteChr
-#endif
-	
 	/* ctrl+c */
 	cpi r25,0x03
-	breq USART0_RX_vect_CtrlC
+	brne USART0_RX_vect_CheckOthers
 	jmp USART0_RX_vect_CtrlC
+	
+USART0_RX_vect_CheckOthers:
+	/* echo the character back */
+	ldi r24,'\n'
+	saveclobber
+	call uartWriteChr
+	restclobber
+	mov r24,r25
+	saveclobber
+	call uartWriteChr
+	restclobber
+	ldi r24,'\n'
+	saveclobber
+	call uartWriteChr
+	restclobber
 	
 	jmp USART0_RX_vect_Done
 	
@@ -81,7 +85,11 @@ USART0_RX_vect_EnableDebugging:
 USART0_RX_vect_UserBreak:
 	ldi r25,hi8(strDbgUserBreak)
 	ldi r24,lo8(strDbgUserBreak)
+	
 USART0_RX_vect_WritePC:
+	/* clear the force break flag */
+	sts dbgForceBreak,r1
+	
 	saveclobber
 	call uartWritePStr
 	restclobber
@@ -97,14 +105,21 @@ USART0_RX_vect_WritePC:
 	call uartWriteChr
 	restclobber
 	
-/*looploop:
-	jmp looploop*/
+USART0_RX_vect_CmdPrompt:
+	ldi r25,hi8(strDbgCmdPrompt)
+	ldi r24,lo8(strDbgCmdPrompt)
+	saveclobber
+	call uartWritePStr
+	restclobber
 	
-	/*jmp USART0_RX_vect_Done*/
+USART0_RX_vect_CmdWait:
+	lds r0,UCSR0A
+	sbrs r0,RXC0
+	jmp USART0_RX_vect_CmdWait
+	
+	jmp USART0_RX_vect_GetChar
 	
 USART0_RX_vect_Done:
-	/* clear the force break flag */
-	sts dbgForceBreak,r1
 	
 	restclobber
 	restsreg
@@ -123,21 +138,10 @@ USART0_TX_vect:
 	.global TIMER2_COMPA_vect
 	.type TIMER2_COMPA_vect,@function
 TIMER2_COMPA_vect:
-	/*saveclobber
-	savesreg
-	
-	ldi r24,'t'
-	call uartWriteChr
-	
-	restsreg
-	restclobber
-	reti*/
-	
-	
 	jmp dbgBreak
-	/*reti*/
 	
 	
+	/* no parameters, no return value */
 	.global dbgInit
 	.type dbgInit,@function
 dbgInit:
@@ -156,6 +160,7 @@ dbgInit:
 	
 	ret
 	
+	/* no parameters, no return value */
 	.global dbgBreak
 	.type dbgBreak,@function
 dbgBreak:
@@ -165,10 +170,3 @@ dbgBreak:
 	sts dbgForceBreak,r18
 	pop r18
 	jmp _VECTAB(USART0_RX_vect_num)
-	
-	
-	.global dbgStep
-	.type dbgStep,@function
-dbgStep:
-	
-	ret

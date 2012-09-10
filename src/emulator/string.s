@@ -17,6 +17,10 @@ strDbgUserBreak:
 strDbgCodeBreak:
 	.asciz "\nCode Break (dbgBreak)\nPC = 0x"
 	
+	.global strDbgCmdPrompt
+strDbgCmdPrompt:
+	.asciz "dbg] "
+	
 	
 	/* ensure that cpu instructions are aligned to word boundaries */
 	.align 2
