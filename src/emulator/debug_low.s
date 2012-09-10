@@ -39,8 +39,7 @@ USART0_RX_vect:
 USART0_RX_vect_NotSingleStep:
 	/* if a break was forced, then skip the serial character handling */
 	lds r18,dbgForceBreak
-	tst r18
-	breq USART0_RX_vect_GetChar
+	sbrc r18,0
 	jmp USART0_RX_vect_EnableDebugging
 	
 	/* read the incoming character */
@@ -49,7 +48,7 @@ USART0_RX_vect_NotSingleStep:
 USART0_RX_vect_GetChar:
 	/* ctrl+c */
 	cpi r24,0x03
-	brne USART0_RX_vect_CheckS
+	brne USART0_RX_vect_CheckLetters
 	
 	/* do nothing if debugging is already on */
 	lds r18,dbgEnabled
@@ -57,10 +56,17 @@ USART0_RX_vect_GetChar:
 	jmp USART0_RX_vect_EnableDebugging
 	jmp USART0_RX_vect_CmdWait
 	
+USART0_RX_vect_CheckLetters:
+	/* do nothing if debugging is off */
+	lds r18,dbgEnabled
+	sbrs r18,0
+	jmp USART0_RX_vect_Done
+	
 USART0_RX_vect_CheckS:
 	/* single step */
 	cpi r24,'s'
 	brne USART0_RX_vect_CheckC
+	
 	jmp USART0_RX_vect_Done
 	
 USART0_RX_vect_CheckC:
