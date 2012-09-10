@@ -15,9 +15,8 @@
 	.global uartWrite
 	.type uartWrite,@function
 uartWrite:
-	/*savesreg
-	cli*/
-	push r0
+	savesreg
+	cli
 	
 uartWrite_WaitLoop:
 	lds r0,UCSR0A
@@ -26,6 +25,5 @@ uartWrite_WaitLoop:
 	
 	sts UDR0,r24
 	
-	pop r0
-	/*restsreg*/
+	restsreg
 	ret
