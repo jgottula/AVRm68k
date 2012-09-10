@@ -32,9 +32,12 @@ void uartWritePArr(const uint8_t *arr, uint16_t len);
 void uartWriteStr(const char *str);
 void uartWritePStr(const char *str);
 void uartWriteChr(char chr);
-void uartWrite(uint8_t byte);
 bool uartEnabled(void);
 void uartInit(void);
+
+
+/* assembly */
+void uartWrite(uint8_t byte);
 
 
 #define uartWritePSTR(_str) (uartWritePStr(PSTR(_str)))

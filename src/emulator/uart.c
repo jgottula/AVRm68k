@@ -188,23 +188,6 @@ void uartWriteChr(char chr)
 	uartWrite(chr);
 }
 
-void uartWrite(uint8_t byte)
-{
-	/* ATOMIC_BLOCK has some serious problems in this particular situation,
-	 * particularly at -O2; so, for now, we just hope that no race conditions
-	 * ever happen with the UART */
-	
-	/* RESTORESTATE is used since this function may be used in an ISR, in which
-	 * case interrupts should remain disabled until the ISR is done */
-	
-	/*ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-	{*/
-		loop_until_bit_is_set(UCSR0A, UDRE0);
-		
-		UDR0 = byte;
-	/*}*/
-}
-
 bool uartEnabled(void)
 {
 	return UCSR0B & _BV(TXEN0);
