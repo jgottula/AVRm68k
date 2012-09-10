@@ -6,6 +6,7 @@
 #include <avr/io.h>
 
 #define _IO(_x) _SFR_IO_ADDR(_x)
+#define _VECTAB(_x) ((_x) * 4)
 
 
 	.altmacro
