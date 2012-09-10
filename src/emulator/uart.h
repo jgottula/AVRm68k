@@ -14,7 +14,6 @@ uint8_t uartRead(void);
 void uartWriteDec16(uint16_t word);
 void uartWriteBin4(uint8_t nibble);
 void uartWriteBin8(uint8_t byte);
-void uartWriteBool(bool truth);
 bool uartEnabled(void);
 void uartInit(void);
 
@@ -27,6 +26,7 @@ void uartWriteStr(const char *str);
 void uartWritePStr(const char *pstr);
 void uartWriteArr(const uint8_t *arr, uint8_t len);
 void uartWritePArr(const uint8_t *arr, uint8_t len);
+void uartWriteBool(bool truth);
 void uartWriteHex4(uint8_t nibble, bool upper);
 void uartWriteHex8(uint8_t byte, bool upper);
 void uartWriteHex12(uint16_t byteAndAHalf, bool upper);

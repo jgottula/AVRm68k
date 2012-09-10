@@ -60,14 +60,6 @@ void uartWriteBin8(uint8_t byte)
 	}
 }
 
-void uartWriteBool(bool truth)
-{
-	if (truth)
-		uartWritePSTR("TRUE");
-	else
-		uartWritePSTR("false");
-}
-
 bool uartEnabled(void)
 {
 	return UCSR0B & _BV(TXEN0);

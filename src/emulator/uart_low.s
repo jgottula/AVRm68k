@@ -175,6 +175,27 @@ uartWritePArr_Loop:
 	ret
 	
 	
+	/* description: writes 'true' or 'false' depending on the value given
+	 * parameters:
+	 * - bool truth [r24]
+	 * no return value
+	 */
+	.global uartWriteBool
+	.type uartWriteBool,@function
+uartWriteBool:
+	tst r24
+	brne uartWriteBool_True
+	
+	ldi r25,hi8(strUartFalse)
+	ldi r24,lo8(strUartFalse)
+	jmp uartWritePStr
+	
+uartWriteBool_True:
+	ldi r25,hi8(strUartTrue)
+	ldi r24,lo8(strUartTrue)
+	jmp uartWritePStr
+	
+	
 	/* description: writes a single hex digit to the UART, optionally uppercase
 	 * parameters:
 	 * - uint8_t nibble [r24]

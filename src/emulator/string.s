@@ -22,5 +22,14 @@ strDbgCmdPrompt:
 	.asciz "dbg] "
 	
 	
+	.global strUartTrue
+strUartTrue:
+	.asciz "true"
+	
+	.global strUartFalse
+strUartFalse:
+	.asciz "false"
+	
+	
 	/* ensure that cpu instructions are aligned to word boundaries */
 	.align 2
