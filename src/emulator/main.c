@@ -14,6 +14,7 @@ noreturn void main(void)
 	uartInit();
 	uartWritePSTR("\nStarted.\n");
 	
+	dbgInit();
 	//sregInit();
 	dramInit();
 	intrInit();
