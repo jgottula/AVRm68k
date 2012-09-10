@@ -12,7 +12,7 @@
 	.section .text
 	
 	
-	/* description: atomically writes one byte to the uart
+	/* description: atomically writes one byte to the UART
 	 * parameters:
 	 * - uint8_t byte [r24]
 	 * no return value
@@ -55,3 +55,28 @@ uartWriteChr:
 #else
 	uartWriteChr = uartWrite
 #endif
+	
+	
+	/* description: writes a string to the UART, adding \r to \n if appropriate
+	 * parameters:
+	 * - const char *str [r25:r24]
+	 * no return value
+	 */
+	.global uartWriteStr
+	.type uartWriteStr,@function
+uartWriteStr:
+	mov ZH,r25
+	mov ZL,r24
+	
+	ld r24,Z+
+	tst r24
+	breq uartWriteStr_Done
+	
+uartWriteStr_Loop:
+	call uartWriteChr
+	ld r24,Z+
+	tst r24
+	brne uartWriteStr_Loop
+	
+uartWriteStr_Done:
+	ret

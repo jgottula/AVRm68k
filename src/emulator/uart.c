@@ -162,13 +162,6 @@ void uartWritePArr(const uint8_t *arr, uint16_t len)
 	while (--len > 0);
 }
 
-void uartWriteStr(const char *str)
-{
-	/* don't write the terminating null */
-	while (*str != 0)
-		uartWriteChr(*(str++));
-}
-
 void uartWritePStr(const char *str)
 {
 	char c;
