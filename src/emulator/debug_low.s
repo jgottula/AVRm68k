@@ -4,17 +4,11 @@
  * simplified BSD license. See the LICENSE file for details. */
 
 #include "../common/macro.s"
-#include <avr/io.h>
 
 	.section .bss
 	
 	
-dbgEnabled:
-	.byte 0
-	
-	.global dbgChar
-dbgChar:
-	.byte 0
+	.lcomm dbgEnabled,1
 	
 	
 	.section .text
@@ -24,22 +18,59 @@ dbgChar:
 	.global USART0_RX_vect
 	.type USART0_RX_vect,@function
 USART0_RX_vect:
+	savesreg
 	saveclobber
 	
-	lds r24,UDR0
+	/* immediately save the stack pointer */
+	lds ZH,SPH
+	lds ZL,SPL
+	adiw ZL,14
 	
-	/* delete me later */
-	sts dbgChar,r24
-	
-	/*call uartWriteChr*/
-	
+	/* read the incoming character */
+	lds r25,UDR0
 	
 #if 0
-	cpi r24,0x03 /* etx: ctrl+c */
-	breq ...
+	/* echo the character back */
+	ldi r24,'\n'
+	call uartWriteChr
+	mov r24,r25
+	ldi r22,0
+	call uartWriteHex8
+	ldi r24,'\n'
+	call uartWriteChr
 #endif
 	
+	/* ctrl+c */
+	cpi r25,0x03
+	breq USART0_RX_vect_CtrlC
+	
+	jmp USART0_RX_vect_Done
+	
+USART0_RX_vect_CtrlC:
+	/* enable debugging */
+	ldi r18,1
+	sts dbgEnabled,r18
+	
+	/* display the interrupted program counter */
+	ldi r25,hi8(strDbgAddr)
+	ldi r24,lo8(strDbgAddr)
+	saveclobber
+	call uartWritePStr
 	restclobber
+	ldd r25,Z+1
+	ldd r24,Z+2
+	reg16_x2 24
+	ldi r22,0
+	call uartWriteHex16
+	ldi r24,'\n'
+	call uartWriteChr
+	
+	/*rjmp USART0_RX_vect_Done*/
+	
+USART0_RX_vect_Done:
+	
+	restclobber
+	restsreg
 	reti
 	
 	
