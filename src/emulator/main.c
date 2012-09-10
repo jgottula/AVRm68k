@@ -40,6 +40,5 @@ noreturn void main(void)
 		m68kNext();
 	}
 	
-	blinkLEDForever(500);
 	die();
 }
