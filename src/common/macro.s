@@ -102,3 +102,21 @@
 	pop r0
 	
 	.endm
+	
+	
+	/* save the Z register (r31:r30) */
+	.macro savez
+	
+	push ZH
+	push ZL
+	
+	.endm
+	
+	
+	/* restore the Z register (r31:r30) */
+	.macro restz
+	
+	pop ZL
+	pop ZH
+	
+	.endm
