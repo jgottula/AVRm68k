@@ -160,9 +160,6 @@ USART0_RX_vect_Done:
 	restall
 	restsreg
 	reti
-	/* PROBLEM: by reading the UART input with a spin loop inside of the rx isr,
-	 * we may be causing an rx interrupt to queue up, which might run the isr an
-	 * extra, unwanted time */
 	
 	
 	/* description: currently unused
