@@ -11,6 +11,14 @@
 	.lcomm dbgEnabled,1
 	.lcomm dbgForceBreak,1
 	.lcomm dbgSingleStep,1
+	.lcomm dbgCmdLen,1
+	
+	
+	.section .noinit
+	
+	
+#define DBG_CMD_BUFFER_SIZE 32
+	.lcomm dbgCmdBuffer,DBG_CMD_BUFFER_SIZE
 	
 	
 	.section .text
@@ -21,13 +29,14 @@
 	.global USART0_RX_vect
 	.type USART0_RX_vect,@function
 USART0_RX_vect:
-	savesreg
+	push r0
 	saveall
+	savesreg
 	
 	/* save the pre-ISR stack pointer */
-	lds ZH,SPH
-	lds ZL,SPL
-	adiw ZL,33
+	lds YH,SPH
+	lds YL,SPL
+	adiw YL,35
 	
 	/* if we just came back from a single step, then skip to the PC dump */
 	lds r18,dbgSingleStep
@@ -48,62 +57,89 @@ USART0_RX_vect_NotSingleStep:
 USART0_RX_vect_GetChar:
 	/* ctrl+c */
 	cpi r24,0x03
-	brne USART0_RX_vect_CheckLetters
+	brne USART0_RX_vect_CheckNewline
 	
 	ldi r24,'\n'
 	call uartWriteChr
 	
-	/* do nothing if debugging is already on */
+	/* if debugging is already on, then ctrl+c should reset the command line */
 	lds r18,dbgEnabled
 	sbrs r18,0
 	jmp USART0_RX_vect_EnableDebugging
-	jmp USART0_RX_vect_CmdWait
 	
-USART0_RX_vect_CheckLetters:
+	jmp USART0_RX_vect_CmdPrompt
+	
+USART0_RX_vect_CheckNewline:
 	/* do nothing if debugging is off */
 	lds r18,dbgEnabled
 	sbrs r18,0
 	jmp USART0_RX_vect_Done
 	
-USART0_RX_vect_CheckS:
-	/* single step */
-	cpi r24,'s'
-	brne USART0_RX_vect_CheckC
+	/* if a newline was received, try to parse the command buffer */
+	cpi r24,'\r'
+	brne USART0_RX_vect_CheckBackspace
+	call dbgReadCmd
 	
-	ldi r24,'\n'
-	call uartWriteChr
-	
-	jmp USART0_RX_vect_Done
-	
-USART0_RX_vect_CheckC:
-	/* continue execution */
-	cpi r24,'c'
-	brne USART0_RX_vect_CheckR
-	
-	ldi r24,'\n'
-	call uartWriteChr
-	
-	/* disable debugging, turn off TIMER2, and clear its overflow flag */
-	sts dbgEnabled,r1
-	sts TIMSK2,r1
-	ldi r18,0xff
-	sts TIFR2,r18
-	
-	jmp USART0_RX_vect_Done
-
-USART0_RX_vect_CheckR:
-	/* dump registers */
-	cpi r24,'r'
-	brne USART0_RX_vect_CheckOthers
-	
-	ldi r24,'\n'
-	call uartWriteChr
-	
-	call dbgDumpReg
 	jmp USART0_RX_vect_CmdPrompt
 	
-USART0_RX_vect_CheckOthers:
-	/* ignore other characters */
+USART0_RX_vect_CheckBackspace:
+	/* if a backspace was received, delete a character */
+	cpi r24,0x08
+	brne USART0_RX_vect_NotBackspace
+	
+	lds r18,dbgCmdLen
+	tst r18
+	breq USART0_RX_vect_BackspaceDone
+	
+	/* decrease the command buffer length by one and echo the backspace */
+	dec r18
+	sts dbgCmdLen,r18
+	
+	call uartWrite
+	ldi r24,' '
+	call uartWrite
+	ldi r24,0x08
+	call uartWrite
+	
+USART0_RX_vect_BackspaceDone:
+	jmp USART0_RX_vect_CmdWait
+	
+USART0_RX_vect_NotBackspace:
+	/* ignore non-printable characters: 0-31, 127, 128-255 */
+	cpi r24,' '
+	brge USART0_RX_vect_Printable0
+	
+	jmp USART0_RX_vect_CmdWait
+	
+USART0_RX_vect_Printable0:
+	cpi r24,0x7f
+	brlt USART0_RX_vect_Printable1
+	
+	jmp USART0_RX_vect_CmdWait
+	
+USART0_RX_vect_Printable1:
+	/* do nothing if the command buffer is full */
+	lds r18,dbgCmdLen
+	cpi r18,DBG_CMD_BUFFER_SIZE
+	brlt USART0_RX_vect_AppendToBuffer
+	
+	jmp USART0_RX_vect_CmdWait
+	
+USART0_RX_vect_AppendToBuffer:
+	/* append the character to the buffer and echo it */
+	ldi ZH,hi8(dbgCmdBuffer)
+	ldi ZL,lo8(dbgCmdBuffer)
+	
+	add ZL,r18
+	adc ZH,0
+	
+	inc r18
+	sts dbgCmdLen,r18
+	
+	st Z,r24
+	
+	call uartWrite
+	
 	jmp USART0_RX_vect_CmdWait
 	
 USART0_RX_vect_EnableDebugging:
@@ -139,8 +175,8 @@ USART0_RX_vect_WritePC:
 	ldi r24,lo8(strDbgPCDump)
 	call uartWritePStr
 	
-	ldd r25,Z+1
-	ldd r24,Z+2
+	ldd r25,Y+1
+	ldd r24,Y+2
 	reg16_x2 24
 	clr r22
 	call uartWriteHex16
@@ -148,6 +184,8 @@ USART0_RX_vect_WritePC:
 	call uartWriteChr
 	
 USART0_RX_vect_CmdPrompt:
+	sts dbgCmdLen,r1
+	
 	ldi r25,hi8(strDbgCmdPrompt)
 	ldi r24,lo8(strDbgCmdPrompt)
 	call uartWritePStr
@@ -157,8 +195,9 @@ USART0_RX_vect_CmdWait:
 	jmp USART0_RX_vect_GetChar
 	
 USART0_RX_vect_Done:
-	restall
 	restsreg
+	restall
+	pop r0
 	reti
 	
 	
@@ -224,7 +263,91 @@ dbgBreak:
 	jmp _VECTAB(USART0_RX_vect_num)
 	
 	
-	/* description: dumps registers (on the stack at Z) to the UART
+	/* description: parses the command string when a newline is received
+	 * no parameters, no return value
+	 * not public
+	 */
+	.type dbgReadCmd,@function
+dbgReadCmd:
+	savez
+	push r18
+	push r24
+	
+	ldi r24,'\n'
+	call uartWrite
+	
+	/* do nothing if the buffer is empty */
+	lds r18,dbgCmdLen
+	tst r18
+	breq dbgReadCmd_EmptyBuffer
+	
+	ldi ZH,hi8(dbgCmdBuffer)
+	ldi ZL,lo8(dbgCmdBuffer)
+	
+	/* echo the command string */
+dbgReadCmd_Loop:
+	ld r24,Z+
+	call uartWrite
+	
+	dec r18
+	brne dbgReadCmd_Loop
+	
+	ldi r24,'\n'
+	call uartWrite
+	
+	sts dbgCmdLen,r1
+	
+dbgReadCmd_EmptyBuffer:
+	pop r18
+	pop r24
+	restz
+	ret
+	
+#if 0
+USART0_RX_vect_CheckS:
+	/* single step */
+	cpi r24,'s'
+	brne USART0_RX_vect_CheckC
+	
+	ldi r24,'\n'
+	call uartWriteChr
+	
+	jmp USART0_RX_vect_Done
+	
+USART0_RX_vect_CheckC:
+	/* continue execution */
+	cpi r24,'c'
+	brne USART0_RX_vect_CheckR
+	
+	ldi r24,'\n'
+	call uartWriteChr
+	
+	/* disable debugging, turn off TIMER2, and clear its overflow flag */
+	sts dbgEnabled,r1
+	sts TIMSK2,r1
+	ldi r18,0xff
+	sts TIFR2,r18
+	
+	jmp USART0_RX_vect_Done
+
+USART0_RX_vect_CheckR:
+	/* dump registers */
+	cpi r24,'r'
+	brne USART0_RX_vect_CheckOthers
+	
+	ldi r24,'\n'
+	call uartWriteChr
+	
+	call dbgDumpReg
+	jmp USART0_RX_vect_CmdPrompt
+	
+USART0_RX_vect_CheckOthers:
+	/* ignore other characters */
+	jmp USART0_RX_vect_CmdWait
+#endif
+	
+	
+	/* description: dumps registers (on the stack at Y) to the UART
 	 * parameters:
 	 * - Z (pre-ISR stack pointer)
 	 * no return value
@@ -232,15 +355,15 @@ dbgBreak:
 	 */
 	.type dbgDumpReg,@function
 dbgDumpReg:
-	savez
+	savey
 	push r22
 	push r24
 	
-	sbiw ZL,31
+	sbiw YL,31
 	
 	.macro dumpreg_forreal offset
 	
-	ldd r24,Z+\offset
+	ldd r24,Y+\offset
 	call uartWriteHex8
 	
 	.endm
@@ -289,11 +412,11 @@ dbgDumpReg:
 	
 	.endm
 	
-	.irp reg,31,29,27,25,23,21,19,17,15,13,11,9,7,5,3
+	.irp reg,31,29,27,25,23,21,19,17,15,13,11,9,7,5,3,1
 		dumpreg \reg
 	.endr
 	
 	pop r24
 	pop r22
-	restz
+	resty
 	ret
