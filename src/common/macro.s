@@ -117,6 +117,42 @@
 	out _IO(SREG),r0
 	pop r0
 	
+	.endm      
+	
+	
+	/* save the X register (r27:r26) */
+	.macro savex
+	
+	push XH
+	push XL
+	
+	.endm
+	
+	
+	/* restore the X register (r27:r26) */
+	.macro restx
+	
+	pop XL
+	pop XH
+	
+	.endm
+	
+	
+	/* save the Y register (r29:r28) */
+	.macro savey
+	
+	push YH
+	push YL
+	
+	.endm
+	
+	
+	/* restore the Y register (r29:r28) */
+	.macro resty
+	
+	pop YL
+	pop YH
+	
 	.endm
 	
 	
