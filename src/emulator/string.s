@@ -25,6 +25,10 @@ strDbgPCDump:
 strDbgCmdPrompt:
 	.asciz "dbg] "
 	
+	.global strDbgBadCmd
+strDbgBadCmd:
+	.asciz "Bad command!\n"
+	
 	
 	.global strUartTrue
 strUartTrue:

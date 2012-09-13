@@ -59,13 +59,13 @@ USART0_RX_vect_GetChar:
 	cpi r24,0x03
 	brne USART0_RX_vect_CheckNewline
 	
-	ldi r24,'\n'
-	call uartWriteChr
-	
 	/* if debugging is already on, then ctrl+c should reset the command line */
 	lds r18,dbgEnabled
 	sbrs r18,0
 	jmp USART0_RX_vect_EnableDebugging
+	
+	ldi r24,'\n'
+	call uartWriteChr
 	
 	jmp USART0_RX_vect_CmdPrompt
 	
@@ -80,7 +80,11 @@ USART0_RX_vect_CheckNewline:
 	brne USART0_RX_vect_CheckBackspace
 	call dbgReadCmd
 	
+	/* continue the command prompt only if the return value is zero */
+	sbrs r24,0
 	jmp USART0_RX_vect_CmdPrompt
+	
+	jmp USART0_RX_vect_Done
 	
 USART0_RX_vect_CheckBackspace:
 	/* if a backspace was received, delete a character */
@@ -195,6 +199,9 @@ USART0_RX_vect_CmdWait:
 	jmp USART0_RX_vect_GetChar
 	
 USART0_RX_vect_Done:
+	ldi r24,'\n'
+	call uartWriteChr
+	
 	restsreg
 	restall
 	pop r0
@@ -271,19 +278,73 @@ dbgBreak:
 dbgReadCmd:
 	savez
 	push r18
-	push r24
+	push r25
 	
 	ldi r24,'\n'
-	call uartWrite
+	call uartWriteChr
 	
 	/* do nothing if the buffer is empty */
 	lds r18,dbgCmdLen
 	tst r18
-	breq dbgReadCmd_EmptyBuffer
+	brne dbgReadCmd_NonEmptyBuffer
+	jmp dbgReadCmd_DonePrompt
 	
+dbgReadCmd_NonEmptyBuffer:
 	ldi ZH,hi8(dbgCmdBuffer)
 	ldi ZL,lo8(dbgCmdBuffer)
 	
+	ld r24,Z+
+	
+dbgReadCmd_CheckC:
+	cpi r24,'c'
+	brne dbgReadCmd_CheckS
+	
+	/* disable debugging, turn off TIMER2, and clear its overflow flag */
+	sts dbgEnabled,r1
+	sts TIMSK2,r1
+	ldi r18,0xff
+	sts TIFR2,r18
+	
+	jmp dbgReadCmd_ExitISR
+	
+dbgReadCmd_CheckS:
+	cpi r24,'s'
+	brne dbgReadCmd_CheckR
+	
+	jmp dbgReadCmd_ExitISR
+	
+dbgReadCmd_CheckR:
+	cpi r24,'r'
+	brne dbgReadCmd_BadCmd
+	
+	call dbgDumpReg
+	
+	jmp dbgReadCmd_DonePrompt
+	
+dbgReadCmd_BadCmd:
+	ldi r25,hi8(strDbgBadCmd)
+	ldi r24,lo8(strDbgBadCmd)
+	call uartWritePStr
+	
+	jmp dbgReadCmd_DonePrompt
+	
+dbgReadCmd_DonePrompt:
+	clr r24
+	
+	pop r18
+	pop r25
+	restz
+	ret
+	
+dbgReadCmd_ExitISR:
+	ldi r24,1
+	
+	pop r18
+	pop r25
+	restz
+	ret
+	
+#if 0
 	/* echo the command string */
 dbgReadCmd_Loop:
 	ld r24,Z+
@@ -293,58 +354,10 @@ dbgReadCmd_Loop:
 	brne dbgReadCmd_Loop
 	
 	ldi r24,'\n'
-	call uartWrite
+	call uartWriteChr
+#endif
 	
 	sts dbgCmdLen,r1
-	
-dbgReadCmd_EmptyBuffer:
-	pop r18
-	pop r24
-	restz
-	ret
-	
-#if 0
-USART0_RX_vect_CheckS:
-	/* single step */
-	cpi r24,'s'
-	brne USART0_RX_vect_CheckC
-	
-	ldi r24,'\n'
-	call uartWriteChr
-	
-	jmp USART0_RX_vect_Done
-	
-USART0_RX_vect_CheckC:
-	/* continue execution */
-	cpi r24,'c'
-	brne USART0_RX_vect_CheckR
-	
-	ldi r24,'\n'
-	call uartWriteChr
-	
-	/* disable debugging, turn off TIMER2, and clear its overflow flag */
-	sts dbgEnabled,r1
-	sts TIMSK2,r1
-	ldi r18,0xff
-	sts TIFR2,r18
-	
-	jmp USART0_RX_vect_Done
-
-USART0_RX_vect_CheckR:
-	/* dump registers */
-	cpi r24,'r'
-	brne USART0_RX_vect_CheckOthers
-	
-	ldi r24,'\n'
-	call uartWriteChr
-	
-	call dbgDumpReg
-	jmp USART0_RX_vect_CmdPrompt
-	
-USART0_RX_vect_CheckOthers:
-	/* ignore other characters */
-	jmp USART0_RX_vect_CmdWait
-#endif
 	
 	
 	/* description: dumps registers (on the stack at Y) to the UART
