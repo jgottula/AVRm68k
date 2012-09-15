@@ -1,0 +1,129 @@
+Firmware-Based Debugger Syntax
+
+
+- debugger admin:
+
+  - ?|h|help
+    - show help
+  - reset (no shortcut)
+    - execute a software reset
+  - die (no shortcut)
+    - turn off interrupts and spin forever
+
+
+- flow control:
+
+  - c|continue
+    - continue normal program execution
+  - s|step [n]
+    - execute one instruction
+    - n: execute this many instructions instead (must be >0)
+    - caveat: may skip more instructions when interrupts are disabled
+  - n|next
+    - same as step, but skip over any call/rcall/icall/eicall sequences
+  - f|finish
+    - continue executing until a ret instruction is encountered
+  - g|goto <addr>
+    - addr: 4-digit hex address to which to jump (must be even)
+
+
+- dissassembly:
+
+  - d|disassemble [n] [addr]
+    - no args: dissassemble the next instruction
+    - n: show this many instructions instead of just one
+    - addr: disassemble at this address instead of pc
+
+
+- breakpoints:
+
+  - bs|breakpointset <addr>
+    - ...
+  - bu|breakpointunset
+    - ...
+  - NOTE: when setting breakpoints using the code modification method, display
+    the instruction(s) that will be overwritten disassembled so the developer
+    can determine if writing over them might cause problems
+
+
+- dumping values:
+
+  - dr|dumpreg [group|reg]
+    - no args: dump all registers
+    - group: dump register group (save, clobber, idx, temp, return, arg)
+    - reg: [r0-r31], X, Y, Z, {X,Y,Z}{H,L}, pc
+  - drw|dumpregword [reg]
+    - reg: dump (reg+1):reg represented as a word
+    - the argument given must be even
+  - drl|dumpreglong [reg]
+    - same as dumpregword, but shows (reg+3):reg represented as a long
+    - the argument given must be even and less than or equal to 28
+  
+  - di|dumpio <group|reg|addr>
+    - group: usart0, timer0, pa, pb, etc.
+    - reg: sreg, sp, sph, spl, udr0, porta, ddrb, etc.
+    - addr: two-digit hex representing an io address
+  
+  - dm|dumpmem <addr> <len>
+    - addr: 4-digit hex representing starting addr
+    - len: decimal number of bytes to dump (must be >0)
+    - uses hexdump 16-byte-wide style
+  - dp|dumpprog <addr> <len>
+    - same as dump mem, but dumps from the program memory address space
+  
+  - dv|dumpvect [num|name]
+    - default: dumps all vectors
+    - num: decimal vector number (not the address)
+    - name: TIMER2_COMPA, USART0_TX, etc.
+  - dva|dumpvectaddr <addr>
+    - addr: address of vector to dump
+    - the address must be aligned to the vector size and within the vector table
+    
+  - ds|dumpstack [len]
+    - no args: dump the entire stack
+    - len: only dump this many bytes from the stack pointer
+  - dsw|dumpstackword [len]
+    - same as dumpstack, but shows the stack as two-byte words (len is the same)
+
+
+- writing values:
+
+  - wr|writereg <reg> <value>
+    - reg: [r0-r31], {X,Y,Z}{H,L}
+    - value: two-digit hex value
+  - wrw|writeregword <reg> <value>
+    - reg: X, Y, Z, pc, [r0-r30] as words (if even; see dumpregword)
+    - value: two-digit hex value
+  - wrl|writereglong <reg> <value>
+    - reg: [r0-r28], must be divisible by 2 (see dumpreglong)
+    - value: two-digit hex value
+  
+  - wi|writeio <reg|addr> <value>
+    - reg: see dumpio
+    - addr: see dumpio
+    - value: two-digit hex value
+  - wiw|writeioword <reg|addr> value
+    - same as writeio, but writes word values like sp, ocr0a, etc.
+  
+  - wm|writemem <addr> <len> <byte> [byte] [byte] ...
+    - addr: 4-digit hex representing starting addr
+    - len: decimal number of bytes to write (must be >0)
+  - wp|writeprog
+    - ...
+  
+  - wv|writevect <num|name> <byte0> <byte1> <byte2> <byte3>
+    - num: see dumpvec
+    - name: see dumpvec
+    - byten: two-digit hex value to be written to byte offset n
+  - wva|writevectaddr <addr> <byte0> <byte1> <byte2> <byte3>
+    - same as writevect, but using the vector address (see dumpvectaddr)
+  
+  - pu|push <byte>
+    - pushes the given 2-digit hex byte to the stack
+  - puw|pushword <word>
+    - pushes the given 4-digit hex word to the stack
+  
+  - po|pop
+    - pops the top byte off the stack
+  - pow|popword
+    - pops the top 2 bytes off the stack
