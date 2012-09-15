@@ -40,6 +40,16 @@
 	.endm
 	
 	
+	/* swaps the contents of the two registers (affects flags) */
+	.macro exch reg1 reg2
+	
+	eor \reg1,\reg2
+	eor \reg2,\reg1
+	eor \reg1,\reg2
+	
+	.endm
+	
+	
 	/* push the registers numbered from low to high, inclusive, onto the stack
 	 * in ascending order */
 	.macro savereg low high
