@@ -347,19 +347,6 @@ dbgReadCmd_ExitISR:
 	restz
 	ret
 	
-#if 0
-	/* echo the command string */
-dbgReadCmd_Loop:
-	ld r24,Z+
-	call uartWrite
-	
-	dec r18
-	brne dbgReadCmd_Loop
-	
-	ldi r24,'\n'
-	call uartWriteChr
-#endif
-	
 	
 	/* description: dumps registers (on the stack at Y) to the UART
 	 * parameters:
