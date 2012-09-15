@@ -80,6 +80,9 @@ USART0_RX_vect_CheckNewline:
 	brne USART0_RX_vect_CheckBackspace
 	call dbgReadCmd
 	
+	/* clear the command buffer */
+	sts dbgCmdLen,r1
+	
 	/* continue the command prompt only if the return value is zero */
 	sbrs r24,0
 	jmp USART0_RX_vect_CmdPrompt
@@ -356,8 +359,6 @@ dbgReadCmd_Loop:
 	ldi r24,'\n'
 	call uartWriteChr
 #endif
-	
-	sts dbgCmdLen,r1
 	
 	
 	/* description: dumps registers (on the stack at Y) to the UART
