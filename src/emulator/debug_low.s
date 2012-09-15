@@ -120,7 +120,7 @@ USART0_RX_vect_NotBackspace:
 	
 USART0_RX_vect_Printable0:
 	cpi r24,0x7f
-	brlt USART0_RX_vect_Printable1
+	brlo USART0_RX_vect_Printable1
 	
 	jmp USART0_RX_vect_CmdWait
 	
@@ -128,7 +128,7 @@ USART0_RX_vect_Printable1:
 	/* do nothing if the command buffer is full */
 	lds r18,dbgCmdLen
 	cpi r18,DBG_CMD_BUFFER_SIZE
-	brlt USART0_RX_vect_AppendToBuffer
+	brlo USART0_RX_vect_AppendToBuffer
 	
 	jmp USART0_RX_vect_CmdWait
 	
