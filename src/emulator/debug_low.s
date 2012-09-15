@@ -114,7 +114,7 @@ USART0_RX_vect_BackspaceDone:
 USART0_RX_vect_NotBackspace:
 	/* ignore non-printable characters: 0-31, 127, 128-255 */
 	cpi r24,' '
-	brge USART0_RX_vect_Printable0
+	brsh USART0_RX_vect_Printable0
 	
 	jmp USART0_RX_vect_CmdWait
 	
