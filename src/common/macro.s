@@ -218,3 +218,23 @@
 	ldi \regl,lo8(\imm16)
 	
 	.endm
+	
+	
+	/* compact global ascii declaration */
+	.macro global_ascii label value
+	
+	.global \label
+\label:
+	.ascii value
+	
+	.endm
+	
+	
+	/* compact global asciz declaration */
+	.macro global_asciz label value
+	
+	.global \label
+\label:
+	.asciz value
+	
+	.endm
