@@ -182,3 +182,39 @@
 	pop ZH
 	
 	.endm
+	
+	
+	/* load X with an immediate word */
+	.macro loadx imm16
+	
+	ldi XH,hi8(\imm16)
+	ldi XL,lo8(\imm16)
+	
+	.endm
+	
+	
+	/* load Y with an immediate word */
+	.macro loady imm16
+	
+	ldi YH,hi8(\imm16)
+	ldi YL,lo8(\imm16)
+	
+	.endm
+	
+	
+	/* load Z with an immediate word */
+	.macro loadz imm16
+	
+	ldi ZH,hi8(\imm16)
+	ldi ZL,lo8(\imm16)
+	
+	.endm
+	
+	
+	/* load a register pair with an immediate word */
+	.macro load16 regh regl imm16
+	
+	ldi \regh,hi8(\imm16)
+	ldi \regl,lo8(\imm16)
+	
+	.endm
