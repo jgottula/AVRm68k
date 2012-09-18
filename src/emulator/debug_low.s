@@ -399,8 +399,7 @@ dbgReadCmd_CheckR:
 	jmp dbgReadCmd_DonePrompt
 	
 dbgReadCmd_BadCmd:
-	ldi r25,hi8(strDbgBadCmd)
-	ldi r24,lo8(strDbgBadCmd)
+	load16 r25,r24,strDbgBadCmd
 	call uartWritePStr
 	
 	jmp dbgReadCmd_DonePrompt

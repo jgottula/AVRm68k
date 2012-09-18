@@ -198,16 +198,14 @@ uartWriteBool:
 	tst r24
 	brne uartWriteBool_True
 	
-	ldi r25,hi8(strUartFalse)
-	ldi r24,lo8(strUartFalse)
+	load16 r25,r24,strUartFalse
 	call uartWritePStr
 	
 	pop r25
 	ret
 	
 uartWriteBool_True:
-	ldi r25,hi8(strUartTrue)
-	ldi r24,lo8(strUartTrue)
+	load16 r25,r24,strUartTrue
 	call uartWritePStr
 	
 	pop r25
