@@ -284,7 +284,7 @@ uartWriteHex4:
 	
 	andi r24,0x0f
 	cpi r24,0x0a
-	brge uartWriteHex4_Letter
+	brsh uartWriteHex4_Letter
 	
 	ldi r17,'0'
 	add r24,r17
