@@ -178,8 +178,8 @@ USART0_RX_vect_WritePC:
 	load16 r25,r24,strDbgPCDump
 	call uartWritePStr
 	
-	ldd r25,Y+1
-	ldd r24,Y+2
+	ld r25,Y
+	ldd r24,Y+1
 	reg16_x2 24
 	clr r22
 	call uartWriteHex16
