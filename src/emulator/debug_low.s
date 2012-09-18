@@ -134,8 +134,7 @@ USART0_RX_vect_Printable1:
 	
 USART0_RX_vect_AppendToBuffer:
 	/* append the character to the buffer and echo it */
-	ldi ZH,hi8(dbgCmdBuffer)
-	ldi ZL,lo8(dbgCmdBuffer)
+	loadz dbgCmdBuffer
 	
 	add ZL,r18
 	adc ZH,0
@@ -163,23 +162,20 @@ USART0_RX_vect_EnableDebugging:
 	tst r18
 	breq USART0_RX_vect_UserBreak
 	
-	ldi r25,hi8(strDbgCodeBreak)
-	ldi r24,lo8(strDbgCodeBreak)
+	load16 r25,r24,strDbgCodeBreak
 	
 	/* clear the force break flag */
 	sts dbgForceBreak,r1
 	jmp USART0_RX_vect_WriteBreak
 	
 USART0_RX_vect_UserBreak:
-	ldi r25,hi8(strDbgUserBreak)
-	ldi r24,lo8(strDbgUserBreak)
+	load16 r25,r24,strDbgUserBreak
 	
 USART0_RX_vect_WriteBreak:
 	call uartWritePStr
 	
 USART0_RX_vect_WritePC:
-	ldi r25,hi8(strDbgPCDump)
-	ldi r24,lo8(strDbgPCDump)
+	load16 r25,r24,strDbgPCDump
 	call uartWritePStr
 	
 	ldd r25,Y+1
@@ -193,8 +189,7 @@ USART0_RX_vect_WritePC:
 USART0_RX_vect_CmdPrompt:
 	sts dbgCmdLen,r1
 	
-	ldi r25,hi8(strDbgCmdPrompt)
-	ldi r24,lo8(strDbgCmdPrompt)
+	load16 r25,r24,strDbgCmdPrompt
 	call uartWritePStr
 	
 USART0_RX_vect_CmdWait:
@@ -289,39 +284,65 @@ dbgReadCmd:
 	/* do nothing if the buffer is empty */
 	lds r18,dbgCmdLen
 	tst r18
-	brne dbgReadCmd_NonEmptyBuffer
+	brne dbgReadCmd_CheckHelp
 	jmp dbgReadCmd_DonePrompt
 	
-dbgReadCmd_NonEmptyBuffer:
-	ldi ZH,hi8(dbgCmdBuffer)
-	ldi ZL,lo8(dbgCmdBuffer)
-	
-	ld r24,Z+
-	
 dbgReadCmd_CheckHelp:
-	ldi r25,hi8(dbgCmdBuffer)
-	ldi r24,lo8(dbgCmdBuffer)
-	ldi r23,hi8(strDbgCmdHelp)
-	ldi r22,lo8(strDbgCmdHelp)
-	clr r21
-	lds r20,dbgCmdLen
-	call strncasecmp_PF
-	
+	loadz strDbgCmdHelp
+	ldi r24,4
+	call dbgCheckCmd
 	tst r24
-	brne dbgReadCmd_CheckC
-	tst r25
-	brne dbgReadCmd_CheckC
-	
-	/*cpi r24,'h'
 	breq dbgReadCmd_ExecHelp
-	cpi r24,'?'
-	breq dbgReadCmd_ExecHelp*/
+	
+	loadz strDbgCmdHelpShort1
+	ldi r24,1
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecHelp
+	
+	loadz strDbgCmdHelpShort2
+	ldi r24,1
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecHelp
+	
+	jmp dbgReadCmd_CheckReset
 	
 dbgReadCmd_ExecHelp:
 	ldi r24,'H'
 	call uartWrite
+	ldi r24,'\n'
+	call uartWriteChr
 	
 	jmp dbgReadCmd_DonePrompt
+	
+dbgReadCmd_CheckReset:
+	loadz strDbgCmdReset
+	ldi r24,5
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecReset
+	
+	jmp dbgReadCmd_CheckDie
+	
+dbgReadCmd_ExecReset:
+	jmp reset
+	
+dbgReadCmd_CheckDie:
+	loadz strDbgCmdDie
+	ldi r24,3
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecDie
+	
+	jmp dbgReadCmd_CheckC
+	
+dbgReadCmd_ExecDie:
+	/* disable interrupts and loop forever */
+	cli
+	
+dbgReadCmd_ExecDie_Loop:
+	jmp dbgReadCmd_ExecDie_Loop
 	
 dbgReadCmd_CheckC:
 	cpi r24,'c'
@@ -445,4 +466,46 @@ dbgDumpReg:
 	pop r24
 	pop r22
 	resty
+	ret
+	
+	
+	/* description: checks the command string against a pstr
+	 * parameters:
+	 * - Z (pstr addr) [not saved]
+	 * - r18 (str length) [saved]
+	 * - r24 (pstr length) [cannot be zero]
+	 * returns: r24 (nonzero if not matched)
+	 * not public
+	 */
+	.type dbgCheckCmd,@function
+dbgCheckCmd:
+	cp r18,r24
+	breq dbgCheckCmd_Check
+	
+	/* r24 must be nonzero at this point */
+	ret
+	
+dbgCheckCmd_Check:
+	push r20
+	push r21
+	savex
+	
+	loadx dbgCmdBuffer
+	
+dbgCheckCmd_Loop:
+	ld r20,X+
+	lpm r21,Z+
+	
+	cp r20,r21
+	brne dbgCheckCmd_Done
+	
+	dec r24
+	brne dbgCheckCmd_Loop
+	
+	/* if we made it successfully thru the loop, r24 will be zero */
+	
+dbgCheckCmd_Done:
+	pop r21
+	pop r20
+	restx
 	ret

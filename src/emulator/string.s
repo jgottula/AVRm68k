@@ -31,13 +31,19 @@ strDbgBadCmd:
 	
 	.global strDbgCmdHelp
 strDbgCmdHelp:
-	.asciz "help "
+	.ascii "help"
 	.global strDbgCmdHelpShort1
 strDbgCmdHelpShort1:
-	.asciz "h "
+	.ascii "h"
 	.global strDbgCmdHelpShort2
 strDbgCmdHelpShort2:
-	.asciz "? "
+	.ascii "?"
+	.global strDbgCmdReset
+strDbgCmdReset:
+	.ascii "reset"
+	.global strDbgCmdDie
+strDbgCmdDie:
+	.ascii "die"
 	
 	
 	.global strUartTrue
