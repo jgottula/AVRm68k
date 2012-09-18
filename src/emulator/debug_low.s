@@ -298,6 +298,31 @@ dbgReadCmd_NonEmptyBuffer:
 	
 	ld r24,Z+
 	
+dbgReadCmd_CheckHelp:
+	ldi r25,hi8(dbgCmdBuffer)
+	ldi r24,lo8(dbgCmdBuffer)
+	ldi r23,hi8(strDbgCmdHelp)
+	ldi r22,lo8(strDbgCmdHelp)
+	clr r21
+	lds r20,dbgCmdLen
+	call strncasecmp_PF
+	
+	tst r24
+	brne dbgReadCmd_CheckC
+	tst r25
+	brne dbgReadCmd_CheckC
+	
+	/*cpi r24,'h'
+	breq dbgReadCmd_ExecHelp
+	cpi r24,'?'
+	breq dbgReadCmd_ExecHelp*/
+	
+dbgReadCmd_ExecHelp:
+	ldi r24,'H'
+	call uartWrite
+	
+	jmp dbgReadCmd_DonePrompt
+	
 dbgReadCmd_CheckC:
 	cpi r24,'c'
 	brne dbgReadCmd_CheckS

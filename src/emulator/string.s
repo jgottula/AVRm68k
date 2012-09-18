@@ -27,7 +27,17 @@ strDbgCmdPrompt:
 	
 	.global strDbgBadCmd
 strDbgBadCmd:
-	.asciz "Bad command!\n"
+	.asciz "Syntax error.\n"
+	
+	.global strDbgCmdHelp
+strDbgCmdHelp:
+	.asciz "help "
+	.global strDbgCmdHelpShort1
+strDbgCmdHelpShort1:
+	.asciz "h "
+	.global strDbgCmdHelpShort2
+strDbgCmdHelpShort2:
+	.asciz "? "
 	
 	
 	.global strUartTrue
