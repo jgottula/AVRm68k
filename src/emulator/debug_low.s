@@ -385,10 +385,64 @@ dbgReadCmd_ExecStep:
 	jmp dbgReadCmd_ExitISR
 	
 dbgReadCmd_CheckNext:
+	loadz strDbgCmdNext
+	ldi r24,4
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecNext
 	
+	loadz strDbgCmdNextShort
+	ldi r24,1
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecNext
 	
+	jmp dbgReadCmd_CheckFinish
 	
+dbgReadCmd_ExecNext:
+	load16 r25,r24,strDbgNotImplemented
+	call uartWritePStr
+	jmp dbgReadCmd_DonePrompt
 	
+dbgReadCmd_CheckFinish:
+	loadz strDbgCmdFinish
+	ldi r24,6
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecFinish
+	
+	loadz strDbgCmdFinishShort
+	ldi r24,1
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecFinish
+	
+	jmp dbgReadCmd_CheckGoto
+	
+dbgReadCmd_ExecFinish:
+	load16 r25,r24,strDbgNotImplemented
+	call uartWritePStr
+	jmp dbgReadCmd_DonePrompt
+	
+dbgReadCmd_CheckGoto:
+	loadz strDbgCmdGoto
+	ldi r24,4
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecGoto
+	
+	loadz strDbgCmdGotoShort
+	ldi r24,1
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecGoto
+	
+	jmp dbgReadCmd_CheckR
+	
+dbgReadCmd_ExecGoto:
+	load16 r25,r24,strDbgNotImplemented
+	call uartWritePStr
+	jmp dbgReadCmd_DonePrompt
 	
 dbgReadCmd_CheckR:
 	cpi r24,'r'

@@ -15,6 +15,7 @@
 	global_asciz strDbgPCDump,"PC = 0x"
 	global_asciz strDbgCmdPrompt,"dbg] "
 	global_asciz strDbgBadCmd,"Syntax error.\n"
+	global_asciz strDbgNotImplemented,"Not implemented.\n"
 	
 	.global strDbgHelp
 strDbgHelp:
