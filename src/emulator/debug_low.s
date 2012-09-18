@@ -333,7 +333,7 @@ dbgReadCmd_CheckDie:
 	tst r24
 	breq dbgReadCmd_ExecDie
 	
-	jmp dbgReadCmd_CheckC
+	jmp dbgReadCmd_CheckContinue
 	
 dbgReadCmd_ExecDie:
 	/* disable interrupts and loop forever */
@@ -342,10 +342,22 @@ dbgReadCmd_ExecDie:
 dbgReadCmd_ExecDie_Loop:
 	jmp dbgReadCmd_ExecDie_Loop
 	
-dbgReadCmd_CheckC:
-	cpi r24,'c'
-	brne dbgReadCmd_CheckS
+dbgReadCmd_CheckContinue:
+	loadz strDbgCmdContinue
+	ldi r24,8
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecContinue
 	
+	loadz strDbgCmdContinueShort
+	ldi r24,1
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecContinue
+	
+	jmp dbgReadCmd_CheckStep
+	
+dbgReadCmd_ExecContinue:
 	/* disable debugging, turn off TIMER2, and clear its overflow flag */
 	sts dbgEnabled,r1
 	sts TIMSK2,r1
@@ -354,11 +366,29 @@ dbgReadCmd_CheckC:
 	
 	jmp dbgReadCmd_ExitISR
 	
-dbgReadCmd_CheckS:
-	cpi r24,'s'
-	brne dbgReadCmd_CheckR
+dbgReadCmd_CheckStep:
+	loadz strDbgCmdStep
+	ldi r24,4
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecStep
 	
+	loadz strDbgCmdStepShort
+	ldi r24,1
+	call dbgCheckCmd
+	tst r24
+	breq dbgReadCmd_ExecStep
+	
+	jmp dbgReadCmd_CheckNext
+	
+dbgReadCmd_ExecStep:
 	jmp dbgReadCmd_ExitISR
+	
+dbgReadCmd_CheckNext:
+	
+	
+	
+	
 	
 dbgReadCmd_CheckR:
 	cpi r24,'r'

@@ -9,25 +9,12 @@
 	.section .text
 	
 	
-	.global strDbgUserBreak
-strDbgUserBreak:
-	.asciz "\nUser Break (^C)\n"
+	global_asciz strDbgUserBreak,"\nUser Break (^C)\n"
+	global_asciz strDbgCodeBreak,"\nCode Break (dbgBreak)\n"
 	
-	.global strDbgCodeBreak
-strDbgCodeBreak:
-	.asciz "\nCode Break (dbgBreak)\n"
-	
-	.global strDbgPCDump
-strDbgPCDump:
-	.asciz "PC = 0x"
-	
-	.global strDbgCmdPrompt
-strDbgCmdPrompt:
-	.asciz "dbg] "
-	
-	.global strDbgBadCmd
-strDbgBadCmd:
-	.asciz "Syntax error.\n"
+	global_asciz strDbgPCDump,"PC = 0x"
+	global_asciz strDbgCmdPrompt,"dbg] "
+	global_asciz strDbgBadCmd,"Syntax error.\n"
 	
 	.global strDbgHelp
 strDbgHelp:
@@ -67,30 +54,26 @@ strDbgHelp:
 	.ascii "  rI     X, Y, or Z\n"
 	.asciz ""
 	
-	.global strDbgCmdHelp
-strDbgCmdHelp:
-	.ascii "help"
-	.global strDbgCmdHelpShort1
-strDbgCmdHelpShort1:
-	.ascii "h"
-	.global strDbgCmdHelpShort2
-strDbgCmdHelpShort2:
-	.ascii "?"
-	.global strDbgCmdReset
-strDbgCmdReset:
-	.ascii "reset"
-	.global strDbgCmdDie
-strDbgCmdDie:
-	.ascii "die"
+	global_ascii strDbgCmdHelp,"help"
+	global_ascii strDbgCmdHelpShort1,"h"
+	global_ascii strDbgCmdHelpShort2,"?"
 	
+	global_ascii strDbgCmdReset,"reset"
+	global_ascii strDbgCmdDie,"die"
 	
-	.global strUartTrue
-strUartTrue:
-	.asciz "true"
+	global_ascii strDbgCmdContinue,"continue"
+	global_ascii strDbgCmdContinueShort,"c"
+	global_ascii strDbgCmdStep,"step"
+	global_ascii strDbgCmdStepShort,"s"
+	global_ascii strDbgCmdNext,"next"
+	global_ascii strDbgCmdNextShort,"next"
+	global_ascii strDbgCmdFinish,"finish"
+	global_ascii strDbgCmdFinishShort,"f"
+	global_ascii strDbgCmdGoto,"goto"
+	global_ascii strDbgCmdGotoShort,"g"
 	
-	.global strUartFalse
-strUartFalse:
-	.asciz "false"
+	global_asciz strUartTrue,"true"
+	global_asciz strUartFalse,"false"
 	
 	
 	/* ensure that cpu instructions are aligned to word boundaries */
