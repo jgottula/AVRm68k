@@ -29,6 +29,27 @@ strDbgCmdPrompt:
 strDbgBadCmd:
 	.asciz "Syntax error.\n"
 	
+	.global strDbgHelp
+strDbgHelp:
+	.ascii "\n"
+	.ascii "  command   short  args  description\n"
+	.ascii "meta:\n"
+	.ascii "  help      h|?          this help\n"
+	.ascii "system:\n"
+	.ascii "  reset                  software reset\n"
+	.ascii "  die                    hard lock-up\n"
+	.ascii "control:\n"
+	.ascii "  continue  c            resume execution\n"
+	.ascii "  step      s      [n]   single step, optionally n times\n"
+	.ascii "  next      n      [n]   same as step, but step over calls\n"
+	.ascii "\n"
+	.ascii "types:\n"
+	.ascii "  d     dec number, 0+\n"
+	.ascii "  n     dec number, 1+\n"
+	.ascii "  hh    hex number, 2 digits\n"
+	.ascii "  hhhh  hex number, 4 digits\n"
+	.asciz ""
+	
 	.global strDbgCmdHelp
 strDbgCmdHelp:
 	.ascii "help"

@@ -309,10 +309,8 @@ dbgReadCmd_CheckHelp:
 	jmp dbgReadCmd_CheckReset
 	
 dbgReadCmd_ExecHelp:
-	ldi r24,'H'
-	call uartWrite
-	ldi r24,'\n'
-	call uartWriteChr
+	load16 r25,r24,strDbgHelp
+	call uartWritePStr
 	
 	jmp dbgReadCmd_DonePrompt
 	
