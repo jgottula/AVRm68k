@@ -39,7 +39,7 @@ strDbgHelp:
 		.ascii "resume execution\n"
 	.ascii "  step      s      [n=1]        "
 		.ascii "single step one or more in structions\n"
-	.ascii "  next      n      [n=1]       "
+	.ascii "  next      n      [n=1]        "
 		.ascii "same as step, but skip calls\n"
 	.ascii "  finish    f                   "
 		.ascii "run until a ret instruction is executed\n"
